@@ -1,5 +1,5 @@
 {
-  "name": "hyperflow",
+  "name": "flowstate",
   "version": "0.0.0",
   "description": "Transactional, stateful flows using page-based navigation.",
   "author": {
