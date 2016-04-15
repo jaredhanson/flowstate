@@ -1,7 +1,7 @@
 {
-  "name": "statefulness",
+  "name": "hyperflow",
   "version": "0.0.0",
-  "description": "State management",
+  "description": "Transactional, stateful flows using page-based navigation.",
   "author": {
     "name": "Jared Hanson",
     "email": "jaredhanson@gmail.com",
