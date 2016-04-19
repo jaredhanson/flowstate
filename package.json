@@ -29,5 +29,8 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha test/*.test.js"
+  },
+  "dependencies": {
+    "uid-safe": "^2.1.0"
   }
 }
