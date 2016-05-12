@@ -31,6 +31,7 @@
     "test": "node_modules/.bin/mocha test/*.test.js"
   },
   "dependencies": {
+    "clone": "^1.0.2",
     "uid-safe": "^2.1.0"
   }
 }
