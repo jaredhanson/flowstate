@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "clone": "^1.0.2",
-    "uid-safe": "^2.1.0"
+    "uid-safe": "^2.1.0",
+    "utils-flatten": "^1.0.0"
   }
 }
