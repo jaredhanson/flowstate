@@ -1,13 +1,19 @@
 /* global describe, it */
 
-var pkg = require('..');
+var flowstate = require('..');
 var expect = require('chai').expect;
 
 
-describe('statefulness', function() {
+describe('flowstate', function() {
   
-  it('should export hello world', function() {
-    expect(pkg.hello).to.equal('world');
+  it('should export constructors', function() {
+    expect(flowstate.Manager).to.be.a('function');
+    expect(flowstate.SessionStore).to.be.a('function');
+  });
+  
+  it('should export Error constructors', function() {
+    expect(flowstate.ExpiredStateError).to.be.a('function');
+    expect(flowstate.MissingStateError).to.be.a('function');
   });
   
 });
