@@ -148,4 +148,49 @@ describe('load', function() {
     });
   });
   
+  describe('encountering an error loading state', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(new Error('something went wrong'));
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store))
+        .req(function(req) {
+          request = req;
+          req.body = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal('something went wrong');
+    });
+    
+    it('should not set state', function() {
+      expect(request.state).to.be.undefined;
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
 });
