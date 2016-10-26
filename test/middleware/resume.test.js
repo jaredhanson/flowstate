@@ -89,6 +89,70 @@ describe('middleware/resume', function() {
     });
   });
   
+  describe('attempting to resume previous state from current state', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, undefined);
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+    });
+    
+    after(function() {
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(resumeState(dispatcher, store))
+        .req(function(req) {
+          request = req;
+          request.state = { handle: '22345678', name: 'bar', y: 2 };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should not set state', function() {
+      expect(request.state).to.be.undefined;
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should call store#destroy', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should not call store#load', function() {
+      expect(store.load).to.not.have.been.called;
+    });
+    
+    it('should not call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.not.have.been.called;
+    });
+  });
+  
   describe('attempting to resume previous state without current state', function() {
     var dispatcher = {
       _resume: function(){}
