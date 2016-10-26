@@ -12,7 +12,7 @@ describe('load', function() {
     expect(loadState(store).name).to.equal('loadState');
   });
   
-  describe('loading state without state query parameter', function() {
+  describe('loading state with state query parameter', function() {
     var store = {
       load: function(){}
     };
@@ -52,7 +52,55 @@ describe('load', function() {
       });
     });
     
-    it('should not call store#load', function() {
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
+  describe('loading state with state body parameter', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, { name: 'test', x: 1 });
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store))
+        .req(function(req) {
+          request = req;
+          req.body = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'test',
+        x: 1
+      });
+    });
+    
+    it('should call store#load', function() {
       expect(store.load).to.have.been.calledOnce;
       var call = store.load.getCall(0);
       expect(call.args[0]).to.equal(request);
