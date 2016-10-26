@@ -1,11 +1,10 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , loadState = require('../../lib/middleware/load')
-  , Dispatcher = require('../../lib/manager');
+  , loadState = require('../../lib/middleware/load');
 
 
-describe('load', function() {
+describe('middleware/load', function() {
   
   it('should be named loadState', function() {
     var store = new Object();
