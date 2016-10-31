@@ -14,7 +14,8 @@ describe('middleware/resume', function() {
   
   describe('resuming previous state from current state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -25,9 +26,11 @@ describe('middleware/resume', function() {
       sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
       sinon.stub(store, 'destroy').yields(null);
       sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
     });
     
     after(function() {
+      dispatcher._transition.restore();
       dispatcher._resume.restore();
       store.destroy.restore();
       store.load.restore();
