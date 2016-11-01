@@ -386,7 +386,13 @@ describe('middleware/resume', function() {
     });
     
     it('should not set state', function() {
-      expect(request.state).to.be.undefined;
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
     });
     
     it('should not set yieldState', function() {
