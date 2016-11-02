@@ -12,7 +12,7 @@ describe('middleware/resume', function() {
     expect(resumeState(dispatcher, store).name).to.equal('resumeState');
   });
   
-  describe('resuming previous state from current state', function() {
+  describe('resuming previous named state from current named state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -87,14 +87,24 @@ describe('middleware/resume', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.equal('bar');
+    });
+    
     it('should call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.have.been.calledOnce;
+      var call = dispatcher._resume.getCall(0);
+      expect(call.args[0]).to.equal('foo');
     });
   });
   
-  describe('attempting to resume previous state from current state', function() {
+  describe('attempting to resume previous state from current named state and proceeding to default behavior', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -105,9 +115,11 @@ describe('middleware/resume', function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
       sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
     });
     
     after(function() {
+      dispatcher._transition.restore();
       dispatcher._resume.restore();
       store.destroy.restore();
       store.load.restore();
@@ -132,8 +144,13 @@ describe('middleware/resume', function() {
       expect(err).to.be.undefined;
     });
     
-    it('should not set state', function() {
-      expect(request.state).to.be.undefined;
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2
+      });
     });
     
     it('should not set yieldState', function() {
@@ -151,6 +168,10 @@ describe('middleware/resume', function() {
       expect(store.load).to.not.have.been.called;
     });
     
+    it('should not call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.not.have.been.called;
+    });
+    
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
@@ -158,7 +179,8 @@ describe('middleware/resume', function() {
   
   describe('attempting to resume previous state without current state', function() {
     var dispatcher = {
-      _resume: function(){}
+      _resume: function(){},
+      _transition: function(){}
     };
     var store = {
       load: function(){},
@@ -169,9 +191,11 @@ describe('middleware/resume', function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
       sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
     });
     
     after(function() {
+      dispatcher._transition.restore();
       dispatcher._resume.restore();
       store.destroy.restore();
       store.load.restore();
@@ -197,11 +221,18 @@ describe('middleware/resume', function() {
     
     it('should not set state', function() {
       expect(request.state).to.be.undefined;
+    });
+    
+    it('should not set yieldState', function() {
       expect(request.yieldState).to.be.undefined;
     });
     
     it('should not call store#load', function() {
       expect(store.load).to.not.have.been.called;
+    });
+    
+    it('should not call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.not.have.been.called;
     });
     
     it('should not call dispatcher#_resume', function() {
@@ -211,7 +242,8 @@ describe('middleware/resume', function() {
   
   describe('attempting to resume previous state, which fails to be loaded', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -222,9 +254,11 @@ describe('middleware/resume', function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
       sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
     });
     
     after(function() {
+      dispatcher._transition.restore();
       dispatcher._resume.restore();
       store.destroy.restore();
       store.load.restore();
@@ -386,13 +420,7 @@ describe('middleware/resume', function() {
     });
     
     it('should not set state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state).to.deep.equal({
-        handle: '22345678',
-        name: 'bar',
-        y: 2,
-        prev: '12345678'
-      });
+      expect(request.state).to.be.undefined;
     });
     
     it('should not set yieldState', function() {
