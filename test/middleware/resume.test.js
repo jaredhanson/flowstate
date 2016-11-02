@@ -240,7 +240,7 @@ describe('middleware/resume', function() {
     });
   });
   
-  describe('attempting to resume previous state, which fails to be loaded', function() {
+  describe.skip('attempting to resume previous state, which fails to be loaded', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -313,7 +313,7 @@ describe('middleware/resume', function() {
     });
   });
   
-  describe('encountering an error destroying state', function() {
+  describe.skip('encountering an error destroying state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -378,7 +378,7 @@ describe('middleware/resume', function() {
     });
   });
   
-  describe('encountering an error loading state', function() {
+  describe.skip('encountering an error loading state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
