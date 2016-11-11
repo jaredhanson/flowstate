@@ -101,6 +101,105 @@ describe('middleware/resume', function() {
     });
   });
   
+  describe('resuming previous state without current state, where current state is loaded and resumes', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      var stub = sinon.stub(store, 'load');
+      stub.onCall(0).yields(null, { handle: '22345678', name: 'bar', y: 2, prev: '12345678' })
+      stub.onCall(1).yields(null, { name: 'foo', x: 1 });
+      
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
+    });
+    
+    after(function() {
+      dispatcher._transition.restore();
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(resumeState(dispatcher, store, { from: 'bar' }))
+        .req(function(req) {
+          request = req;
+          req.query = { state: '22345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
+    });
+    
+    it('should call store#load to load current state', function() {
+      expect(store.load).to.have.been.calledTwice;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should call store#destroy to destroy current state', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should call store#load to load previous state', function() {
+      expect(store.load).to.have.been.calledTwice;
+      var call = store.load.getCall(1);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+    
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.equal('bar');
+    });
+    
+    it('should call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.have.been.calledOnce;
+      var call = dispatcher._resume.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+    });
+  });
+  
   describe('attempting to resume previous state from current state and proceeding to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
