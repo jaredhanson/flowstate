@@ -235,6 +235,10 @@ describe('middleware/resume', function() {
       expect(err).to.be.undefined;
     });
     
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
     it('should preserve state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
@@ -263,6 +267,7 @@ describe('middleware/resume', function() {
       expect(dispatcher._resume).to.have.been.calledOnce;
       var call = dispatcher._resume.getCall(0);
       expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.be.undefined;
     });
   });
   
