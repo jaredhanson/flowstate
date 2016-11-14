@@ -55,7 +55,7 @@ describe('middleware/resume', function() {
       expect(err).to.be.undefined;
     });
     
-    it('should set skip errror flag', function() {
+    it('should set skip error flag', function() {
       expect(request._skipResumeError).to.equal(true);
     });
     
@@ -150,6 +150,10 @@ describe('middleware/resume', function() {
       expect(err).to.be.undefined;
     });
     
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
     it('should preserve state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
@@ -177,12 +181,14 @@ describe('middleware/resume', function() {
       var call = dispatcher._transition.getCall(0);
       expect(call.args[0]).to.equal('bar');
       expect(call.args[1]).to.equal('baz');
+      expect(call.args[2]).to.be.null;
     });
     
     it('should call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.have.been.calledOnce;
       var call = dispatcher._resume.getCall(0);
       expect(call.args[0]).to.equal('bar');
+      expect(call.args[1]).to.be.undefined;
     });
   });
   
