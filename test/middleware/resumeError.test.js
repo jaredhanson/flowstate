@@ -188,4 +188,80 @@ describe('middleware/resumeError', function() {
     });
   });
   
+  describe('resuming previous state without current state, but optimized previous state', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(err); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null);
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
+    });
+    
+    after(function() {
+      dispatcher._transition.restore();
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(resumeStateError(dispatcher, store))
+        .req(function(req) {
+          request = req;
+          request._state = { name: 'foo', x: 1 };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch(new Error('something went wrong'));
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should not call store#destroy', function() {
+      expect(store.destroy).to.not.have.been.called;
+    });
+    
+    it('should not call store#load', function() {
+      expect(store.load).to.not.have.been.called;
+    });
+    
+    it('should not call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.not.have.been.called;
+    });
+    
+    it('should call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.have.been.calledOnce;
+      var call = dispatcher._resume.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.be.an.instanceOf(Error);
+      expect(call.args[1].message).to.equal('something went wrong');
+    });
+  });
+  
 });
