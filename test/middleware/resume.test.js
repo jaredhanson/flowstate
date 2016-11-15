@@ -502,6 +502,10 @@ describe('middleware/resume', function() {
       expect(err).to.be.undefined;
     });
     
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
     it('should preserve state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
@@ -576,6 +580,10 @@ describe('middleware/resume', function() {
     
     it('should not error', function() {
       expect(err).to.be.undefined;
+    });
+    
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
     });
     
     it('should set state', function() {
@@ -654,6 +662,10 @@ describe('middleware/resume', function() {
     
     it('should not error', function() {
       expect(err).to.be.undefined;
+    });
+    
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
     });
     
     it('should not set state', function() {
