@@ -622,7 +622,7 @@ describe('middleware/resume', function() {
     });
   }); // attempting to resume previous state where current state is loaded and proceeds to default behavior
   
-  describe('attempting to resume previous state without current state and request parameters', function() {
+  describe('attempting to resume previous state without current state and without state parameters', function() {
     var dispatcher = {
       _resume: function(){},
       _transition: function(){}
@@ -687,9 +687,9 @@ describe('middleware/resume', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state without current state and request parameters
+  }); // attempting to resume previous state without current state and without state parameters
   
-  describe.skip('attempting to resume previous state, which fails to be loaded', function() {
+  describe('attempting to resume previous state which fails to be loaded', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -735,8 +735,18 @@ describe('middleware/resume', function() {
       expect(err.handle).to.equal('12345678');
     });
     
-    it('should not set state', function() {
-      expect(request.state).to.be.undefined;
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
     });
     
     it('should not set yieldState', function() {
@@ -760,9 +770,9 @@ describe('middleware/resume', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state which fails to be loaded
   
-  describe.skip('encountering an error destroying state', function() {
+  describe('encountering an error destroying current state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -803,8 +813,18 @@ describe('middleware/resume', function() {
       expect(err.message).to.equal('something went wrong destroying state');
     });
     
-    it('should not set state', function() {
-      expect(request.state).to.be.undefined;
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
     });
     
     it('should not set yieldState', function() {
@@ -827,7 +847,7 @@ describe('middleware/resume', function() {
     });
   });
   
-  describe.skip('encountering an error loading state', function() {
+  describe('encountering an error loading previous state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -868,8 +888,18 @@ describe('middleware/resume', function() {
       expect(err.message).to.equal('something went wrong loading state');
     });
     
-    it('should not set state', function() {
-      expect(request.state).to.be.undefined;
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
     });
     
     it('should not set yieldState', function() {
