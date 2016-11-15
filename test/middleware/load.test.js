@@ -474,7 +474,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading required named state without handle', function() {
+  describe('loading specifically requested and required state without handle', function() {
     var store = {
       load: function(){}
     };

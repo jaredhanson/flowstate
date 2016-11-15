@@ -539,7 +539,7 @@ describe('middleware/resume', function() {
     });
   }); // attempting to resume previous state from current state and proceeding to default behavior
   
-  describe('attempting to resume previous state without current state, where current state is loaded and proceeds to default behavior', function() {
+  describe('attempting to resume previous state where current state is loaded and proceeds to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -620,9 +620,9 @@ describe('middleware/resume', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state where current state is loaded and proceeds to default behavior
   
-  describe('attempting to resume previous state without current state and no state handle', function() {
+  describe('attempting to resume previous state without current state and request parameters', function() {
     var dispatcher = {
       _resume: function(){},
       _transition: function(){}
@@ -687,7 +687,7 @@ describe('middleware/resume', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state without current state and request parameters
   
   describe.skip('attempting to resume previous state, which fails to be loaded', function() {
     var dispatcher = {
