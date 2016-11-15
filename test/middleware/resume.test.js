@@ -105,7 +105,7 @@ describe('middleware/resume', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  });
+  }); // resuming previous state from current state
   
   describe('resuming previous state with non-yielding state', function() {
     var dispatcher = {
@@ -190,9 +190,9 @@ describe('middleware/resume', function() {
       expect(call.args[0]).to.equal('bar');
       expect(call.args[1]).to.be.undefined;
     });
-  });
+  }); // resuming previous state with non-yielding state
   
-  describe('resuming previous state without current state, but optimized previous state', function() {
+  describe('resuming previous state with optimized previous state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -269,9 +269,9 @@ describe('middleware/resume', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  });
+  }); // resuming previous state with optimized previous state
   
-  describe('resuming explicitly named previous state without current state, but optimized previous state', function() {
+  describe('resuming previous state with optimized previous state from named state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -352,9 +352,9 @@ describe('middleware/resume', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  });
+  }); // resuming previous state with optimized previous state from named state
   
-  describe('resuming previous state without current state, where current state is loaded and resumes', function() {
+  describe('resuming previous state where current state is loaded and resumes', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -457,7 +457,7 @@ describe('middleware/resume', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  });
+  }); // resuming previous state where current state is loaded and resumes
   
   describe('attempting to resume previous state from current state and proceeding to default behavior', function() {
     var dispatcher = {
@@ -537,7 +537,7 @@ describe('middleware/resume', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state from current state and proceeding to default behavior
   
   describe('attempting to resume previous state without current state, where current state is loaded and proceeds to default behavior', function() {
     var dispatcher = {
