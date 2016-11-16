@@ -103,7 +103,7 @@ describe('middleware/resumeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  });
+  }); // resuming previous state from current state
   
   describe('resuming previous state with non-yielding state', function() {
     var dispatcher = {
@@ -186,9 +186,9 @@ describe('middleware/resumeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  });
+  }); // resuming previous state with non-yielding state
   
-  describe('resuming previous state without current state, but optimized previous state', function() {
+  describe('resuming previous state with optimized previous state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -262,9 +262,9 @@ describe('middleware/resumeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  });
+  }); // resuming previous state with optimized previous state
   
-  describe('resuming explicitly named previous state without current state, but optimized previous state', function() {
+  describe('resuming previous state with optimized previous state from named state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -343,9 +343,9 @@ describe('middleware/resumeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  });
+  }); // resuming previous state with optimized previous state from named state
   
-  describe('resuming previous state without current state, where current state is loaded and resumes', function() {
+  describe('resuming previous state where current state is loaded and resumes', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -446,7 +446,7 @@ describe('middleware/resumeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  });
+  }); // resuming previous state where current state is loaded and resumes
   
   describe('attempting to resume previous state from current state and proceeding to default behavior', function() {
     var dispatcher = {
@@ -487,7 +487,7 @@ describe('middleware/resumeError', function() {
         .dispatch(new Error('something went wrong'));
     });
     
-    it('should not error', function() {
+    it('should continue with error', function() {
       expect(err).to.be.an.instanceOf(Error);
       expect(err.message).to.equal('something went wrong');
     });
@@ -523,9 +523,9 @@ describe('middleware/resumeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state from current state and proceeding to default behavior
   
-  describe('attempting to resume previous state without current state, where current state is loaded and proceeds to default behavior', function() {
+  describe('attempting to resume previous state where current state is loaded and proceeds to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -564,7 +564,7 @@ describe('middleware/resumeError', function() {
         .dispatch(new Error('something went wrong'));
     });
     
-    it('should not error', function() {
+    it('should continue with error', function() {
       expect(err).to.be.an.instanceOf(Error);
       expect(err.message).to.equal('something went wrong');
     });
@@ -603,9 +603,9 @@ describe('middleware/resumeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state where current state is loaded and proceeds to default behavior
   
-  describe('attempting to resume previous state without current state and no state handle', function() {
+  describe('attempting to resume previous state without current state and without state parameters', function() {
     var dispatcher = {
       _resume: function(){},
       _transition: function(){}
@@ -643,7 +643,7 @@ describe('middleware/resumeError', function() {
         .dispatch(new Error('something went wrong'));
     });
     
-    it('should not error', function() {
+    it('should continue with error', function() {
       expect(err).to.be.an.instanceOf(Error);
       expect(err.message).to.equal('something went wrong');
     });
@@ -667,6 +667,6 @@ describe('middleware/resumeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // attempting to resume previous state without current state and without state parameters
   
 });
