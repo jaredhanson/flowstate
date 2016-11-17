@@ -1,15 +1,15 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , resumeState = require('../../lib/middleware/resume');
+  , completeState = require('../../lib/middleware/complete');
 
 
-describe('middleware/resume', function() {
+describe('middleware/complete', function() {
   
-  it('should be named resumeState', function() {
+  it('should be named completeState', function() {
     var dispatcher = new Object();
     var store = new Object();
-    expect(resumeState(dispatcher, store).name).to.equal('resumeState');
+    expect(completeState(dispatcher, store).name).to.equal('completeState');
   });
   
   describe('resuming previous state from current state', function() {
@@ -39,7 +39,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
@@ -134,7 +134,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store, { name: 'baz' }))
+      chai.connect.use(completeState(dispatcher, store, { name: 'baz' }))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
@@ -219,7 +219,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request._state = { name: 'foo', x: 1 };
@@ -298,7 +298,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store, { name: 'bar' }))
+      chai.connect.use(completeState(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           request._state = { name: 'foo', x: 1 };
@@ -384,7 +384,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store, { name: 'bar' }))
+      chai.connect.use(completeState(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           req.query = { state: '22345678' };
@@ -486,7 +486,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2 };
@@ -566,7 +566,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store, { name: 'bar' }))
+      chai.connect.use(completeState(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           req.query = { state: '22345678' };
@@ -649,7 +649,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
         })
@@ -716,7 +716,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
@@ -796,7 +796,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
@@ -871,7 +871,7 @@ describe('middleware/resume', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(resumeState(dispatcher, store))
+      chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
