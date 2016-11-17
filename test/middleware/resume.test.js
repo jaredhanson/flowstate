@@ -519,8 +519,11 @@ describe('middleware/resume', function() {
       expect(request.yieldState).to.be.undefined;
     });
     
-    it('should not call store#destroy', function() {
-      expect(store.destroy).to.not.have.been.called;
+    it('should call store#destroy', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
     });
     
     it('should not call store#load', function() {
@@ -604,7 +607,10 @@ describe('middleware/resume', function() {
     });
     
     it('should not call store#destroy', function() {
-      expect(store.destroy).to.not.have.been.called;
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
     });
     
     it('should not call dispatcher#_transition', function() {
