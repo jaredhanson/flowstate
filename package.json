@@ -1,6 +1,6 @@
 {
   "name": "flowstate",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Stateful, transactional flows using page-based navigation.",
   "author": {
     "name": "Jared Hanson",
