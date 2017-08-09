@@ -42,7 +42,7 @@ describe('middleware/completeError', function() {
       chai.connect.use(completeStateError(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -69,7 +69,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -135,7 +135,7 @@ describe('middleware/completeError', function() {
       chai.connect.use(completeStateError(dispatcher, store, { from: 'baz' }))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -154,7 +154,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -357,7 +357,7 @@ describe('middleware/completeError', function() {
     
     before(function() {
       var stub = sinon.stub(store, 'load');
-      stub.onCall(0).yields(null, { handle: '22345678', name: 'bar', y: 2, prev: '12345678' })
+      stub.onCall(0).yields(null, { handle: '22345678', name: 'bar', y: 2, up: '12345678' })
       stub.onCall(1).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
@@ -405,7 +405,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -699,7 +699,7 @@ describe('middleware/completeError', function() {
       chai.connect.use(completeStateError(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -719,7 +719,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -773,7 +773,7 @@ describe('middleware/completeError', function() {
       chai.connect.use(completeStateError(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -793,7 +793,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -844,7 +844,7 @@ describe('middleware/completeError', function() {
       chai.connect.use(completeStateError(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -864,7 +864,7 @@ describe('middleware/completeError', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     

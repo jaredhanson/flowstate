@@ -42,7 +42,7 @@ describe('middleware/complete', function() {
       chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -73,7 +73,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -137,7 +137,7 @@ describe('middleware/complete', function() {
       chai.connect.use(completeState(dispatcher, store, { name: 'baz' }))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -160,7 +160,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -366,7 +366,7 @@ describe('middleware/complete', function() {
     
     before(function() {
       var stub = sinon.stub(store, 'load');
-      stub.onCall(0).yields(null, { handle: '22345678', name: 'bar', y: 2, prev: '12345678' })
+      stub.onCall(0).yields(null, { handle: '22345678', name: 'bar', y: 2, up: '12345678' })
       stub.onCall(1).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
@@ -418,7 +418,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -719,7 +719,7 @@ describe('middleware/complete', function() {
       chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -731,7 +731,7 @@ describe('middleware/complete', function() {
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
       expect(err.constructor.name).to.equal('MissingStateError');
-      expect(err.message).to.equal('Failed to load previous state');
+      expect(err.message).to.equal('Failed to load parent state');
       expect(err.handle).to.equal('12345678');
     });
     
@@ -745,7 +745,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -799,7 +799,7 @@ describe('middleware/complete', function() {
       chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -823,7 +823,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     
@@ -874,7 +874,7 @@ describe('middleware/complete', function() {
       chai.connect.use(completeState(dispatcher, store))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'bar', y: 2, up: '12345678' };
         })
         .next(function(e) {
           err = e;
@@ -898,7 +898,7 @@ describe('middleware/complete', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        up: '12345678'
       });
     });
     

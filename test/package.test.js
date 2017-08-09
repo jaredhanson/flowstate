@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 describe('flowstate', function() {
   
   it('should export constructors', function() {
-    expect(flowstate.Manager).to.be.a('function');
+    expect(flowstate.Dispatcher).to.be.a('function');
     expect(flowstate.SessionStore).to.be.a('function');
   });
   
