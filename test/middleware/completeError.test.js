@@ -516,8 +516,12 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal(undefined);
+      expect(call.args[1]).to.equal('bar');
+      expect(call.args[2].message).to.equal('something went wrong');
     });
     
     it('should not call dispatcher#_resume', function() {
@@ -596,8 +600,12 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('22345678');
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal(undefined);
+      expect(call.args[1]).to.equal('bar');
+      expect(call.args[2].message).to.equal('something went wrong');
     });
     
     it('should not call dispatcher#_resume', function() {
