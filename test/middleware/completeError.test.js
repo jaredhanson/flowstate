@@ -132,7 +132,7 @@ describe('middleware/completeError', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(completeStateError(dispatcher, store, { from: 'baz' }))
+      chai.connect.use(completeStateError(dispatcher, store, { name: 'baz' }))
         .req(function(req) {
           request = req;
           request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
@@ -291,7 +291,7 @@ describe('middleware/completeError', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(completeStateError(dispatcher, store, { from: 'bar' }))
+      chai.connect.use(completeStateError(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           request._state = { name: 'foo', x: 1 };
@@ -375,7 +375,7 @@ describe('middleware/completeError', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(completeStateError(dispatcher, store, { from: 'bar' }))
+      chai.connect.use(completeStateError(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           req.query = { state: '22345678' };
@@ -552,7 +552,7 @@ describe('middleware/completeError', function() {
     
     var request, err;
     before(function(done) {
-      chai.connect.use(completeStateError(dispatcher, store, { from: 'bar' }))
+      chai.connect.use(completeStateError(dispatcher, store, { name: 'bar' }))
         .req(function(req) {
           request = req;
           req.query = { state: '22345678' };
