@@ -426,7 +426,7 @@ describe('middleware/load', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal("Failed to load required state 'undefined'");
+      expect(err.message).to.equal("Failed to load required state");
     });
     
     it('should not set state', function() {
@@ -510,7 +510,7 @@ describe('middleware/load', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal("Failed to load required state 'undefined'");
+      expect(err.message).to.equal("Failed to load required state");
     });
     
     it('should not set state', function() {
