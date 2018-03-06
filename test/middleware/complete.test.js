@@ -356,7 +356,7 @@ describe('middleware/complete', function() {
     });
   }); // resuming parent state from named state with optimized parent state
   
-  describe('resuming previous state where current state is loaded and resumes', function() {
+  describe('resuming parent state from unloaded named state query parameter', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -438,7 +438,7 @@ describe('middleware/complete', function() {
       expect(call.args[1]).to.equal('22345678');
     });
     
-    it('should call store#load to load previous state', function() {
+    it('should call store#load to load parent state', function() {
       expect(store.load).to.have.been.calledTwice;
       var call = store.load.getCall(1);
       expect(call.args[0]).to.equal(request);
@@ -459,9 +459,9 @@ describe('middleware/complete', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  }); // resuming previous state where current state is loaded and resumes
+  }); // resuming parent state from unloaded named state query parameter
   
-  describe('attempting to resume previous state from current state and proceeding to default behavior', function() {
+  describe('attempting to resume parent state from state and proceeding to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -539,9 +539,9 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state from current state and proceeding to default behavior
+  }); // attempting to resume parent state from state and proceeding to default behavior
   
-  describe('attempting to resume previous state where current state is loaded and proceeds to default behavior', function() {
+  describe('attempting to resume parent state from unloaded named state and proceeding to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -622,9 +622,9 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state where current state is loaded and proceeds to default behavior
+  }); // attempting to resume parent state from unloaded named state and proceeding to default behavior
   
-  describe('attempting to resume previous state without current state and without state parameters', function() {
+  describe('attempting to resume previous state without state', function() {
     var dispatcher = {
       _resume: function(){},
       _transition: function(){}
@@ -689,9 +689,9 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state without current state and without state parameters
+  }); // attempting to resume previous state without state
   
-  describe('attempting to resume previous state which fails to be loaded', function() {
+  describe('attempting to resume previous state which is not found', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -772,9 +772,9 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state which fails to be loaded
+  }); // attempting to resume previous state which is not found
   
-  describe('encountering an error destroying current state', function() {
+  describe('encountering an error destroying state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -847,9 +847,9 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // encountering an error destroying state
   
-  describe('encountering an error loading previous state', function() {
+  describe('encountering an error loading parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -925,6 +925,6 @@ describe('middleware/complete', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // encountering an error loading parent state
   
 });
