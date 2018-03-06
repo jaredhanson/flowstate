@@ -105,6 +105,192 @@ describe('middleware/completeError', function() {
     });
   }); // resuming parent state from state
   
+  describe('resuming parent state from named state', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(err); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
+    });
+    
+    after(function() {
+      dispatcher._transition.restore();
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(completeStateError(dispatcher, store, { name: 'bar' }))
+        .req(function(req) {
+          request = req;
+          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch(new Error('something went wrong'));
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
+    });
+    
+    it('should call store#destroy', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+    
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.equal('bar');
+      expect(call.args[2]).to.be.an.instanceOf(Error);
+      expect(call.args[2].message).to.equal('something went wrong');
+    });
+    
+    it('should call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.have.been.calledOnce;
+      var call = dispatcher._resume.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.be.an.instanceOf(Error);
+      expect(call.args[1].message).to.equal('something went wrong');
+    });
+  }); // resuming parent state from named state
+  
+  describe('resuming parent state from named state, using string as argument', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); },
+      _transition: function(name, from, err, req, res, next){ next(err); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_transition');
+    });
+    
+    after(function() {
+      dispatcher._transition.restore();
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(completeStateError(dispatcher, store, 'bar'))
+        .req(function(req) {
+          request = req;
+          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch(new Error('something went wrong'));
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
+    });
+    
+    it('should call store#destroy', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+    
+    it('should call dispatcher#_transition', function() {
+      expect(dispatcher._transition).to.have.been.calledOnce;
+      var call = dispatcher._transition.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.equal('bar');
+      expect(call.args[2]).to.be.an.instanceOf(Error);
+      expect(call.args[2].message).to.equal('something went wrong');
+    });
+    
+    it('should call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.have.been.calledOnce;
+      var call = dispatcher._resume.getCall(0);
+      expect(call.args[0]).to.equal('foo');
+      expect(call.args[1]).to.be.an.instanceOf(Error);
+      expect(call.args[1].message).to.equal('something went wrong');
+    });
+  }); // resuming parent state from named state, using string as argument
+  
   describe('resuming parent state from named state with non-yielding state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
