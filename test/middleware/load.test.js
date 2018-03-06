@@ -107,6 +107,58 @@ describe('middleware/load', function() {
     });
   });
   
+  describe('loading state with custom parameter', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, { name: 'test', x: 1 });
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      function getHandle(req) {
+        return req.query.s;
+      }
+      
+      chai.connect.use(loadState(store, { getHandle: getHandle }))
+        .req(function(req) {
+          request = req;
+          req.query = { s: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'test',
+        x: 1
+      });
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
   describe('loading named state where state matches', function() {
     var store = {
       load: function(){}
