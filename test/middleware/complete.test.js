@@ -12,7 +12,7 @@ describe('middleware/complete', function() {
     expect(completeState(dispatcher, store).name).to.equal('completeState');
   });
   
-  describe('resuming previous state from current state', function() {
+  describe('resuming parent state from state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -105,9 +105,9 @@ describe('middleware/complete', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  }); // resuming previous state from current state
+  }); // resuming parent state from state
   
-  describe('resuming previous state with non-yielding state', function() {
+  describe('resuming parent state from named state with non-yielding state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -190,9 +190,9 @@ describe('middleware/complete', function() {
       expect(call.args[0]).to.equal('bar');
       expect(call.args[1]).to.be.undefined;
     });
-  }); // resuming previous state with non-yielding state
+  }); // resuming parent state from named state with non-yielding state
   
-  describe('resuming previous state with optimized previous state', function() {
+  describe('resuming parent state with optimized parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -270,9 +270,9 @@ describe('middleware/complete', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  }); // resuming previous state with optimized previous state
+  }); // resuming parent state with optimized parent state
   
-  describe('resuming previous state with optimized previous state from named state', function() {
+  describe('resuming parent state from named state with optimized parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(); }
@@ -325,6 +325,7 @@ describe('middleware/complete', function() {
         name: 'foo',
         x: 1
       });
+      expect(request._state).to.be.undefined;
     });
     
     it('should not set yieldState', function() {
@@ -353,7 +354,7 @@ describe('middleware/complete', function() {
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.be.undefined;
     });
-  }); // resuming previous state with optimized previous state from named state
+  }); // resuming parent state from named state with optimized parent state
   
   describe('resuming previous state where current state is loaded and resumes', function() {
     var dispatcher = {
