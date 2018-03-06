@@ -2,6 +2,11 @@
   "name": "flowstate",
   "version": "0.4.1",
   "description": "Stateful, transactional flows using page-based navigation.",
+  "keywords": [
+    "express",
+    "connect",
+    "state"
+  ],
   "author": {
     "name": "Jared Hanson",
     "email": "jaredhanson@gmail.com",
@@ -9,10 +14,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/jaredhanson/statefulness.git"
+    "url": "git://github.com/jaredhanson/flowstate.git"
   },
   "bugs": {
-    "url": "http://github.com/jaredhanson/statefulness/issues"
+    "url": "http://github.com/jaredhanson/flowstate/issues"
   },
   "license": "MIT",
   "licenses": [
@@ -22,19 +27,20 @@
     }
   ],
   "main": "./lib",
-  "devDependencies": {
-    "make-node": "^0.3.0",
-    "mocha": "^2.0.0",
-    "chai": "^3.0.0",
-    "sinon-chai": "^2.8.0",
-    "chai-connect-middleware": "0.3.x"
-  },
-  "scripts": {
-    "test": "node_modules/.bin/mocha test/*.test.js"
-  },
   "dependencies": {
     "clone": "^1.0.2",
     "uid-safe": "^2.1.0",
     "utils-flatten": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "chai-connect-middleware": "0.3.x",
+    "make-node": "^0.3.0",
+    "mocha": "^2.0.0",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.8.0"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha test/*.test.js"
   }
 }
