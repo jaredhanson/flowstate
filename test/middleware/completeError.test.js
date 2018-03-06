@@ -12,7 +12,7 @@ describe('middleware/completeError', function() {
     expect(completeStateError(dispatcher, store).name).to.equal('completeStateError');
   });
   
-  describe('resuming previous state from current state', function() {
+  describe('resuming parent state from state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -103,9 +103,9 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  }); // resuming previous state from current state
+  }); // resuming parent state from state
   
-  describe('resuming previous state with non-yielding state', function() {
+  describe('resuming parent state from named state with non-yielding state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -186,9 +186,9 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  }); // resuming previous state with non-yielding state
+  }); // resuming parent state from named state with non-yielding state
   
-  describe('resuming previous state with optimized previous state', function() {
+  describe('resuming parent state with optimized parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -262,9 +262,9 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  }); // resuming previous state with optimized previous state
+  }); // resuming parent state with optimized parent state
   
-  describe('resuming previous state with optimized previous state from named state', function() {
+  describe('resuming parent state from named state with optimized parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -343,9 +343,9 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  }); // resuming previous state with optimized previous state from named state
+  }); // resuming parent state from named state with optimized parent state
   
-  describe('resuming previous state where current state is loaded and resumes', function() {
+  describe('resuming parent state from unloaded named state query parameter', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -423,7 +423,7 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('22345678');
     });
     
-    it('should call store#load to load previous state', function() {
+    it('should call store#load to load parent state', function() {
       expect(store.load).to.have.been.calledTwice;
       var call = store.load.getCall(1);
       expect(call.args[0]).to.equal(request);
@@ -446,9 +446,9 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.be.an.instanceOf(Error);
       expect(call.args[1].message).to.equal('something went wrong');
     });
-  }); // resuming previous state where current state is loaded and resumes
+  }); // resuming parent state from unloaded named state query parameter
   
-  describe('attempting to resume previous state from current state and proceeding to default behavior', function() {
+  describe('attempting to resume parent state from state and proceeding to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -523,9 +523,9 @@ describe('middleware/completeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state from current state and proceeding to default behavior
+  }); // attempting to resume parent state from state and proceeding to default behavior
   
-  describe('attempting to resume previous state where current state is loaded and proceeds to default behavior', function() {
+  describe('attempting to resume parent state from unloaded named state and proceeding to default behavior', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -603,7 +603,7 @@ describe('middleware/completeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state where current state is loaded and proceeds to default behavior
+  }); // attempting to resume parent state from unloaded named state and proceeding to default behavior
   
   describe('attempting to resume previous state without current state and without state parameters', function() {
     var dispatcher = {
