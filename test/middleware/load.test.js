@@ -107,7 +107,59 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state matches', function() {
+  describe('loading state with custom parameter', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, { name: 'test', x: 1 });
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      function getHandle(req) {
+        return req.query.s;
+      }
+      
+      chai.connect.use(loadState(store, { getHandle: getHandle }))
+        .req(function(req) {
+          request = req;
+          req.query = { s: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should not error', function() {
+      expect(err).to.be.undefined;
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'test',
+        x: 1
+      });
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
+  describe('loading named state where state matches', function() {
     var store = {
       load: function(){}
     };
@@ -155,7 +207,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state matches, using string as options argument', function() {
+  describe('loading named state where state matches, using string as argument', function() {
     var store = {
       load: function(){}
     };
@@ -203,7 +255,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state does not match', function() {
+  describe('loading named state where state does not match', function() {
     var store = {
       load: function(){}
     };
@@ -255,7 +307,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested and required state where state does not match', function() {
+  describe('loading named and required state where state does not match', function() {
     var store = {
       load: function(){}
     };
@@ -340,7 +392,7 @@ describe('middleware/load', function() {
       expect(err).to.be.undefined;
     });
     
-    it('should set state', function() {
+    it('should not set state', function() {
       expect(request.state).to.be.undefined;
     });
     
@@ -352,7 +404,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('attempting to load specifically request state with state query parameter', function() {
+  describe('attempting to load named state with state query parameter', function() {
     var store = {
       load: function(){}
     };
@@ -384,7 +436,7 @@ describe('middleware/load', function() {
       expect(err).to.be.undefined;
     });
     
-    it('should set state', function() {
+    it('should not set state', function() {
       expect(request.state).to.be.undefined;
     });
     
@@ -426,10 +478,10 @@ describe('middleware/load', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal("Failed to load required state 'undefined'");
+      expect(err.message).to.equal("Failed to load required state");
     });
     
-    it('should set state', function() {
+    it('should not set state', function() {
       expect(request.state).to.be.undefined;
     });
     
@@ -441,7 +493,52 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading state without handle', function() {
+  describe('attempting to load named and required state with state query parameter', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(null, undefined);
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store, { name: 'test', required: true }))
+        .req(function(req) {
+          request = req;
+          req.query = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal("Failed to load required state 'test'");
+    });
+    
+    it('should not set state', function() {
+      expect(request.state).to.be.undefined;
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
+  describe('attempting to load state without handle', function() {
     var store = {
       load: function(){}
     };
@@ -481,7 +578,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading required state without handle', function() {
+  describe('attempting to load required state without handle', function() {
     var store = {
       load: function(){}
     };
@@ -510,7 +607,7 @@ describe('middleware/load', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal("Failed to load required state 'undefined'");
+      expect(err.message).to.equal("Failed to load required state");
     });
     
     it('should not set state', function() {
@@ -518,7 +615,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested and required state without handle', function() {
+  describe('attempting to load named and required state without handle', function() {
     var store = {
       load: function(){}
     };
