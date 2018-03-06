@@ -605,7 +605,7 @@ describe('middleware/completeError', function() {
     });
   }); // attempting to resume parent state from unloaded named state and proceeding to default behavior
   
-  describe('attempting to resume previous state without current state and without state parameters', function() {
+  describe('attempting to resume parent state without state', function() {
     var dispatcher = {
       _resume: function(){},
       _transition: function(){}
@@ -667,9 +667,9 @@ describe('middleware/completeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state without current state and without state parameters
+  }); // attempting to resume parent state without state
   
-  describe('attempting to resume previous state which fails to be loaded', function() {
+  describe('attempting to resume parent state which is not found', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); },
       _transition: function(name, from, err, req, res, next){ next(err); }
@@ -744,9 +744,9 @@ describe('middleware/completeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  }); // attempting to resume previous state which fails to be loaded
+  }); // attempting to resume parent state which is not found
   
-  describe('encountering an error destroying current state', function() {
+  describe('encountering an error destroying state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -817,7 +817,7 @@ describe('middleware/completeError', function() {
     });
   });
   
-  describe('encountering an error loading previous state', function() {
+  describe('encountering an error loading parent state', function() {
     var dispatcher = {
       _resume: function(name, err, req, res, next){ next(); }
     };
@@ -889,6 +889,6 @@ describe('middleware/completeError', function() {
     it('should not call dispatcher#_resume', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
-  });
+  }); // encountering an error loading parent state
   
 });
