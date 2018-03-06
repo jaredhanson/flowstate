@@ -245,6 +245,7 @@ describe('middleware/complete', function() {
         name: 'foo',
         x: 1
       });
+      expect(request._state).to.be.undefined;
     });
     
     it('should not set yieldState', function() {

@@ -107,7 +107,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state matches', function() {
+  describe('loading named state where state matches', function() {
     var store = {
       load: function(){}
     };
@@ -155,7 +155,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state matches, using string as options argument', function() {
+  describe('loading named state where state matches, using string as argument', function() {
     var store = {
       load: function(){}
     };
@@ -203,7 +203,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested state where state does not match', function() {
+  describe('loading named state where state does not match', function() {
     var store = {
       load: function(){}
     };
@@ -255,7 +255,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested and required state where state does not match', function() {
+  describe('loading named and required state where state does not match', function() {
     var store = {
       load: function(){}
     };
@@ -352,7 +352,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('attempting to load specifically request state with state query parameter', function() {
+  describe('attempting to load named state with state query parameter', function() {
     var store = {
       load: function(){}
     };
@@ -518,7 +518,7 @@ describe('middleware/load', function() {
     });
   });
   
-  describe('loading specifically requested and required state without handle', function() {
+  describe('loading named and required state without handle', function() {
     var store = {
       load: function(){}
     };
