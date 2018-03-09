@@ -1,7 +1,8 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , loadState = require('../../lib/middleware/load');
+  , loadState = require('../../lib/middleware/load')
+  , ExpiredStateError = require('../../lib/errors/expiredstateerror');
 
 
 describe('middleware/load', function() {
@@ -649,6 +650,149 @@ describe('middleware/load', function() {
     
     it('should not set state', function() {
       expect(request.state).to.be.undefined;
+    });
+  });
+  
+  describe('loading an expired state', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(new ExpiredStateError('state expired', { name: 'test', x: 1 }));
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store))
+        .req(function(req) {
+          request = req;
+          req.body = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal('state expired');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'test',
+        x: 1
+      });
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
+  describe('loading an expired named state where state matches', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(new ExpiredStateError('state expired', { name: 'test', x: 1 }));
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store, { name: 'test' }))
+        .req(function(req) {
+          request = req;
+          req.body = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal('state expired');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'test',
+        x: 1
+      });
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+  });
+  
+  describe('loading an expired named state where state does not match', function() {
+    var store = {
+      load: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(new ExpiredStateError('state expired', { name: 'test', x: 1 }));
+    });
+    
+    after(function() {
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(loadState(store, { name: 'xtest' }))
+        .req(function(req) {
+          request = req;
+          req.body = { state: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal('state expired');
+    });
+    
+    it('should not set state', function() {
+      expect(request.state).to.be.undefined;
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
     });
   });
   
