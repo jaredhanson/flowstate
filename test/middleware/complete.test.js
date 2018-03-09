@@ -1,7 +1,8 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , completeState = require('../../lib/middleware/complete');
+  , completeState = require('../../lib/middleware/complete')
+  , ExpiredStateError = require('../../lib/errors/expiredstateerror');
 
 
 describe('middleware/complete', function() {
@@ -1423,6 +1424,85 @@ describe('middleware/complete', function() {
       expect(dispatcher._resume).to.not.have.been.called;
     });
   }); // attempting to resume parent state from unloaded state which is not found
+  
+  // WIP
+  describe.skip('loading an expired parent state', function() {
+    var dispatcher = {
+      _resume: function(name, err, req, res, next){ next(); }
+    };
+    var store = {
+      load: function(){},
+      destroy: function(){}
+    };
+    
+    before(function() {
+      sinon.stub(store, 'load').yields(new ExpiredStateError('state expired',{ name: 'foo', x: 1 }));
+      sinon.stub(store, 'destroy').yields(null);
+      sinon.spy(dispatcher, '_resume');
+    });
+    
+    after(function() {
+      dispatcher._resume.restore();
+      store.destroy.restore();
+      store.load.restore();
+    });
+    
+    
+    var request, err;
+    before(function(done) {
+      chai.connect.use(completeState(dispatcher, store))
+        .req(function(req) {
+          request = req;
+          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.message).to.equal('state expired');
+    });
+    
+    it('should set skip error flag', function() {
+      expect(request._skipResumeError).to.equal(true);
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: '22345678',
+        name: 'bar',
+        y: 2,
+        prev: '12345678'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should call store#destroy', function() {
+      expect(store.destroy).to.have.been.calledOnce;
+      var call = store.destroy.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('22345678');
+    });
+    
+    it('should call store#load', function() {
+      expect(store.load).to.have.been.calledOnce;
+      var call = store.load.getCall(0);
+      expect(call.args[0]).to.equal(request);
+      expect(call.args[1]).to.equal('12345678');
+    });
+    
+    it('should not call dispatcher#_resume', function() {
+      expect(dispatcher._resume).to.not.have.been.called;
+    });
+  }); // loading an expired parent state
   
   describe('encountering an error destroying state', function() {
     var dispatcher = {
