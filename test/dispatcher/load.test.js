@@ -1,9 +1,7 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../lib/manager')
-  , SessionStore = require('../../lib/stores/session')
-  , completeState = require('../../lib/middleware/complete');
+  , Dispatcher = require('../../lib/manager');
 
 
 describe('Dispatcher#complete', function() {
@@ -12,8 +10,7 @@ describe('Dispatcher#complete', function() {
     
     var request, response, err;
     before(function(done) {
-      var store = new SessionStore();
-      var dispatcher = new Dispatcher(store);
+      var dispatcher = new Dispatcher();
       
       dispatcher.use('foo', null, [function(req, res, next) {
         res.end('foo.');
