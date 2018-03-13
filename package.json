@@ -35,6 +35,7 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "chai-connect-middleware": "0.3.x",
+    "chai-express-handler": "0.0.2",
     "make-node": "^0.3.0",
     "mocha": "^2.0.0",
     "sinon": "^1.17.7",
