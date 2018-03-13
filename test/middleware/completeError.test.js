@@ -14,8 +14,7 @@ describe('middleware/completeError', function() {
   
   describe('resuming parent state from state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -25,13 +24,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -87,28 +84,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[1]).to.be.undefined;
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from state
   
   describe('resuming parent state from named state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -118,13 +107,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -180,28 +167,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from named state
   
   describe('resuming parent state from named state, using string as argument', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -211,13 +190,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -273,28 +250,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from named state, using string as argument
   
   describe('resuming parent state from named state with non-yielding state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -304,13 +273,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -356,28 +323,20 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('bar');
       expect(call.args[1]).to.equal('baz');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('bar');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from named state with non-yielding state
   
   describe('resuming parent state with optimized parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -387,13 +346,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -437,23 +394,20 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[1]).to.be.undefined;
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state with optimized parent state
   
   describe('resuming parent state from named state with optimized parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -463,13 +417,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -513,28 +465,20 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from named state with optimized parent state
   
   describe('resuming parent state from unloaded state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -546,13 +490,11 @@ describe('middleware/completeError', function() {
       stub.onCall(0).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -599,23 +541,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[1]).to.be.undefined;
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from unloaded state
   
   describe('resuming parent state from unloaded named state query parameter', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -628,13 +567,11 @@ describe('middleware/completeError', function() {
       stub.onCall(1).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -697,28 +634,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from unloaded named state query parameter
   
   describe('resuming parent state from unloaded named state body parameter', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -731,13 +660,11 @@ describe('middleware/completeError', function() {
       stub.onCall(1).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -800,28 +727,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from unloaded named state body parameter
   
   describe('resuming parent state from unloaded named state with custom parameter', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -834,13 +753,11 @@ describe('middleware/completeError', function() {
       stub.onCall(1).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -907,28 +824,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from unloaded named state with custom parameter
   
   describe('resuming parent state from unloaded named state with non-yielding state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -940,13 +849,11 @@ describe('middleware/completeError', function() {
       stub.onCall(0).yields(null, { name: 'foo', x: 1 });
       
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -993,28 +900,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.have.been.calledOnce;
-      var call = dispatcher._transition.getCall(0);
+    it('should call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
       expect(call.args[0]).to.equal('foo');
       expect(call.args[1]).to.equal('bar');
-      expect(call.args[2]).to.be.an.instanceOf(Error);
-      expect(call.args[2].message).to.equal('something went wrong');
-    });
-    
-    it('should call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.have.been.calledOnce;
-      var call = dispatcher._resume.getCall(0);
-      expect(call.args[0]).to.equal('foo');
-      expect(call.args[1]).to.be.an.instanceOf(Error);
-      expect(call.args[1].message).to.equal('something went wrong');
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // resuming parent state from unloaded named state with non-yielding state
   
   describe('attempting to resume parent state from state and proceeding to default behavior', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(err); }
     };
     var store = {
       load: function(){},
@@ -1024,13 +923,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1079,19 +976,14 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
-    });
-    
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // attempting to resume parent state from state and proceeding to default behavior
   
   describe('attempting to resume parent state from unloaded named state and proceeding to default behavior', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(err); }
     };
     var store = {
       load: function(){},
@@ -1101,13 +993,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { handle: '22345678', name: 'bar', y: 2 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1159,19 +1049,14 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('22345678');
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
-    });
-    
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // attempting to resume parent state from unloaded named state and proceeding to default behavior
   
   describe('attempting to resume parent state without state', function() {
     var dispatcher = {
-      _resume: function(){},
-      _transition: function(){}
+      _dispatch: function(){}
     };
     var store = {
       load: function(){},
@@ -1181,13 +1066,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1223,19 +1106,14 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_transition', function() {
-      expect(dispatcher._transition).to.not.have.been.called;
-    });
-    
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // attempting to resume parent state without state
   
   describe('attempting to resume parent state which is not found', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(err); }
     };
     var store = {
       load: function(){},
@@ -1245,13 +1123,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1304,15 +1180,14 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // attempting to resume parent state which is not found
   
   describe('attempting to resume parent state from unloaded state which is not found', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); },
-      _transition: function(name, from, err, req, res, next){ next(err); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(err); }
     };
     var store = {
       load: function(){},
@@ -1322,13 +1197,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, undefined);
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
-      sinon.spy(dispatcher, '_transition');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._transition.restore();
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1372,14 +1245,14 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // attempting to resume parent state from unloaded state which is not found
   
   describe('encountering an error destroying state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -1389,11 +1262,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { name: 'foo', x: 1 });
       sinon.stub(store, 'destroy').yields(new Error('something went wrong destroying state'));
-      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1443,14 +1316,14 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   });
   
   describe('encountering an error loading parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -1460,11 +1333,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(new Error('something went wrong loading state'));
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1517,14 +1390,14 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // encountering an error loading parent state
   
   describe('encountering an error resuming unnamed parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(new Error("Cannot dispatch to unnamed state")); }
     };
     var store = {
       load: function(){},
@@ -1534,11 +1407,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1560,7 +1433,7 @@ describe('middleware/completeError', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal('Cannot resume unnamed flow');
+      expect(err.message).to.equal('Cannot dispatch to unnamed state');
     });
     
     it('should set state', function() {
@@ -1594,14 +1467,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
+      expect(call.args[0]).to.be.undefined;
+      expect(call.args[1]).to.be.undefined;
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // encountering an error resuming unnamed parent state
   
   describe('encountering an error resuming unloaded unnamed parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(new Error("Cannot dispatch to unnamed state")); }
     };
     var store = {
       load: function(){},
@@ -1611,11 +1490,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1637,7 +1516,7 @@ describe('middleware/completeError', function() {
     
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
-      expect(err.message).to.equal('Cannot resume unnamed flow');
+      expect(err.message).to.equal('Cannot dispatch to unnamed state');
     });
     
     it('should set state', function() {
@@ -1662,14 +1541,20 @@ describe('middleware/completeError', function() {
       expect(call.args[1]).to.equal('12345678');
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.have.been.calledOnce;
+      var call = dispatcher._dispatch.getCall(0);
+      expect(call.args[0]).to.be.undefined;
+      expect(call.args[1]).to.be.undefined;
+      expect(call.args[2]).to.be.undefined;
+      expect(call.args[3]).to.be.an.instanceOf(Error);
+      expect(call.args[3].message).to.equal('something went wrong');
     });
   }); // encountering an error resuming unloaded unnamed parent state
   
   describe('handling an error encountered when resuming parent state', function() {
     var dispatcher = {
-      _resume: function(name, err, req, res, next){ next(); }
+      _dispatch: function(name, from, through, err, req, res, next){ next(); }
     };
     var store = {
       load: function(){},
@@ -1679,11 +1564,11 @@ describe('middleware/completeError', function() {
     before(function() {
       sinon.stub(store, 'load').yields(null, { x: 1 });
       sinon.stub(store, 'destroy').yields(null);
-      sinon.spy(dispatcher, '_resume');
+      sinon.spy(dispatcher, '_dispatch');
     });
     
     after(function() {
-      dispatcher._resume.restore();
+      dispatcher._dispatch.restore();
       store.destroy.restore();
       store.load.restore();
     });
@@ -1736,8 +1621,8 @@ describe('middleware/completeError', function() {
       expect(store.load).to.not.have.been.called;
     });
     
-    it('should not call dispatcher#_resume', function() {
-      expect(dispatcher._resume).to.not.have.been.called;
+    it('should not call dispatcher#_dispatch', function() {
+      expect(dispatcher._dispatch).to.not.have.been.called;
     });
   }); // handling an error encountered when resuming a parent state
   
