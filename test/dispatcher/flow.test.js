@@ -24,8 +24,6 @@ describe('Dispatcher#flow', function() {
       ]);
       
       function handler(req, res, next) {
-        console.log(req.state)
-        
         res.__text = req.state.name;
         next();
       }
@@ -38,9 +36,6 @@ describe('Dispatcher#flow', function() {
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
           request.session.state['H2'] = { name: 'bar', y: 2, prev: 'H1' };
-        })
-        .res(function(res) {
-          //res.__text = 'bar'
         })
         .end(function(res) {
           response = res;
@@ -82,9 +77,9 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response._data).to.equal('bar foo(bar)');
     });
-  }); // resuming parent state from loaded, named state
+  }); // resuming parent state from stored child state
   
-  describe('resuming parent state after transition from loaded, named state', function() {
+  describe('resuming parent state after transition from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
@@ -113,17 +108,19 @@ describe('Dispatcher#flow', function() {
         }
       ]);
       
+      function handler(req, res, next) {
+        res.__text = req.state.name;
+        next();
+      }
       
-      chai.express.handler(dispatcher.flow())
+      
+      chai.express.handler(dispatcher.flow('bar', handler))
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'bar', y: 2, prev: '12345678' };
+          request.body = { state: 'H2' };
           request.session = { state: {} };
-          request.session.state['12345678'] = { name: 'foo', x: 1 };
-          request.session.state['22345678'] = { name: 'bar', y: 2, prev: '12345678' };
-        })
-        .res(function(res) {
-          res.__text = 'bar'
+          request.session.state['H1'] = { name: 'foo', x: 1 };
+          request.session.state['H2'] = { name: 'bar', y: 2, prev: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -135,7 +132,7 @@ describe('Dispatcher#flow', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        handle: '12345678',
+        handle: 'H1',
         name: 'foo',
         x: 1,
         y: 2
@@ -145,17 +142,17 @@ describe('Dispatcher#flow', function() {
     it('should set yieldState', function() {
       expect(request.yieldState).to.be.an('object');
       expect(request.yieldState).to.deep.equal({
-        handle: '22345678',
+        handle: 'H2',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        prev: 'H1'
       });
     });
     
     it('should remove state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
-          '12345678': {
+          'H1': {
             name: 'foo',
             x: 1
           }
@@ -166,7 +163,7 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response._data).to.equal('bar --bar/foo--> foo(bar)');
     });
-  }); // resuming parent state after transition from loaded, named state
+  }); // resuming parent state after transition from stored child state
   
   describe('resuming parent state after transition through synthesized state with transition from specified, loaded, named state', function() {
     
