@@ -165,6 +165,94 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state yielding from stored child state
   
+  describe('resuming parent state through synthesized state from stored child state', function() {
+    
+    var request, response, err;
+    before(function(done) {
+      var dispatcher = new Dispatcher();
+      
+      // foo
+      dispatcher.use('foo', null, [
+        function(req, res, next) {
+          res.__text += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          res.end(res.__text);
+        },
+        function(err, req, res, next) {
+          res.__text += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          res.end(res.__text);
+        }
+      ]);
+      
+      // bar
+      dispatcher.use('bar', null, [
+        function(req, res, next) {
+          res.__text += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          res.completePrompt();
+        },
+        function(err, req, res, next) {
+          res.__text += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          res.completePrompt(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__text = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('baz', handler, { through: 'bar' }))
+        .req(function(req) {
+          request = req;
+          request.body = { state: 'H2' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'foo', x: 1 };
+          request.session.state['H2'] = { name: 'baz', z: 3, prev: 'H1' };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .next(function(err) {
+          console.log(err);
+          done(err);
+        })
+        .dispatch();
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        handle: 'H1',
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState).to.deep.equal({
+        name: 'bar',
+        prev: 'H1'
+      });
+    });
+    
+    it('should remove state from session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'foo',
+            x: 1
+          }
+        }
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response._data).to.equal('baz bar(baz) foo(bar)');
+    });
+  }); // resuming parent state through synthesized state from stored child state
+  
   describe('resuming parent state yielding through synthesized state from stored child state', function() {
     
     var request, response, err;
