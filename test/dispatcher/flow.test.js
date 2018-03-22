@@ -6,6 +6,52 @@ var chai = require('chai')
 
 describe('Dispatcher#flow', function() {
   
+  describe('immediately processing an external state', function() {
+    
+    var request, response, err;
+    before(function(done) {
+      var dispatcher = new Dispatcher();
+      
+      function handler(req, res, next) {
+        res.redirect('/from/' + req.state.name);
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'X1' };
+          request.session = { state: {} };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'start'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should not persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {}
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/start');
+    });
+  }); // resuming parent state from stored child state
+  
   describe('resuming parent state from stored child state', function() {
     
     var request, response, err;
@@ -63,7 +109,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should remove state from session', function() {
+    it('should remove completed state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
@@ -149,7 +195,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should remove state from session', function() {
+    it('should remove completed state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
@@ -237,7 +283,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should remove state from session', function() {
+    it('should remove completed state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
@@ -340,7 +386,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should remove state from session', function() {
+    it('should remove completed state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
@@ -456,7 +502,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should remove state from session', function() {
+    it('should remove completed state from session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
