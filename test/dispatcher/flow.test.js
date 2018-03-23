@@ -274,6 +274,7 @@ describe('Dispatcher#flow', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       var call = dispatcher._store.load.getCall(0);
       expect(call.args[1]).to.equal('H1');
+      
       expect(dispatcher._store.save).to.have.callCount(0);
     });
     
@@ -284,7 +285,7 @@ describe('Dispatcher#flow', function() {
       });
     });
     
-    it('should set optimized state', function() {
+    it('should set optimized parent state', function() {
       expect(request._state).to.be.an('object');
       expect(request._state).to.deep.equal({
         name: 'start',
@@ -316,23 +317,20 @@ describe('Dispatcher#flow', function() {
     });
   }); // rendering from a flow which will eventually resume parent state referenced by query param
   
-  // WIP
-  describe.skip('resuming parent state referenced by query param which completes by redirecting', function() {
+  describe('resuming parent state referenced by query param which completes by redirecting', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
     
-    var request, response, err;
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+    
     before(function(done) {
-      var dispatcher = new Dispatcher();
-      
       dispatcher.use('start', null, [
         function(req, res, next) {
-          console.log('RESUME START!');
-          console.log(req.state);
-          console.log(req.yieldState);
-          //return;
-          
           res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
-          
-          console.log('START REDIRECT!');
           res.redirect('/from/' + req.state.name);
         },
         function(err, req, res, next) {
@@ -341,12 +339,12 @@ describe('Dispatcher#flow', function() {
       ]);
       
       function handler(req, res, next) {
-        res.__text = req.state.name;
+        res.__track = req.state.name;
         next();
       }
       
       
-      chai.express.handler(dispatcher.flow('bar', handler))
+      chai.express.handler(dispatcher.flow('consent', handler))
         .req(function(req) {
           request = req;
           request.body = { state: 'H1' };
@@ -361,38 +359,47 @@ describe('Dispatcher#flow', function() {
         .dispatch();
     });
     
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('consent start(consent)');
+    });
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+    });
+    
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        name: 'foo',
-        x: 1
+        name: 'start',
+        foo: 'bar'
       });
     });
     
     it('should set yieldState', function() {
       expect(request.yieldState).to.be.an('object');
-      expect(request.yieldState.handle).to.equal('H2');
+      expect(request.yieldState.handle).to.be.undefined;
       expect(request.yieldState).to.deep.equal({
-        name: 'bar',
-        y: 2,
-        prev: 'H1'
+        name: 'consent'
       });
     });
     
-    it('should remove completed state from session', function() {
-      expect(request.session).to.deep.equal({
-        state: {
-          'H1': {
-            name: 'foo',
-            x: 1
-          }
-        }
-      });
+    it('should remove completed parent state from session', function() {
+      expect(request.session).to.deep.equal({});
     });
     
     it('should respond', function() {
-      expect(response.__track).to.equal('bar foo(bar)');
+      expect(response.getHeader('Location')).to.equal('/from/start');
     });
   }); // resuming parent state referenced by query param
   
