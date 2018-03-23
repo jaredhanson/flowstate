@@ -35,7 +35,7 @@ describe('Dispatcher#complete', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        handle: '12345678',
+        //handle: '12345678',
         name: 'foo',
         x: 1
       });

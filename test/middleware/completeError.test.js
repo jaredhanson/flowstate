@@ -1025,7 +1025,7 @@ describe('middleware/completeError', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        handle: '22345678',
+        //handle: '22345678',
         name: 'bar',
         y: 2
       });

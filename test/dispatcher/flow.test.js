@@ -92,8 +92,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        handle: 'H1',
         name: 'foo',
         x: 1
       });
@@ -101,8 +101,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set yieldState', function() {
       expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.equal('H2');
       expect(request.yieldState).to.deep.equal({
-        handle: 'H2',
         name: 'bar',
         y: 2,
         prev: 'H1'
@@ -177,8 +177,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        handle: 'H1',
         name: 'foo',
         x: 1,
         y: 2
@@ -187,8 +187,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set yieldState', function() {
       expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.equal('H2');
       expect(request.yieldState).to.deep.equal({
-        handle: 'H2',
         name: 'bar',
         y: 2,
         prev: 'H1'
@@ -268,8 +268,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        handle: 'H1',
         name: 'foo',
         x: 1
       });
@@ -369,8 +369,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        handle: 'H1',
         name: 'foo',
         x: 1,
         y: undefined,
@@ -484,8 +484,8 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
       expect(request.state).to.deep.equal({
-        handle: 'H1',
         name: 'foo',
         x: 1,
         y: undefined,
