@@ -6,13 +6,14 @@ var chai = require('chai')
 
 describe('Dispatcher#flow', function() {
   
-  describe('immediately processing an external state', function() {
+  describe('immediately completing an external state', function() {
     
     var request, response, err;
     before(function(done) {
       var dispatcher = new Dispatcher();
       
       function handler(req, res, next) {
+        req.state.complete();
         res.redirect('/from/' + req.state.name);
       }
       
