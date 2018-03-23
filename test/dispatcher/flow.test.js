@@ -67,7 +67,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // immediately completing an externally initiated flow
   
-  describe('prompting via redirect from an externally initiated flow with changed state', function() {
+  describe('prompting via redirect from an externally initiated flow with new unchanged state', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -80,8 +80,82 @@ describe('Dispatcher#flow', function() {
     before(function(done) {
       dispatcher.use('consent', [
         function(req, res, next) {
-          console.log('consent...');
-          
+          res.redirect('/from/' + req.state.name);
+        }
+      ], null);
+      
+      function handler(req, res, next) {
+        res.prompt('consent');
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'X1' };
+          request.session = { state: {} };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(1);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'consent',
+        prev: 'H1'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should persist initial state in session', function() {
+      expect(request.session.state['H1'].initiatedAt).to.be.a('number')
+      delete request.session.state['H1'].initiatedAt;
+      
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'start'
+          }
+        }
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
+    });
+  }); // prompting via redirect from an externally initiated flow with new unchanged state
+  
+  describe('prompting via redirect from an externally initiated flow with new changed state', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
+      dispatcher.use('consent', [
+        function(req, res, next) {
           res.redirect('/from/' + req.state.name);
         }
       ], null);
@@ -145,7 +219,7 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
     });
-  }); // prompting via redirect from an externally initiated flow
+  }); // prompting via redirect from an externally initiated flow with new changed state
   
   describe('resuming parent state from stored child state', function() {
     
