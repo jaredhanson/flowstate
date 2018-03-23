@@ -67,7 +67,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // immediately completing an externally initiated flow
   
-  describe('prompting via redirect from an externally initiated flow with new unchanged state', function() {
+  describe('prompting via redirect from an externally initiated flow', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -141,9 +141,9 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
     });
-  }); // prompting via redirect from an externally initiated flow with new unchanged state
+  }); // prompting via redirect from an externally initiated flow
   
-  describe('prompting via redirect from an externally initiated flow with new changed state', function() {
+  describe('prompting via redirect from an externally initiated flow with changed state', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -219,7 +219,7 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
     });
-  }); // prompting via redirect from an externally initiated flow with new changed state
+  }); // prompting via redirect from an externally initiated flow with changed state
   
   describe('resuming parent state from stored child state', function() {
     
