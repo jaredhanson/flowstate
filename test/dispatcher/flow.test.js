@@ -13,7 +13,6 @@ describe('Dispatcher#flow', function() {
       var dispatcher = new Dispatcher();
       
       function handler(req, res, next) {
-        req.state.complete();
         res.redirect('/from/' + req.state.name);
       }
       
