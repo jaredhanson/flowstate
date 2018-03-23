@@ -6,7 +6,7 @@ var chai = require('chai')
 
 describe('Dispatcher#flow', function() {
   
-  describe('immediately completing an external state', function() {
+  describe('immediately completing an externally initiated flow', function() {
     
     var request, response, err;
     before(function(done) {
@@ -50,7 +50,72 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/start');
     });
-  }); // resuming parent state from stored child state
+  }); // immediately completing an externally initiated flow
+  
+  describe('prompting via redirect from an externally initiated flow with changed state', function() {
+    
+    var request, response, err;
+    before(function(done) {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } });
+      
+      dispatcher.use('consent', [
+        function(req, res, next) {
+          console.log('consent...');
+          
+          res.redirect('/from/' + req.state.name);
+        }
+      ], null);
+      
+      function handler(req, res, next) {
+        req.state.x = 1;
+        res.prompt('consent');
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'X1' };
+          request.session = { state: {} };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'consent',
+        prev: 'H1'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should persist initial state in session', function() {
+      expect(request.session.state['H1'].initiatedAt).to.be.a('number')
+      delete request.session.state['H1'].initiatedAt;
+      
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'start',
+            x: 1
+          }
+        }
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
+    });
+  }); // prompting via redirect from an externally initiated flow
   
   describe('resuming parent state from stored child state', function() {
     
