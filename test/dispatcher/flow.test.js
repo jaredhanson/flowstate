@@ -221,6 +221,101 @@ describe('Dispatcher#flow', function() {
     });
   }); // prompting via redirect from an externally initiated flow with changed state
   
+  describe('rendering from a flow which will eventually resume parent state referenced by query param', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, layout, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
+      /*
+      dispatcher.use('start', null, [
+        function(req, res, next) {
+          res.redirect('/from/' + req.state.name);
+        }
+      ]);
+      */
+      
+      function handler(req, res, next) {
+        res.locals.baz = 'qux';
+        res.render('views/' + req.state.name);
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('consent', handler))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H1' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'start', foo: 'bar' };
+        })
+        .res(function(res) {
+          res.locals = {};
+        })
+        .render(function(res, lay) {
+          layout = lay;
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      expect(dispatcher._store.save).to.have.callCount(0);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'consent'
+      });
+    });
+    
+    it('should set optimized state', function() {
+      expect(request._state).to.be.an('object');
+      expect(request._state).to.deep.equal({
+        name: 'start',
+        foo: 'bar'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should keep parent state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'start',
+            foo: 'bar'
+          }
+        }
+      });
+    });
+    
+    it('should render layout', function() {
+      expect(layout).to.equal('views/consent');
+      expect(response.locals).to.deep.equal({
+        baz: 'qux',
+        state: 'H1'
+      });
+    });
+  }); // prompting via redirect from an externally initiated flow with changed state
+  
   describe('resuming parent state from stored child state', function() {
     
     var request, response, err;
