@@ -7,11 +7,15 @@ var chai = require('chai')
 describe('Dispatcher#flow', function() {
   
   describe('immediately completing an externally initiated flow', function() {
-    
-    var request, response, err;
-    before(function(done) {
-      var dispatcher = new Dispatcher();
+    var dispatcher = new Dispatcher()
+      , request, response, err;
       
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
       function handler(req, res, next) {
         res.redirect('/from/' + req.state.name);
       }
@@ -28,6 +32,17 @@ describe('Dispatcher#flow', function() {
           done();
         })
         .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -53,12 +68,16 @@ describe('Dispatcher#flow', function() {
   }); // immediately completing an externally initiated flow
   
   describe('prompting via redirect from an externally initiated flow with changed state', function() {
-    
-    var request, response, err;
-    before(function(done) {
-      var hc = 1;
-      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } });
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
       
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
       dispatcher.use('consent', [
         function(req, res, next) {
           console.log('consent...');
@@ -84,6 +103,17 @@ describe('Dispatcher#flow', function() {
           done();
         })
         .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(1);
     });
     
     it('should set state', function() {
