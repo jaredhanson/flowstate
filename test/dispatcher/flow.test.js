@@ -6,7 +6,7 @@ var chai = require('chai')
 
 describe('Dispatcher#flow', function() {
   
-  describe('immediately completing an externally initiated flow', function() {
+  describe('immediately completing an externally initiated flow by redirecting', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
       
@@ -65,7 +65,7 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/start');
     });
-  }); // immediately completing an externally initiated flow
+  }); // immediately completing an externally initiated flow by redirecting
   
   describe('prompting via redirect from an externally initiated flow', function() {
     var hc = 1;
@@ -314,9 +314,89 @@ describe('Dispatcher#flow', function() {
         state: 'H1'
       });
     });
-  }); // prompting via redirect from an externally initiated flow with changed state
+  }); // rendering from a flow which will eventually resume parent state referenced by query param
   
-  describe('resuming parent state from stored child state', function() {
+  // WIP
+  describe.skip('resuming parent state referenced by query param which completes by redirecting', function() {
+    
+    var request, response, err;
+    before(function(done) {
+      var dispatcher = new Dispatcher();
+      
+      dispatcher.use('start', null, [
+        function(req, res, next) {
+          console.log('RESUME START!');
+          console.log(req.state);
+          console.log(req.yieldState);
+          //return;
+          
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          
+          console.log('START REDIRECT!');
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__text = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('bar', handler))
+        .req(function(req) {
+          request = req;
+          request.body = { state: 'H1' };
+          request.session = { state: {} };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'start', foo: 'bar' };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
+      expect(request.state).to.deep.equal({
+        name: 'foo',
+        x: 1
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.equal('H2');
+      expect(request.yieldState).to.deep.equal({
+        name: 'bar',
+        y: 2,
+        prev: 'H1'
+      });
+    });
+    
+    it('should remove completed state from session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'foo',
+            x: 1
+          }
+        }
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response.__track).to.equal('bar foo(bar)');
+    });
+  }); // resuming parent state referenced by query param
+  
+  describe.skip('resuming parent state from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
@@ -389,7 +469,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state from stored child state
   
-  describe('resuming parent state yielding from stored child state', function() {
+  describe.skip('resuming parent state yielding from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
@@ -475,7 +555,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state yielding from stored child state
   
-  describe('resuming parent state through synthesized state from stored child state', function() {
+  describe.skip('resuming parent state through synthesized state from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
@@ -563,7 +643,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state through synthesized state from stored child state
   
-  describe('resuming parent state yielding through synthesized state from stored child state', function() {
+  describe.skip('resuming parent state yielding through synthesized state from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
@@ -666,7 +746,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state yielding through synthesized state from stored child state
   
-  describe('resuming parent state yielding through synthesized state yielding from stored child state', function() {
+  describe.skip('resuming parent state yielding through synthesized state yielding from stored child state', function() {
     
     var request, response, err;
     before(function(done) {
