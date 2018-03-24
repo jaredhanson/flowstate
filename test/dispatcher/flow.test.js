@@ -869,7 +869,7 @@ describe('Dispatcher#flow', function() {
   
   /***/
   
-  describe.skip('resuming parent state referenced by query param which completes by redirecting', function() {
+  describe('resuming parent state referenced by query param which finishes by redirecting', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -877,18 +877,26 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'destroy');
     });
     
     before(function(done) {
       dispatcher.use('start', null, [
         function(req, res, next) {
-          //req.state.complete();
-          
           res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          console.log(err);
+          //res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
           res.redirect('/from/' + req.state.name);
         },
         function(err, req, res, next) {
-          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          console.log(err);
         }
       ]);
       
@@ -903,7 +911,6 @@ describe('Dispatcher#flow', function() {
           request = req;
           request.body = { state: 'H1' };
           request.session = { state: {} };
-          request.session = { state: {} };
           request.session.state['H1'] = { name: 'start', foo: 'bar' };
         })
         .end(function(res) {
@@ -916,19 +923,27 @@ describe('Dispatcher#flow', function() {
     after(function() {
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
+      dispatcher._store.destroy.restore();
     });
     
     
     it('should track correctly', function() {
-      expect(response.__track).to.equal('consent start(consent)');
+      expect(response.__track).to.equal('consent start(consent)[F]');
     });
     
-    it('should correctly invoke state store', function() {
+    // FIXME: double destroy
+    it.skip('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       var call = dispatcher._store.load.getCall(0);
       expect(call.args[1]).to.equal('H1');
       
       expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
     });
     
     it('should set state', function() {
