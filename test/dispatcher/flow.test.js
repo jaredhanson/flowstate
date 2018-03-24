@@ -675,7 +675,12 @@ describe('Dispatcher#flow', function() {
     });
   }); // prompting via render with parameters from an externally initiated flow
   
-  describe('rendering from a flow which will eventually resume parent state referenced by query param', function() {
+  
+  
+  
+  /***/
+  
+  describe('prompting via render from an initial state where parent state is carried in query param', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, layout, err;
@@ -686,14 +691,6 @@ describe('Dispatcher#flow', function() {
     });
       
     before(function(done) {
-      /*
-      dispatcher.use('start', null, [
-        function(req, res, next) {
-          res.redirect('/from/' + req.state.name);
-        }
-      ]);
-      */
-      
       function handler(req, res, next) {
         res.locals.baz = 'qux';
         res.render('views/' + req.state.name);
@@ -712,6 +709,9 @@ describe('Dispatcher#flow', function() {
         })
         .render(function(res, lay) {
           layout = lay;
+          res.end();
+        })
+        .end(function(res) {
           response = res;
           done();
         })
@@ -751,7 +751,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.be.undefined;
     });
     
-    it('should keep parent state in session', function() {
+    it('should maintain state in session', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
@@ -769,7 +769,7 @@ describe('Dispatcher#flow', function() {
         state: 'H1'
       });
     });
-  }); // rendering from a flow which will eventually resume parent state referenced by query param
+  }); // prompting via render from an initial state where parent state is carried in query param
   
   describe('resuming parent state referenced by query param which completes by redirecting', function() {
     var hc = 1;
