@@ -680,7 +680,7 @@ describe('Dispatcher#flow', function() {
   
   /***/
   
-  describe('prompting via render from an initial state where parent state is carried in query param', function() {
+  describe('prompting via render from a new state where parent state is carried in query param', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, layout, err;
@@ -769,9 +769,103 @@ describe('Dispatcher#flow', function() {
         state: 'H1'
       });
     });
-  }); // prompting via render from an initial state where parent state is carried in query param
+  }); // prompting via render from a new state where parent state is carried in query param
   
-  describe('resuming parent state referenced by query param which completes by redirecting', function() {
+  // WIP
+  describe.skip('prompting via render from a current state where state is carried in query param', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, layout, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
+      function handler(req, res, next) {
+        res.locals.baz = 'qux';
+        res.render('views/' + req.state.name);
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('consent', handler))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H2' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'start', foo: 'bar' };
+          request.session.state['H2'] = { name: 'consent', beep: 'boop' };
+        })
+        .res(function(res) {
+          res.locals = {};
+        })
+        .render(function(res, lay) {
+          layout = lay;
+          res.end();
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'consent',
+        beep: 'boop'
+      });
+    });
+    
+    it('should not set optimized parent state', function() {
+      expect(request._state).to.be.undefined;
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should maintain state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'start',
+            foo: 'bar'
+          },
+          'H2': {
+            name: 'consent',
+            beep: 'boop'
+          }
+        }
+      });
+    });
+    
+    it('should render layout', function() {
+      expect(layout).to.equal('views/consent');
+      expect(response.locals).to.deep.equal({
+        baz: 'qux',
+        state: 'H2'
+      });
+    });
+  }); // prompting via render from a current state where state is carried in query param
+  
+  describe.skip('resuming parent state referenced by query param which completes by redirecting', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -784,6 +878,8 @@ describe('Dispatcher#flow', function() {
     before(function(done) {
       dispatcher.use('start', null, [
         function(req, res, next) {
+          //req.state.complete();
+          
           res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
           res.redirect('/from/' + req.state.name);
         },
