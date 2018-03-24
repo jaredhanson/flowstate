@@ -771,8 +771,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // prompting via render from a new state where parent state is carried in query param
   
-  // WIP
-  describe.skip('prompting via render from a current state where state is carried in query param', function() {
+  describe('prompting via render from a current state where state is carried in query param', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, layout, err;
@@ -864,6 +863,11 @@ describe('Dispatcher#flow', function() {
       });
     });
   }); // prompting via render from a current state where state is carried in query param
+  
+  
+  
+  
+  /***/
   
   describe.skip('resuming parent state referenced by query param which completes by redirecting', function() {
     var hc = 1;
