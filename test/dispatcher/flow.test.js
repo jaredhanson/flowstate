@@ -227,6 +227,88 @@ describe('Dispatcher#flow', function() {
     });
   }); // prompting via redirect from an externally initiated flow with changed state
   
+  describe('prompting via redirect with parameters from an externally initiated flow', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+    });
+      
+    before(function(done) {
+      function handler(req, res, next) {
+        res.prompt('consent', { to: 'test' });
+      }
+      
+      dispatcher.use('consent', [
+        function(req, res, next) {
+          res.redirect('/from/' + req.state.name + '?to=' + req.locals.to);
+        }
+      ], null);
+      
+      
+      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'X1' };
+          request.session = {};
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(1);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'consent',
+        prev: 'H1'
+      });
+    });
+    
+    it('should set locals', function() {
+      expect(request.locals).to.deep.equal({
+        to: 'test'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should persist state in session', function() {
+      expect(request.session.state['H1'].initiatedAt).to.be.a('number')
+      delete request.session.state['H1'].initiatedAt;
+      
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'start'
+          }
+        }
+      });
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/consent?to=test&state=H1');
+    });
+  }); // prompting via redirect with parameters from an externally initiated flow
+  
   describe('prompting via render from an externally initiated flow', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -316,88 +398,6 @@ describe('Dispatcher#flow', function() {
       });
     });
   }); // prompting via render from an externally initiated flow
-  
-  describe('prompting via redirect with parameters from an externally initiated flow', function() {
-    var hc = 1;
-    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
-      , request, response, err;
-      
-    before(function() {
-      sinon.spy(dispatcher._store, 'load');
-      sinon.spy(dispatcher._store, 'save');
-    });
-      
-    before(function(done) {
-      function handler(req, res, next) {
-        res.prompt('consent', { to: 'test' });
-      }
-      
-      dispatcher.use('consent', [
-        function(req, res, next) {
-          res.redirect('/from/' + req.state.name + '?to=' + req.locals.to);
-        }
-      ], null);
-      
-      
-      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
-        .req(function(req) {
-          request = req;
-          request.query = { state: 'X1' };
-          request.session = {};
-        })
-        .end(function(res) {
-          response = res;
-          done();
-        })
-        .dispatch();
-    });
-    
-    after(function() {
-      dispatcher._store.save.restore();
-      dispatcher._store.load.restore();
-    });
-    
-    
-    it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(0);
-      expect(dispatcher._store.save).to.have.callCount(1);
-    });
-    
-    it('should set state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state).to.deep.equal({
-        name: 'consent',
-        prev: 'H1'
-      });
-    });
-    
-    it('should set locals', function() {
-      expect(request.locals).to.deep.equal({
-        to: 'test'
-      });
-    });
-    
-    it('should not set yieldState', function() {
-      expect(request.yieldState).to.be.undefined;
-    });
-    
-    it('should persist state in session', function() {
-      expect(request.session.state['H1'].initiatedAt).to.be.a('number')
-      delete request.session.state['H1'].initiatedAt;
-      
-      expect(request.session).to.deep.equal({
-        state: {
-          'H1': {
-            name: 'start'
-          }
-        }
-      });
-    });
-    
-    it('should respond', function() {
-      expect(response.getHeader('Location')).to.equal('/from/consent?to=test&state=H1');
-    });
-  }); // prompting via redirect with parameters from an externally initiated flow
   
   describe('rendering from a flow which will eventually resume parent state referenced by query param', function() {
     var hc = 1;
