@@ -909,7 +909,7 @@ describe('Dispatcher#flow', function() {
       chai.express.handler(dispatcher.flow('consent', handler))
         .req(function(req) {
           request = req;
-          request.body = { state: 'H1' };
+          request.query = { state: 'H1' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'start', foo: 'bar' };
         })
@@ -1023,7 +1023,7 @@ describe('Dispatcher#flow', function() {
       chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
         .req(function(req) {
           request = req;
-          request.body = { state: 'H1' };
+          request.query = { state: 'H1' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'start', foo: 'bar' };
         })
