@@ -1085,7 +1085,108 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/start');
     });
-  }); // resuming parent state referenced by query param
+  }); // resuming parent state referenced by query param through synthesized state which finishes by redirecting
+  
+  describe('resuming synthesized state which finishes by redirecting', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          console.log(err);
+          //res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          console.log(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+        .req(function(req) {
+          request = req;
+          request.body = {};
+          request.session = {};
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+      dispatcher._store.destroy.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('federate login(federate)[F]');
+    });
+    
+    // FIXME: double destroy
+    it.skip('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.undefined;
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.undefined;
+      expect(request.yieldState).to.deep.equal({
+        name: 'federate'
+      });
+    });
+    
+    it('should not persist state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/login');
+    });
+  }); // resuming synthesized state which finishes by redirecting
   
   describe.skip('resuming parent state from stored child state', function() {
     
