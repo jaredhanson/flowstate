@@ -30,6 +30,7 @@
   "dependencies": {
     "clone": "^1.0.2",
     "crc": "^3.5.0",
+    "debug": "^3.1.0",
     "uid-safe": "^2.1.0",
     "utils-flatten": "^1.0.0"
   },
