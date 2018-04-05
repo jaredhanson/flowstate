@@ -6,7 +6,7 @@ var chai = require('chai')
 
 describe('Dispatcher#complete', function() {
   
-  describe('resuming parent state from loaded, unnamed state', function() {
+  describe.skip('resuming parent state from loaded, unnamed state', function() {
     
     var request, response, err;
     before(function(done) {
