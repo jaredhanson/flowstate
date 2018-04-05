@@ -1282,7 +1282,7 @@ describe('Dispatcher#flow', function() {
       }
       
       
-      chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+      chai.express.handler(dispatcher.flow('authenticate', handler, { through: 'login' }))
         .req(function(req) {
           request = req;
           request.body = {};
@@ -1303,7 +1303,7 @@ describe('Dispatcher#flow', function() {
     
     
     it('should track correctly', function() {
-      expect(response.__track).to.equal('federate login(federate)[F]');
+      expect(response.__track).to.equal('authenticate login(authenticate)[F]');
     });
     
     // FIXME: double destroy
@@ -1333,7 +1333,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.be.an('object');
       expect(request.yieldState.handle).to.be.undefined;
       expect(request.yieldState).to.deep.equal({
-        name: 'federate'
+        name: 'authenticate'
       });
     });
     
