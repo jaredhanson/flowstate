@@ -779,12 +779,11 @@ describe('Dispatcher#flow', function() {
       
     before(function(done) {
       function handler(req, res, next) {
-        res.locals.baz = 'qux';
         res.render('views/' + req.state.name);
       }
       
       
-      chai.express.handler(dispatcher.flow('consent', handler))
+      chai.express.handler(dispatcher.flow('login', handler))
         .req(function(req) {
           request = req;
           request.session = {};
@@ -817,7 +816,7 @@ describe('Dispatcher#flow', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: 'consent'
+        name: 'login'
       });
     });
     
@@ -834,12 +833,10 @@ describe('Dispatcher#flow', function() {
     });
     
     it('should render layout', function() {
-      expect(layout).to.equal('views/consent');
-      expect(response.locals).to.deep.equal({
-        baz: 'qux'
-      });
+      expect(layout).to.equal('views/login');
+      expect(response.locals).to.deep.equal({});
     });
-  }); // prompting via render from a new state where parent state is carried in query param
+  }); // prompting via render from a new state without parent state
   
   describe('prompting via render from a new state where parent state is carried in query param', function() {
     var hc = 1;
@@ -853,12 +850,12 @@ describe('Dispatcher#flow', function() {
       
     before(function(done) {
       function handler(req, res, next) {
-        res.locals.baz = 'qux';
+        res.locals.identifierHint = 'alice@example.com';
         res.render('views/' + req.state.name);
       }
       
       
-      chai.express.handler(dispatcher.flow('consent', handler))
+      chai.express.handler(dispatcher.flow('login', handler))
         .req(function(req) {
           request = req;
           request.query = { state: 'H1' };
@@ -896,7 +893,7 @@ describe('Dispatcher#flow', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: 'consent'
+        name: 'login'
       });
     });
     
@@ -924,9 +921,9 @@ describe('Dispatcher#flow', function() {
     });
     
     it('should render layout', function() {
-      expect(layout).to.equal('views/consent');
+      expect(layout).to.equal('views/login');
       expect(response.locals).to.deep.equal({
-        baz: 'qux',
+        identifierHint: 'alice@example.com',
         state: 'H1'
       });
     });
@@ -944,18 +941,18 @@ describe('Dispatcher#flow', function() {
       
     before(function(done) {
       function handler(req, res, next) {
-        res.locals.baz = 'qux';
+        res.locals.identifierHint = 'alice@example.com';
         res.render('views/' + req.state.name);
       }
       
       
-      chai.express.handler(dispatcher.flow('consent', handler))
+      chai.express.handler(dispatcher.flow('login', handler))
         .req(function(req) {
           request = req;
           request.query = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'start', foo: 'bar' };
-          request.session.state['H2'] = { name: 'consent', beep: 'boop' };
+          request.session.state['H2'] = { name: 'login', failureCount: 2 };
         })
         .res(function(res) {
           res.locals = {};
@@ -988,8 +985,8 @@ describe('Dispatcher#flow', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: 'consent',
-        beep: 'boop'
+        name: 'login',
+        failureCount: 2
       });
     });
     
@@ -1009,17 +1006,17 @@ describe('Dispatcher#flow', function() {
             foo: 'bar'
           },
           'H2': {
-            name: 'consent',
-            beep: 'boop'
+            name: 'login',
+            failureCount: 2
           }
         }
       });
     });
     
     it('should render layout', function() {
-      expect(layout).to.equal('views/consent');
+      expect(layout).to.equal('views/login');
       expect(response.locals).to.deep.equal({
-        baz: 'qux',
+        identifierHint: 'alice@example.com',
         state: 'H2'
       });
     });
