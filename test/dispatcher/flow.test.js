@@ -488,7 +488,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // prompting via redirect with changed state from an externally initiated flow
   
-  describe('prompting via redirect with required state from an externally initiated flow', function() {
+  describe('prompting via redirect with touched state from an externally initiated flow', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -505,7 +505,7 @@ describe('Dispatcher#flow', function() {
       
       dispatcher.use('finish', [
         function(req, res, next) {
-          req.state.required();
+          req.state.touch();
           res.redirect('/from/' + req.state.name);
         }
       ], null);
