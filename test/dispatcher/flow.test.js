@@ -115,7 +115,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -196,7 +196,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -277,7 +277,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -365,7 +365,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -450,7 +450,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'federate',
-        prev: 'H1',
+        parent: 'H1',
         verifier: 'secret'
       });
     });
@@ -476,7 +476,7 @@ describe('Dispatcher#flow', function() {
           },
           'H2': {
             name: 'federate',
-            prev: 'H1',
+            parent: 'H1',
             verifier: 'secret'
           }
         }
@@ -542,7 +542,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'finish',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -567,7 +567,7 @@ describe('Dispatcher#flow', function() {
           },
           'H2': {
             name: 'finish',
-            prev: 'H1'
+            parent: 'H1'
           }
         }
       });
@@ -635,7 +635,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -726,7 +726,7 @@ describe('Dispatcher#flow', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -1234,7 +1234,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState.handle).to.be.undefined;
       expect(request.yieldState).to.deep.equal({
         name: 'login',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -1848,7 +1848,7 @@ describe('Dispatcher#flow', function() {
           request.body = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
-          request.session.state['H2'] = { name: 'bar', y: 2, prev: 'H1' };
+          request.session.state['H2'] = { name: 'bar', y: 2, parent: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -1872,7 +1872,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.deep.equal({
         name: 'bar',
         y: 2,
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -1933,7 +1933,7 @@ describe('Dispatcher#flow', function() {
           request.body = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
-          request.session.state['H2'] = { name: 'bar', y: 2, prev: 'H1' };
+          request.session.state['H2'] = { name: 'bar', y: 2, parent: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -1958,7 +1958,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.deep.equal({
         name: 'bar',
         y: 2,
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -2020,7 +2020,7 @@ describe('Dispatcher#flow', function() {
           request.body = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
-          request.session.state['H2'] = { name: 'baz', z: 3, prev: 'H1' };
+          request.session.state['H2'] = { name: 'baz', z: 3, parent: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -2046,7 +2046,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.be.an('object');
       expect(request.yieldState).to.deep.equal({
         name: 'bar',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -2121,7 +2121,7 @@ describe('Dispatcher#flow', function() {
           request.body = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
-          request.session.state['H2'] = { name: 'baz', z: 3, prev: 'H1' };
+          request.session.state['H2'] = { name: 'baz', z: 3, parent: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -2149,7 +2149,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.be.an('object');
       expect(request.yieldState).to.deep.equal({
         name: 'bar',
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -2236,7 +2236,7 @@ describe('Dispatcher#flow', function() {
           request.body = { state: 'H2' };
           request.session = { state: {} };
           request.session.state['H1'] = { name: 'foo', x: 1 };
-          request.session.state['H2'] = { name: 'baz', z: 3, prev: 'H1' };
+          request.session.state['H2'] = { name: 'baz', z: 3, parent: 'H1' };
         })
         .end(function(res) {
           response = res;
@@ -2265,7 +2265,7 @@ describe('Dispatcher#flow', function() {
       expect(request.yieldState).to.deep.equal({
         name: 'bar',
         z: 3,
-        prev: 'H1'
+        parent: 'H1'
       });
     });
     
@@ -2331,10 +2331,10 @@ describe('Dispatcher#flow', function() {
       chai.express.handler(dispatcher.flow())
         .req(function(req) {
           request = req;
-          request.state = { handle: '22345678', name: 'baz', z: 3, prev: '12345678' };
+          request.state = { handle: '22345678', name: 'baz', z: 3, parent: '12345678' };
           request.session = { state: {} };
           request.session.state['12345678'] = { name: 'foo', x: 1 };
-          request.session.state['22345678'] = { name: 'baz', z: 3, prev: '12345678' };
+          request.session.state['22345678'] = { name: 'baz', z: 3, parent: '12345678' };
         })
         .res(function(res) {
           res.__text = 'bar'
@@ -2362,7 +2362,7 @@ describe('Dispatcher#flow', function() {
         handle: '22345678',
         name: 'bar',
         y: 2,
-        prev: '12345678'
+        parent: '12345678'
       });
     });
     
