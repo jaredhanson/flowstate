@@ -1247,6 +1247,130 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state referenced by query param through synthesized state which finishes by redirecting
   
+  describe('resuming with error parent state referenced by body param through unsynthesized state which resumes by rendering', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, layout, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          req.state.failureCount++;
+          res.locals.message = err.message;
+          res.render('views/' + req.state.name);
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += '[E]';
+          next(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next(new Error('invalid login'));
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('authenticate', handler, { through: 'login' }))
+        .req(function(req) {
+          request = req;
+          request.body = { state: 'H1' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'login', failureCount: 1 };
+        })
+        .res(function(res) {
+          res.locals = {};
+        })
+        .render(function(res, lay) {
+          layout = lay;
+          res.end();
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+      dispatcher._store.destroy.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('authenticate E:login(authenticate)');
+    });
+    
+    // FIXME: double destroy
+    it.skip('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.equal('H1');
+      expect(request.state).to.deep.equal({
+        name: 'login',
+        failureCount: 2
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.undefined;
+      expect(request.yieldState).to.deep.equal({
+        name: 'authenticate'
+      });
+    });
+    
+    it('should persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'H1': {
+            name: 'login',
+            failureCount: 2
+          }
+        }
+      });
+    });
+    
+    it('should render layout', function() {
+      expect(layout).to.equal('views/login');
+      expect(response.locals).to.deep.equal({
+        message: 'invalid login',
+        state: 'H1'
+      });
+    });
+  }); // resuming with error parent state referenced by body param through unsynthesized state which finishes by rendering
+  
   describe('resuming synthesized state which finishes by redirecting', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -1462,7 +1586,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming with error a synthesized state which finishes by rendering
   
-  describe('resuming with error a synthesized state which finishes by updating state and rendering', function() {
+  describe('resuming with error a synthesized state which resumes by rendering updated state', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -1481,7 +1605,9 @@ describe('Dispatcher#flow', function() {
         },
         function(err, req, res, next) {
           res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
-          next(err);
+          req.state.failureCount = 1;
+          res.locals.message = err.message;
+          res.render('views/' + req.state.name);
         }
       ], [
         function(req, res, next) {
@@ -1490,9 +1616,7 @@ describe('Dispatcher#flow', function() {
         },
         function(err, req, res, next) {
           res.__track += '[E]';
-          req.state.failureCount = 1;
-          res.locals.message = err.message;
-          res.render('views/' + req.state.name);
+          next(err);
         }
       ]);
       
@@ -1530,7 +1654,7 @@ describe('Dispatcher#flow', function() {
     
     
     it('should track correctly', function() {
-      expect(response.__track).to.equal('authenticate E:login(authenticate)[E]');
+      expect(response.__track).to.equal('authenticate E:login(authenticate)');
     });
     
     // FIXME: double destroy
@@ -1583,7 +1707,7 @@ describe('Dispatcher#flow', function() {
         state: 'H1'
       });
     });
-  }); // resuming with error a synthesized state which finishes by rendering
+  }); // resuming with error a synthesized state which resumes by rendering updated state
   
   describe('resuming with error a synthesized state which continues with error', function() {
     var hc = 1;
@@ -1693,7 +1817,7 @@ describe('Dispatcher#flow', function() {
     it('should continue with error', function() {
       expect(error.message).to.equal('something went wrong');
     });
-  }); // resuming with error a synthesized state which finishes by rendering
+  }); // resuming with error a synthesized state which continues with error
   
   describe.skip('resuming parent state from stored child state', function() {
     
