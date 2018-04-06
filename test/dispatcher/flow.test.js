@@ -1107,7 +1107,7 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
-      expect(request.state.handle).to.equal('H1');
+      expect(request.state.handle).to.be.null;
       expect(request.state).to.deep.equal({
         name: 'start',
         foo: 'bar'
@@ -1222,7 +1222,7 @@ describe('Dispatcher#flow', function() {
     
     it('should set state', function() {
       expect(request.state).to.be.an('object');
-      expect(request.state.handle).to.equal('H1');
+      expect(request.state.handle).to.be.null;
       expect(request.state).to.deep.equal({
         name: 'start',
         foo: 'bar'
