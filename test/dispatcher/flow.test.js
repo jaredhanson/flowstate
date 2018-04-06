@@ -1263,8 +1263,8 @@ describe('Dispatcher#flow', function() {
           next();
         },
         function(err, req, res, next) {
-          console.log(err);
-          //res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
         }
       ], [
         function(req, res, next) {
@@ -1272,7 +1272,8 @@ describe('Dispatcher#flow', function() {
           res.redirect('/from/' + req.state.name);
         },
         function(err, req, res, next) {
-          console.log(err);
+          res.__track += '[E]';
+          next(err);
         }
       ]);
       
