@@ -1346,6 +1346,119 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming synthesized state which finishes by redirecting
   
+  describe('resuming with error a synthesized state which finishes by rendering', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += '[E]';
+          res.locals.message = err.message;
+          res.render('views/error/' + req.state.name);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next(new Error('something went wrong'));
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('authenticate', handler, { through: 'login' }))
+        .req(function(req) {
+          request = req;
+          request.body = {};
+          request.session = {};
+        })
+        .res(function(res) {
+          res.locals = {};
+        })
+        .render(function(res, lay) {
+          layout = lay;
+          res.end();
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+      dispatcher._store.destroy.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('authenticate E:login(authenticate)[E]');
+    });
+    
+    // FIXME: double destroy
+    it.skip('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.undefined;
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.undefined;
+      expect(request.yieldState).to.deep.equal({
+        name: 'authenticate'
+      });
+    });
+    
+    it('should not persist state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should render layout', function() {
+      expect(layout).to.equal('views/error/login');
+      expect(response.locals).to.deep.equal({
+        message: 'something went wrong'
+      });
+    });
+  }); // resuming with error a synthesized state which finishes by rendering
+  
   describe.skip('resuming parent state from stored child state', function() {
     
     var request, response, err;
