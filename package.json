@@ -1,6 +1,6 @@
 {
   "name": "flowstate",
-  "version": "0.4.1",
+  "version": "0.4.999",
   "description": "Stateful, transactional flows using page-based navigation.",
   "keywords": [
     "express",
