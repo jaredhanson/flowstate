@@ -1038,6 +1038,89 @@ describe('Dispatcher#flow', function() {
     });
   }); // redirecting from a new state without parent state
   
+  describe('continuing and then rendering from a new state without parent state', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, layout, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+      
+    before(function(done) {
+      function handler(req, res, next) {
+        next();
+      }
+      
+      function outHandler(req, res, next) {
+        res.render('views/continue/' + req.state.name);
+      }
+      
+      
+      chai.express.handler([dispatcher.flow('login', handler), outHandler])
+        .req(function(req) {
+          request = req;
+          request.session = {};
+        })
+        .res(function(res) {
+          res.locals = {};
+        })
+        .render(function(res, lay) {
+          layout = lay;
+          res.end();
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should not set optimized parent state', function() {
+      expect(request._state).to.be.undefined;
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should not persist state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should render layout', function() {
+      expect(layout).to.equal('views/continue/login');
+      expect(response.locals).to.deep.equal({});
+    });
+  }); // continuing and then rendering  from a new state without parent state
+  
+  // TODO: continuing from a new state without parent state (loading finish handlers from registered state)
+  
   describe('rendering from a new state where parent state is carried in query param', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
