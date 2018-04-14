@@ -782,7 +782,7 @@ describe('Dispatcher#flow', function() {
     it('should render layout', function() {
       expect(layout).to.equal('views/consent');
       expect(response.locals).to.deep.equal({
-        state: 'X1'
+        state: 'H1'
       });
     });
   }); // prompting via render from an externally initiated flow
@@ -882,7 +882,7 @@ describe('Dispatcher#flow', function() {
       expect(layout).to.equal('views/consent');
       expect(response.locals).to.deep.equal({
         to: 'test',
-        state: 'X1'
+        state: 'H1'
       });
     });
   }); // prompting via render with parameters from an externally initiated flow
