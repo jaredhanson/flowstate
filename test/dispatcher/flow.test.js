@@ -896,6 +896,75 @@ describe('Dispatcher#flow', function() {
     });
   }); // rendering from a new state without parent state
   
+  describe('redirecting from a new state without parent state', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, layout, err;
+      
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+      
+    before(function(done) {
+      function handler(req, res, next) {
+        res.redirect('/from/' + req.state.name);
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('login', handler))
+        .req(function(req) {
+          request = req;
+          request.session = {};
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should not set optimized parent state', function() {
+      expect(request._state).to.be.undefined;
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should not persist state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/login');
+    });
+  }); // redirecting from a new state without parent state
+  
   describe('rendering from a new state where parent state is carried in query param', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -2086,7 +2155,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming with error synthesized state which finishes by rendering
   
-  describe('resuming with error a synthesized state which resumes by rendering updated state', function() {
+  describe('resuming with error synthesized state which resumes by rendering updated state', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -2094,6 +2163,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -2147,9 +2217,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
@@ -2157,19 +2228,11 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('authenticate E:login(authenticate)');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
-      var call = dispatcher._store.load.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      
-      expect(dispatcher._store.save).to.have.callCount(0);
-      
-      expect(dispatcher._store.destroy).to.have.callCount(2);
-      call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
-      expect(call.args[1]).to.equal('H1');
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(1);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -2207,9 +2270,9 @@ describe('Dispatcher#flow', function() {
         state: 'H1'
       });
     });
-  }); // resuming with error a synthesized state which resumes by rendering updated state
+  }); // resuming with error synthesized state which resumes by rendering updated state
   
-  describe('resuming with error a synthesized state which continues with error', function() {
+  describe('resuming with error synthesized state which continues with error', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, error;
@@ -2217,6 +2280,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -2269,9 +2333,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
@@ -2279,19 +2344,11 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('authenticate E:login(authenticate)[E]/E');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
-      var call = dispatcher._store.load.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(0);
-      
-      expect(dispatcher._store.destroy).to.have.callCount(2);
-      call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
-      expect(call.args[1]).to.equal('H1');
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -2317,7 +2374,7 @@ describe('Dispatcher#flow', function() {
     it('should continue with error', function() {
       expect(error.message).to.equal('something went wrong');
     });
-  }); // resuming with error a synthesized state which continues with error
+  }); // resuming with error synthesized state which continues with error
   
   describe.skip('resuming parent state from stored child state', function() {
     
