@@ -1892,6 +1892,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -1936,9 +1937,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
@@ -1946,19 +1948,11 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('authenticate login(authenticate)[F]');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
-      var call = dispatcher._store.load.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(0);
-      
-      expect(dispatcher._store.destroy).to.have.callCount(2);
-      call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
-      expect(call.args[1]).to.equal('H1');
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -1986,7 +1980,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming synthesized state which finishes by redirecting
   
-  describe('resuming with error a synthesized state which finishes by rendering', function() {
+  describe('resuming with error synthesized state which finishes by rendering', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -1994,6 +1988,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -2056,19 +2051,11 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('authenticate E:login(authenticate)[E]');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
-      var call = dispatcher._store.load.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(0);
-      
-      expect(dispatcher._store.destroy).to.have.callCount(2);
-      call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
-      expect(call.args[1]).to.equal('H1');
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -2097,7 +2084,7 @@ describe('Dispatcher#flow', function() {
         message: 'something went wrong'
       });
     });
-  }); // resuming with error a synthesized state which finishes by rendering
+  }); // resuming with error synthesized state which finishes by rendering
   
   describe('resuming with error a synthesized state which resumes by rendering updated state', function() {
     var hc = 1;
