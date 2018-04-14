@@ -2955,6 +2955,7 @@ describe('Dispatcher#flow', function() {
     it('should error', function() {
       expect(err).to.be.an.instanceOf(Error);
       expect(err.constructor.name).to.equal('MissingStateError');
+      // FIXME: Failed to load state
       expect(err.message).to.equal('Failed to load previous state');
       expect(err.handle).to.equal('H1');
     });
