@@ -1288,6 +1288,7 @@ describe('Dispatcher#flow', function() {
     });
   }); // rendering from a current state where state is carried in body param
   
+  // TODO: Modify new and current states and rerender.  Test for persisting state.
   
   
   
@@ -1301,6 +1302,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -1346,9 +1348,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
@@ -1356,18 +1359,16 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('consent start(consent)[F]');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
+    it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       var call = dispatcher._store.load.getCall(0);
       expect(call.args[1]).to.equal('H1');
       
       expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
       
-      expect(dispatcher._store.destroy).to.have.callCount(2);
+      expect(dispatcher._store.destroy).to.have.callCount(1);
       call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
       expect(call.args[1]).to.equal('H1');
     });
     
@@ -1405,6 +1406,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -1461,9 +1463,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
@@ -1471,18 +1474,16 @@ describe('Dispatcher#flow', function() {
       expect(response.__track).to.equal('federate login(federate) start(login)[F]');
     });
     
-    // FIXME: double destroy
-    it.skip('should correctly invoke state store', function() {
+    it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       var call = dispatcher._store.load.getCall(0);
       expect(call.args[1]).to.equal('H1');
       
       expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
       
-      expect(dispatcher._store.destroy).to.have.callCount(2);
+      expect(dispatcher._store.destroy).to.have.callCount(1);
       call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      call = dispatcher._store.destroy.getCall(1);
       expect(call.args[1]).to.equal('H1');
     });
     
@@ -1513,7 +1514,128 @@ describe('Dispatcher#flow', function() {
     });
   }); // resuming parent state referenced by query param through synthesized state which finishes by redirecting
   
-  describe('resuming with error parent state referenced by body param through unsynthesized state which resumes by rendering', function() {
+  describe('resuming parent state referenced by query param through unsynthesized state which finishes by redirecting', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('start', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += '[E]';
+          next(err);
+        }
+      ]);
+      
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H2' };
+          request.session = { state: {} };
+          request.session.state['H2'] = { name: 'login', parent: 'H1' };
+          request.session.state['H1'] = { name: 'start', foo: 'bar' };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('federate login(federate) start(login)[F]');
+    });
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(2);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      var call = dispatcher._store.load.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.null;
+      expect(request.state).to.deep.equal({
+        name: 'start',
+        foo: 'bar'
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.null;
+      expect(request.yieldState).to.deep.equal({
+        name: 'login',
+        parent: 'H1'
+      });
+    });
+    
+    it('should remove completed states from session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/start');
+    });
+  }); // resuming parent state referenced by query param through unsynthesized state which finishes by redirecting
+  
+  describe('resuming with error parent state referenced by body param which resumes by rendering', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, layout, err;
@@ -1521,6 +1643,7 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
     
@@ -1575,9 +1698,10 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
-      dispatcher._store.destroy.restore();
     });
     
     
