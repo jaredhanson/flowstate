@@ -13,6 +13,8 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -35,6 +37,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -43,6 +47,8 @@ describe('Dispatcher#flow', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -73,6 +79,8 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -101,6 +109,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -109,6 +119,8 @@ describe('Dispatcher#flow', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(1);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -153,6 +165,8 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -182,6 +196,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -190,6 +206,8 @@ describe('Dispatcher#flow', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(1);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -235,6 +253,8 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -263,6 +283,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -271,6 +293,8 @@ describe('Dispatcher#flow', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(1);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -318,6 +342,7 @@ describe('Dispatcher#flow', function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
       sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -350,6 +375,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -359,6 +386,7 @@ describe('Dispatcher#flow', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(1);
       expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
@@ -394,7 +422,7 @@ describe('Dispatcher#flow', function() {
     it('should respond', function() {
       expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
     });
-  }); // prompting via redirect from an externally initiated flow
+  }); // prompting via redirect from an externally initiated flow that explicity saved state
   
   describe('prompting via redirect with changed state from an externally initiated flow', function() {
     var hc = 1;
@@ -404,6 +432,8 @@ describe('Dispatcher#flow', function() {
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
     });
       
     before(function(done) {
@@ -433,6 +463,8 @@ describe('Dispatcher#flow', function() {
     });
     
     after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
       dispatcher._store.save.restore();
       dispatcher._store.load.restore();
     });
@@ -441,6 +473,8 @@ describe('Dispatcher#flow', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(0);
       expect(dispatcher._store.save).to.have.callCount(2);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
     });
     
     it('should set state', function() {
