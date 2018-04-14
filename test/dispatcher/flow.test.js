@@ -1117,7 +1117,7 @@ describe('Dispatcher#flow', function() {
       expect(layout).to.equal('views/continue/login');
       expect(response.locals).to.deep.equal({});
     });
-  }); // continuing and then rendering  from a new state without parent state
+  }); // continuing and then rendering from a new state without parent state
   
   // TODO: continuing from a new state without parent state (loading finish handlers from registered state)
   
@@ -2121,6 +2121,95 @@ describe('Dispatcher#flow', function() {
       expect(response.getHeader('Location')).to.equal('/from/login');
     });
   }); // resuming from current state and finishing by redirecting
+  
+  describe('failing to resume from current state due to state not found', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('federate', handler))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H2' };
+          request.session = { state: {} };
+          request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+        })
+        .res(function(res) {
+          response = res;
+        })
+        .next(function(e) {
+          err = e;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should error', function() {
+      expect(err).to.be.an.instanceOf(Error);
+      expect(err.constructor.name).to.equal('MissingStateError');
+      expect(err.message).to.equal('Failed to load previous state');
+      expect(err.handle).to.equal('H1');
+    });
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('federate');
+    });
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(2);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      var call = dispatcher._store.load.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(1);
+      var call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.null;
+      expect(request.state).to.deep.equal({
+        name: 'federate',
+        verifier: 'secret',
+        parent: 'H1'
+      });
+    });
+    
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+    
+    it('should remove completed state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+  }); // failing to resume from current state due to state not found
   
   describe('resuming parent state referenced by query param which finishes by redirecting', function() {
     var hc = 1;
