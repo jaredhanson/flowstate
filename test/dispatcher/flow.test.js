@@ -1145,6 +1145,7 @@ describe('Dispatcher#flow', function() {
       }
       
       function outErrorHandler(err, req, res, next) {
+        res.locals.message = err.message;
         res.render('views/econtinue/' + req.state.name);
       }
       
@@ -1204,7 +1205,7 @@ describe('Dispatcher#flow', function() {
     
     it('should render layout', function() {
       expect(layout).to.equal('views/econtinue/login');
-      expect(response.locals).to.deep.equal({});
+      expect(response.locals).to.deep.equal({ message: 'something went wrong' });
     });
   }); // continuing with error and then rendering from a new state without parent state
   
