@@ -7,12 +7,6 @@ var chai = require('chai')
 /*
 describe('middleware/complete', function() {
   
-  it('should be named completeState', function() {
-    var dispatcher = new Object();
-    var store = new Object();
-    expect(completeState(dispatcher, store).name).to.equal('completeState');
-  });
-  
   describe('resuming parent state from state', function() {
     var dispatcher = {
       _dispatch: function(name, from, through, err, req, res, next){ next(); }

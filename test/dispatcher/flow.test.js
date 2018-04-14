@@ -1608,6 +1608,220 @@ describe('Dispatcher#flow', function() {
   
   /***/
   
+  describe('resuming from current state and finishing by redirecting', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += '[E]';
+          next(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('federate', handler))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H2' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'login' };
+          request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('federate login(federate)[F]');
+    });
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(2);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      var call = dispatcher._store.load.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(2);
+      var call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H2');
+      var call = dispatcher._store.destroy.getCall(1);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.null;
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.null;
+      expect(request.yieldState).to.deep.equal({
+        name: 'federate',
+        verifier: 'secret',
+        parent: 'H1'
+      });
+    });
+    
+    it('should remove completed state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/login');
+    });
+  }); // resuming from current state and finishing by redirecting
+  
+  describe('resuming from current state through synthesized state which finishes by redirecting', function() {
+    var hc = 1;
+    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      dispatcher.use('login', null, [
+        function(req, res, next) {
+          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+          next();
+        },
+        function(err, req, res, next) {
+          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+          next(err);
+        }
+      ], [
+        function(req, res, next) {
+          res.__track += '[F]';
+          res.redirect('/from/' + req.state.name);
+        },
+        function(err, req, res, next) {
+          res.__track += '[E]';
+          next(err);
+        }
+      ]);
+      
+      function handler(req, res, next) {
+        res.__track = req.state.name;
+        next();
+      }
+      
+      
+      chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+        .req(function(req) {
+          request = req;
+          request.query = { state: 'H1' };
+          request.session = { state: {} };
+          request.session.state['H1'] = { name: 'federate', verifier: 'secret' };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+    
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+    
+    
+    it('should track correctly', function() {
+      expect(response.__track).to.equal('federate login(federate)[F]');
+    });
+    
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      var call = dispatcher._store.load.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+      
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      
+      expect(dispatcher._store.destroy).to.have.callCount(1);
+      var call = dispatcher._store.destroy.getCall(0);
+      expect(call.args[1]).to.equal('H1');
+    });
+    
+    it('should set state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state.handle).to.be.undefined;
+      expect(request.state).to.deep.equal({
+        name: 'login'
+      });
+    });
+    
+    it('should set yieldState', function() {
+      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState.handle).to.be.null;
+      expect(request.yieldState).to.deep.equal({
+        name: 'federate',
+        verifier: 'secret'
+      });
+    });
+    
+    it('should remove completed state in session', function() {
+      expect(request.session).to.deep.equal({});
+    });
+    
+    it('should respond', function() {
+      expect(response.getHeader('Location')).to.equal('/from/login');
+    });
+  }); // resuming from current state through synthesized state which finishes by redirecting
+  
   describe('resuming parent state referenced by query param which finishes by redirecting', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -2620,110 +2834,6 @@ describe('Dispatcher#flow', function() {
       expect(error.message).to.equal('something went wrong');
     });
   }); // resuming with error synthesized state which continues with error
-  
-  describe('resuming synthesized state which finishes by redirecting from current state', function() {
-    var hc = 1;
-    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
-      , request, response, err;
-    
-    before(function() {
-      sinon.spy(dispatcher._store, 'load');
-      sinon.spy(dispatcher._store, 'save');
-      sinon.spy(dispatcher._store, 'update');
-      sinon.spy(dispatcher._store, 'destroy');
-    });
-    
-    before(function(done) {
-      dispatcher.use('login', null, [
-        function(req, res, next) {
-          res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
-          next();
-        },
-        function(err, req, res, next) {
-          res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
-          next(err);
-        }
-      ], [
-        function(req, res, next) {
-          res.__track += '[F]';
-          res.redirect('/from/' + req.state.name);
-        },
-        function(err, req, res, next) {
-          res.__track += '[E]';
-          next(err);
-        }
-      ]);
-      
-      function handler(req, res, next) {
-        res.__track = req.state.name;
-        next();
-      }
-      
-      
-      chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
-        .req(function(req) {
-          request = req;
-          request.query = { state: 'H1' };
-          request.session = { state: {} };
-          request.session.state['H1'] = { name: 'federate', verifier: 'secret' };
-        })
-        .end(function(res) {
-          response = res;
-          done();
-        })
-        .dispatch();
-    });
-    
-    after(function() {
-      dispatcher._store.destroy.restore();
-      dispatcher._store.update.restore();
-      dispatcher._store.save.restore();
-      dispatcher._store.load.restore();
-    });
-    
-    
-    it('should track correctly', function() {
-      expect(response.__track).to.equal('federate login(federate)[F]');
-    });
-    
-    it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
-      var call = dispatcher._store.load.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-      
-      expect(dispatcher._store.save).to.have.callCount(0);
-      expect(dispatcher._store.save).to.have.callCount(0);
-      
-      expect(dispatcher._store.destroy).to.have.callCount(1);
-      var call = dispatcher._store.destroy.getCall(0);
-      expect(call.args[1]).to.equal('H1');
-    });
-    
-    it('should set state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state.handle).to.be.undefined;
-      expect(request.state).to.deep.equal({
-        name: 'login'
-      });
-    });
-    
-    it('should set yieldState', function() {
-      expect(request.yieldState).to.be.an('object');
-      expect(request.yieldState.handle).to.be.null;
-      expect(request.yieldState).to.deep.equal({
-        name: 'federate',
-        verifier: 'secret'
-      });
-    });
-    
-    it('should remove completed state in session', function() {
-      expect(request.session).to.deep.equal({});
-    });
-    
-    it('should respond', function() {
-      expect(response.getHeader('Location')).to.equal('/from/login');
-    });
-  }); // resuming synthesized state which finishes by redirecting from current state
   
   describe.skip('resuming parent state from stored child state', function() {
     
