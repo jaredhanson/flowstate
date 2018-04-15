@@ -232,7 +232,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // from current state carried in custom query param
     
-    describe('from current state yeilding to parent state', function() {
+    describe('from current state yeilding results to parent state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, err;
@@ -355,7 +355,7 @@ describe('Dispatcher#flow (resume)', function() {
       it('should respond', function() {
         expect(response.getHeader('Location')).to.equal('/from/login');
       });
-    }); // from current state yeilding to parent state
+    }); // from current state yeilding results to parent state
     
     describe('from current state through synthesized state', function() {
       var hc = 1;
@@ -461,7 +461,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // from current state through synthesized state
     
-    describe('from current state yielding through synthesized state', function() {
+    describe('from current state yielding results through synthesized state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, err;
@@ -578,7 +578,7 @@ describe('Dispatcher#flow (resume)', function() {
       it('should respond', function() {
         expect(response.getHeader('Location')).to.equal('/from/login');
       });
-    }); // from current state yielding through synthesized state
+    }); // from current state yielding results through synthesized state
     
     describe('with error from current state', function() {
       var hc = 1;
@@ -1117,6 +1117,283 @@ describe('Dispatcher#flow (resume)', function() {
         expect(response.getHeader('Location')).to.equal('/from/start');
       });
     }); // from new state yielding to state referenced by query param through synthesized state
+    
+    describe('from new state yielding with results to state referenced by query param through synthesized state', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        dispatcher.use('start', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ], [
+          function(req, res, next) {
+            res.__track += '[F]';
+            res.redirect('/from/' + req.state.name);
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            next(err);
+          }
+        ]);
+      
+        dispatcher.use('login', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ]);
+        
+        dispatcher.yield('login', 'federate', [
+          function(req, res, next) {
+            res.__track += ' <' + req.yieldState.name + '>';
+            req.state.issuer = req.yieldState.issuer;
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' <E:' + req.yieldState.name + '>';
+            next(err);
+          }
+        ]);
+      
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          req.state.issuer = 'https://id.example.com'
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+          .req(function(req) {
+            request = req;
+            request.query = { state: 'H1' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'start', foo: 'bar' };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('federate <federate> login(federate) start(login)[F]');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+      
+        expect(dispatcher._store.destroy).to.have.callCount(1);
+        call = dispatcher._store.destroy.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.be.null;
+        expect(request.state).to.deep.equal({
+          name: 'start',
+          foo: 'bar'
+        });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.undefined;
+        expect(request.yieldState).to.deep.equal({
+          name: 'login',
+          parent: 'H1',
+          issuer: 'https://id.example.com'
+        });
+      });
+    
+      it('should remove completed state from session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+    
+      it('should respond', function() {
+        expect(response.getHeader('Location')).to.equal('/from/start');
+      });
+    }); // from new state yielding with results to state referenced by query param through synthesized state
+    
+    describe('from new state yielding with results to state referenced by query param through synthesized state that also yields results', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        dispatcher.use('start', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ], [
+          function(req, res, next) {
+            res.__track += '[F]';
+            res.redirect('/from/' + req.state.name);
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            next(err);
+          }
+        ]);
+      
+        dispatcher.use('login', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            req.state.confidence = 0.5;
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ]);
+        
+        dispatcher.yield('start', 'login', [
+          function(req, res, next) {
+            res.__track += ' <' + req.yieldState.name + '>';
+            req.state.issuer = req.yieldState.issuer;
+            req.state.confidence = req.yieldState.confidence * 100;
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' <E:' + req.yieldState.name + '>';
+            next(err);
+          }
+        ]);
+        
+        dispatcher.yield('login', 'federate', [
+          function(req, res, next) {
+            res.__track += ' <' + req.yieldState.name + '>';
+            req.state.issuer = req.yieldState.issuer;
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' <E:' + req.yieldState.name + '>';
+            next(err);
+          }
+        ]);
+      
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          req.state.issuer = 'https://id.example.com'
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('federate', handler, { through: 'login' }))
+          .req(function(req) {
+            request = req;
+            request.query = { state: 'H1' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'start', foo: 'bar' };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('federate <federate> login(federate) <login> start(login)[F]');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+      
+        expect(dispatcher._store.destroy).to.have.callCount(1);
+        call = dispatcher._store.destroy.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.be.null;
+        expect(request.state).to.deep.equal({
+          name: 'start',
+          foo: 'bar',
+          issuer: 'https://id.example.com',
+          confidence: 50
+        });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.undefined;
+        expect(request.yieldState).to.deep.equal({
+          name: 'login',
+          parent: 'H1',
+          issuer: 'https://id.example.com',
+          confidence: 0.5
+        });
+      });
+    
+      it('should remove completed state from session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+    
+      it('should respond', function() {
+        expect(response.getHeader('Location')).to.equal('/from/start');
+      });
+    }); // from new state yielding with results to state referenced by query param through synthesized state that also yields results
     
     describe('from new state yielding to state referenced by query param through unsynthesized state', function() {
       var hc = 1;
