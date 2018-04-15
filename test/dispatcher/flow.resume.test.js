@@ -2087,6 +2087,99 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // due to parent state being unnamed after error
     
+    describe('due to state not being registered', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('federate', handler))
+          .req(function(req) {
+            request = req;
+            request.query = { state: 'H2' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'login' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+          })
+          .res(function(res) {
+            response = res;
+          })
+          .next(function(e) {
+            err = e;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should error', function() {
+        expect(err).to.be.an.instanceOf(Error);
+        expect(err.constructor.name).to.equal('Error');
+        expect(err.message).to.equal("Cannot find flow 'login'");
+      });
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('federate');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(2);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H2');
+        var call = dispatcher._store.load.getCall(1);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+      
+        expect(dispatcher._store.destroy).to.have.callCount(1);
+        var call = dispatcher._store.destroy.getCall(0);
+        expect(call.args[1]).to.equal('H2');
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.equal('H1');
+        expect(request.state).to.deep.equal({ name: 'login' });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.null;
+        expect(request.yieldState).to.deep.equal({
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        });
+      });
+    
+      it('should maintain state in session', function() {
+        expect(request.session).to.deep.equal({ state: {
+          'H1': { name: 'login' }
+        } });
+      });
+    }); // due to state not being registered
+    
     describe('encountered while destroying current state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
