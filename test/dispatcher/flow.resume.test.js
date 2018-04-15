@@ -407,7 +407,7 @@ describe('Dispatcher#flow (resume)', function() {
           function(err, req, res, next) {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             // FIXME: put this back
-            //req.state.keep();
+            req.state.keep();
             next();
           }
         ], [
