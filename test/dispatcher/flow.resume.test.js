@@ -265,12 +265,17 @@ describe('Dispatcher#flow (resume)', function() {
           }
         ]);
         
-        dispatcher.yield('login', 'federate', function(req, res, next) {
-          res.__track += ' <' + req.yieldState.name + '>';
-          
-          req.state.issuer = req.yieldState.issuer;
-          next();
-        });
+        dispatcher.yield('login', 'federate', [
+          function(req, res, next) {
+            res.__track += ' <' + req.yieldState.name + '>';
+            req.state.issuer = req.yieldState.issuer;
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' <E:' + req.yieldState.name + '>';
+            next(err);
+          }
+        ]);
       
         function handler(req, res, next) {
           res.__track = req.state.name;
