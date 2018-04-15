@@ -3291,6 +3291,243 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // encountered while destroying current state after error
     
+    describe('encountered while saving state kept after resuming', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.stub(dispatcher._store, 'update').yields(new Error('something went wrong saving state'));
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        dispatcher.use('login', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            req.state.ok = true;
+            req.state.keep();
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ], [
+          function(req, res, next) {
+            res.__track += '[F]';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            next(err);
+          }
+        ]);
+      
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('authenticate', handler))
+          .req(function(req) {
+            request = req;
+            request.body = { state: 'H1' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'login', failureCount: 2 };
+          })
+          .res(function(res) {
+            response = res;
+          })
+          .next(function(e) {
+            err = e;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should error', function() {
+        expect(err).to.be.an.instanceOf(Error);
+        expect(err.constructor.name).to.equal('Error');
+        expect(err.message).to.equal('something went wrong saving state');
+      });
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('authenticate login(authenticate)[E]');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(1);
+        var call = dispatcher._store.update.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.equal('H1');
+        expect(request.state).to.deep.equal({
+          name: 'login',
+          failureCount: 2,
+          ok: true
+        });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.undefined;
+        expect(request.yieldState).to.deep.equal({
+          name: 'authenticate'
+        });
+      });
+    
+      it('should maintain state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'H1': {
+              name: 'login',
+              failureCount: 2
+            }
+          }
+        });
+      });
+    }); // encountered while saving state kept after resuming
+    
+    describe('encountered while saving state kept after resuming with error', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.stub(dispatcher._store, 'update').yields(new Error('something went wrong saving state'));
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        dispatcher.use('login', null, [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            req.state.failureCount++;
+            req.state.keep();
+            next(err);
+          }
+        ], [
+          function(req, res, next) {
+            res.__track += '[F]';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            next(err);
+          }
+        ]);
+      
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          next(new Error('invalid credentials'));
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('authenticate', handler))
+          .req(function(req) {
+            request = req;
+            request.body = { state: 'H1' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'login', failureCount: 2 };
+          })
+          .res(function(res) {
+            response = res;
+          })
+          .next(function(e) {
+            err = e;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should error', function() {
+        expect(err).to.be.an.instanceOf(Error);
+        expect(err.constructor.name).to.equal('Error');
+        expect(err.message).to.equal('something went wrong saving state');
+      });
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('authenticate E:login(authenticate)[E]');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(1);
+        var call = dispatcher._store.update.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.equal('H1');
+        expect(request.state).to.deep.equal({
+          name: 'login',
+          failureCount: 3
+        });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.undefined;
+        expect(request.yieldState).to.deep.equal({
+          name: 'authenticate'
+        });
+      });
+    
+      it('should maintain state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'H1': {
+              name: 'login',
+              failureCount: 2
+            }
+          }
+        });
+      });
+    }); // encountered while saving kept state after error
+    
     describe('encountered while loading parent state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
