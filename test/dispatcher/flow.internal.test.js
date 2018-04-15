@@ -85,7 +85,178 @@ describe('Dispatcher#flow (internally-driven)', function() {
       });
     }); // without any state
     
-    describe('with state from query param', function() {
+    describe('without any state in final handler', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, layout, err;
+      
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+      
+      before(function(done) {
+        function handler(req, res, next) {
+          next();
+        }
+      
+        function finalHandler(req, res, next) {
+          res.render('views/final/' + req.state.name);
+        }
+      
+      
+        chai.express.handler([dispatcher.flow('login', handler), finalHandler])
+          .req(function(req) {
+            request = req;
+            request.session = {};
+          })
+          .res(function(res) {
+            res.locals = {};
+          })
+          .render(function(res, lay) {
+            layout = lay;
+            res.end();
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          name: 'login'
+        });
+      });
+    
+      it('should not set optimized parent state', function() {
+        expect(request._state).to.be.undefined;
+      });
+    
+      it('should not set yieldState', function() {
+        expect(request.yieldState).to.be.undefined;
+      });
+    
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+    
+      it('should render layout', function() {
+        expect(layout).to.equal('views/final/login');
+        expect(response.locals).to.deep.equal({});
+      });
+    }); // without any state in final handler
+    
+    describe('without any state in final error handler', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, layout, err;
+      
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+      
+      before(function(done) {
+        function handler(req, res, next) {
+          next(new Error('something went wrong'));
+        }
+      
+        function errorHandler(err, req, res, next) {
+          next(err);
+        }
+      
+        function outHandler(req, res, next) {
+          res.render('views/final/' + req.state.name);
+        }
+      
+        function outErrorHandler(err, req, res, next) {
+          res.locals.message = err.message;
+          res.render('views/final/error/' + req.state.name);
+        }
+      
+      
+        chai.express.handler([dispatcher.flow('login', handler, errorHandler), outHandler, outErrorHandler])
+          .req(function(req) {
+            request = req;
+            request.session = {};
+          })
+          .res(function(res) {
+            res.locals = {};
+          })
+          .render(function(res, lay) {
+            layout = lay;
+            res.end();
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          name: 'login'
+        });
+      });
+    
+      it('should not set optimized parent state', function() {
+        expect(request._state).to.be.undefined;
+      });
+    
+      it('should not set yieldState', function() {
+        expect(request.yieldState).to.be.undefined;
+      });
+    
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+    
+      it('should render layout', function() {
+        expect(layout).to.equal('views/final/error/login');
+        expect(response.locals).to.deep.equal({ message: 'something went wrong' });
+      });
+    }); // without any state in final error handler
+    
+    describe('from new state yielding to state from query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, layout, err;
@@ -178,9 +349,9 @@ describe('Dispatcher#flow (internally-driven)', function() {
           state: 'H1'
         });
       });
-    }); // with state from query param
+    }); // from new state yielding to state from query param
     
-    describe('with state from body param', function() {
+    describe('from new state yielding to state from body param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, layout, err;
@@ -273,9 +444,9 @@ describe('Dispatcher#flow (internally-driven)', function() {
           state: 'H1'
         });
       });
-    }); // with state from body param
+    }); // from new state yielding to state from body param
     
-    describe('in final handler without any state', function() {
+    describe('from current state carried in query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, layout, err;
@@ -289,18 +460,18 @@ describe('Dispatcher#flow (internally-driven)', function() {
       
       before(function(done) {
         function handler(req, res, next) {
-          next();
-        }
-      
-        function finalHandler(req, res, next) {
-          res.render('views/final/' + req.state.name);
+          res.locals.attemptsRemaining = 3 - req.state.failureCount;
+          res.render('views/' + req.state.name);
         }
       
       
-        chai.express.handler([dispatcher.flow('login', handler), finalHandler])
+        chai.express.handler(dispatcher.flow('login', handler))
           .req(function(req) {
             request = req;
-            request.session = {};
+            request.query = { state: 'H2' };
+            request.session = { state: {} };
+            request.session.state['H1'] = { name: 'start', foo: 'bar' };
+            request.session.state['H2'] = { name: 'login', failureCount: 2 };
           })
           .res(function(res) {
             res.locals = {};
@@ -325,7 +496,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
     
     
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H2');
+      
         expect(dispatcher._store.save).to.have.callCount(0);
         expect(dispatcher._store.update).to.have.callCount(0);
         expect(dispatcher._store.destroy).to.have.callCount(0);
@@ -334,7 +508,8 @@ describe('Dispatcher#flow (internally-driven)', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          name: 'login'
+          name: 'login',
+          failureCount: 2
         });
       });
     
@@ -346,105 +521,29 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should not persist state in session', function() {
-        expect(request.session).to.deep.equal({});
-      });
-    
-      it('should render layout', function() {
-        expect(layout).to.equal('views/final/login');
-        expect(response.locals).to.deep.equal({});
-      });
-    }); // in final handler without any state
-    
-    describe('in final error handler without any state', function() {
-      var hc = 1;
-      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
-        , request, response, layout, err;
-      
-      before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
-      });
-      
-      before(function(done) {
-        function handler(req, res, next) {
-          next(new Error('something went wrong'));
-        }
-      
-        function errorHandler(err, req, res, next) {
-          next(err);
-        }
-      
-        function outHandler(req, res, next) {
-          res.render('views/final/' + req.state.name);
-        }
-      
-        function outErrorHandler(err, req, res, next) {
-          res.locals.message = err.message;
-          res.render('views/final/error/' + req.state.name);
-        }
-      
-      
-        chai.express.handler([dispatcher.flow('login', handler, errorHandler), outHandler, outErrorHandler])
-          .req(function(req) {
-            request = req;
-            request.session = {};
-          })
-          .res(function(res) {
-            res.locals = {};
-          })
-          .render(function(res, lay) {
-            layout = lay;
-            res.end();
-          })
-          .end(function(res) {
-            response = res;
-            done();
-          })
-          .dispatch();
-      });
-    
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-    
-    
-      it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
-      });
-    
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({
-          name: 'login'
+      it('should maintain state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'H1': {
+              name: 'start',
+              foo: 'bar'
+            },
+            'H2': {
+              name: 'login',
+              failureCount: 2
+            }
+          }
         });
       });
     
-      it('should not set optimized parent state', function() {
-        expect(request._state).to.be.undefined;
-      });
-    
-      it('should not set yieldState', function() {
-        expect(request.yieldState).to.be.undefined;
-      });
-    
-      it('should not persist state in session', function() {
-        expect(request.session).to.deep.equal({});
-      });
-    
       it('should render layout', function() {
-        expect(layout).to.equal('views/final/error/login');
-        expect(response.locals).to.deep.equal({ message: 'something went wrong' });
+        expect(layout).to.equal('views/login');
+        expect(response.locals).to.deep.equal({
+          attemptsRemaining: 1,
+          state: 'H2'
+        });
       });
-    }); // in final error handler without any state
+    }); // from current state carried in query param
   
   }); // rendering
   
@@ -519,7 +618,7 @@ describe('Dispatcher#flow (internally-driven)', function() {
       });
     }); // without any state
     
-    describe('with state from query param', function() {
+    describe('from new state yielding to state from query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, layout, err;
@@ -601,7 +700,7 @@ describe('Dispatcher#flow (internally-driven)', function() {
       it('should respond', function() {
         expect(response.getHeader('Location')).to.equal('/from/login?state=H1');
       });
-    }); // with state from query param
+    }); // from new state yielding to state from query param
     
   }); // redirecting
   
