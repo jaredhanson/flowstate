@@ -993,4 +993,11 @@ describe('Dispatcher#flow (internally-driven)', function() {
     
   }); // redirecting
   
+  
+  describe('failure', function() {
+    
+    // TODO: required state not found
+    
+  }); // failure
+  
 });

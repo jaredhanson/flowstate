@@ -1163,89 +1163,6 @@ describe('Dispatcher#flow (resume)', function() {
   
   describe('failure', function() {
     
-    describe('due to current state not found', function() {
-      var hc = 1;
-      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
-      });
-    
-      before(function(done) {
-        function handler(req, res, next) {
-          res.__track = req.state.name;
-          next();
-        }
-      
-      
-        chai.express.handler(dispatcher.flow('consent', handler))
-          .req(function(req) {
-            request = req;
-            request.query = { state: 'H1' };
-            request.session = { state: {} };
-          })
-          .res(function(res) {
-            response = res;
-          })
-          .next(function(e) {
-            err = e;
-            done();
-          })
-          .dispatch();
-      });
-    
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-    
-    
-      it('should error', function() {
-        expect(err).to.be.an.instanceOf(Error);
-        expect(err.constructor.name).to.equal('MissingStateError');
-        // FIXME: Failed to load state
-        expect(err.message).to.equal('Failed to load previous state');
-        expect(err.handle).to.equal('H1');
-      });
-    
-      it('should track correctly', function() {
-        expect(response.__track).to.equal('consent');
-      });
-    
-      // FIXME: this should only call load once, but calls it twice
-      it.skip('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(1);
-        var call = dispatcher._store.load.getCall(0);
-        expect(call.args[1]).to.equal('H1');
-      
-        expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
-      });
-    
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state.handle).to.be.undefined;
-        expect(request.state).to.deep.equal({
-          name: 'consent'
-        });
-      });
-    
-      it('should not set yieldState', function() {
-        expect(request.yieldState).to.be.undefined;
-      });
-    
-      it('should not modify session', function() {
-        expect(request.session).to.deep.equal({ state: {} });
-      });
-    }); // due to current state not found
-    
     describe('due to parent state not found', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -1421,6 +1338,89 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.session).to.deep.equal({});
       });
     }); // due to parent state not found after error
+    
+    describe('due to state referenced by query param not found', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('consent', handler))
+          .req(function(req) {
+            request = req;
+            request.query = { state: 'H1' };
+            request.session = { state: {} };
+          })
+          .res(function(res) {
+            response = res;
+          })
+          .next(function(e) {
+            err = e;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should error', function() {
+        expect(err).to.be.an.instanceOf(Error);
+        expect(err.constructor.name).to.equal('MissingStateError');
+        // FIXME: Failed to load state
+        expect(err.message).to.equal('Failed to load previous state');
+        expect(err.handle).to.equal('H1');
+      });
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('consent');
+      });
+    
+      // FIXME: this should only call load once, but calls it twice
+      it.skip('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H1');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.be.undefined;
+        expect(request.state).to.deep.equal({
+          name: 'consent'
+        });
+      });
+    
+      it('should not set yieldState', function() {
+        expect(request.yieldState).to.be.undefined;
+      });
+    
+      it('should not modify session', function() {
+        expect(request.session).to.deep.equal({ state: {} });
+      });
+    }); // due to state referenced by query param not found
     
     describe('due to parent state being unnamed', function() {
       var hc = 1;
