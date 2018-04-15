@@ -3291,7 +3291,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // encountered while destroying current state after error
     
-    describe('encountered while saving state kept after resuming', function() {
+    describe('encountered while saving state kept after resuming state referenced by query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, err;
@@ -3408,9 +3408,9 @@ describe('Dispatcher#flow (resume)', function() {
           }
         });
       });
-    }); // encountered while saving state kept after resuming
+    }); // encountered while saving state kept after resuming state referenced by query param
     
-    describe('encountered while saving state kept after resuming with error', function() {
+    describe('encountered while saving state kept after resuming state referenced by query param with error', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, err;
@@ -3526,7 +3526,9 @@ describe('Dispatcher#flow (resume)', function() {
           }
         });
       });
-    }); // encountered while saving kept state after error
+    }); // encountered while saving state kept after resuming state referenced by query param with error
+    
+    // TODO: Resume through to a synthentic state and keep it, failing with error (and success cases)
     
     describe('encountered while loading parent state', function() {
       var hc = 1;
