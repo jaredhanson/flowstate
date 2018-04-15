@@ -749,7 +749,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain existing session', function() {
+      it('should not persist completed state in session', function() {
         expect(request.session).to.deep.equal({});
       });
     
@@ -1219,7 +1219,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should not persist state in session', function() {
+      it('should maintain state in session', function() {
         expect(request.session).to.deep.equal({});
       });
     
@@ -1457,7 +1457,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should persist state in session', function() {
+      it('should maintain state in session', function() {
         expect(request.session).to.deep.equal({
           state: {
             'H1': {
@@ -1736,7 +1736,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should not modify session', function() {
+      it('should maintain state in session', function() {
         expect(request.session).to.deep.equal({ state: {} });
       });
     }); // due to state referenced by query param not found
