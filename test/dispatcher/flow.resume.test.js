@@ -108,6 +108,16 @@ describe('Dispatcher#flow (resume)', function() {
           parent: 'H1'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -221,6 +231,16 @@ describe('Dispatcher#flow (resume)', function() {
           verifier: 'secret',
           parent: 'H1'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -355,6 +375,19 @@ describe('Dispatcher#flow (resume)', function() {
           name: 'login',
           parent: 'H0'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H0'
+        }, {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -491,6 +524,19 @@ describe('Dispatcher#flow (resume)', function() {
           parent: 'H0'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H0'
+        }, {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
+      });
     
       it('should remove completed state from session, including kept state because it has a parent state', function() {
         expect(request.session).to.deep.equal({});
@@ -616,6 +662,17 @@ describe('Dispatcher#flow (resume)', function() {
           issuer: 'https://id.example.com'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1',
+          issuer: 'https://id.example.com'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -719,6 +776,15 @@ describe('Dispatcher#flow (resume)', function() {
           name: 'federate',
           verifier: 'secret'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -839,6 +905,16 @@ describe('Dispatcher#flow (resume)', function() {
           issuer: 'https://id.example.com'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret',
+          issuer: 'https://id.example.com'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -953,6 +1029,16 @@ describe('Dispatcher#flow (resume)', function() {
           parent: 'H1'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -1056,6 +1142,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'consent'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'consent'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -1165,6 +1259,14 @@ describe('Dispatcher#flow (resume)', function() {
           name: 'consent'
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'consent'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -1260,6 +1362,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'authenticate'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(1);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'authenticate'
+        } ]);
       });
     
       it('should not persist completed state in session', function() {
@@ -1376,6 +1486,17 @@ describe('Dispatcher#flow (resume)', function() {
           name: 'login',
           parent: 'H1'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H1'
+        }, {
+          name: 'federate'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -1506,6 +1627,19 @@ describe('Dispatcher#flow (resume)', function() {
           parent: 'H1',
           issuer: 'https://id.example.com'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H1',
+          issuer: 'https://id.example.com'
+        }, {
+          name: 'federate',
+          issuer: 'https://id.example.com'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
@@ -1654,6 +1788,20 @@ describe('Dispatcher#flow (resume)', function() {
           confidence: 0.5
         });
       });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H1',
+          issuer: 'https://id.example.com',
+          confidence: 0.5
+        }, {
+          name: 'federate',
+          issuer: 'https://id.example.com'
+        } ]);
+      });
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({});
@@ -1774,6 +1922,17 @@ describe('Dispatcher#flow (resume)', function() {
           name: 'login',
           parent: 'H1'
         });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H1'
+        }, {
+          name: 'federate'
+        } ]);
       });
     
       it('should remove completed state from session', function() {
