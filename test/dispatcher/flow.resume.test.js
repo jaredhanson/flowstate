@@ -2925,7 +2925,7 @@ describe('Dispatcher#flow (resume)', function() {
       it('should error', function() {
         expect(err).to.be.an.instanceOf(Error);
         expect(err.constructor.name).to.equal('Error');
-        expect(err.message).to.equal("Cannot find flow 'login'");
+        expect(err.message).to.equal("Unknown state 'login'");
       });
     
       it('should track correctly', function() {
