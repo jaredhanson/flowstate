@@ -187,17 +187,17 @@ describe('Dispatcher#flow (internally-driven)', function() {
           next(err);
         }
       
-        function outHandler(req, res, next) {
+        function finalHandler(req, res, next) {
           res.render('views/final/' + req.state.name);
         }
       
-        function outErrorHandler(err, req, res, next) {
+        function finalErrorHandler(err, req, res, next) {
           res.locals.message = err.message;
-          res.render('views/final/error/' + req.state.name);
+          res.render('views/final/' + req.state.name);
         }
       
       
-        chai.express.handler([dispatcher.flow('login', handler, errorHandler), outHandler, outErrorHandler])
+        chai.express.handler([dispatcher.flow('login', handler, errorHandler), finalHandler, finalErrorHandler])
           .req(function(req) {
             request = req;
             request.session = {};
@@ -251,7 +251,7 @@ describe('Dispatcher#flow (internally-driven)', function() {
       });
     
       it('should render layout', function() {
-        expect(layout).to.equal('views/final/error/login');
+        expect(layout).to.equal('views/final/login');
         expect(response.locals).to.deep.equal({ message: 'something went wrong' });
       });
     }); // without any state in final error handler
