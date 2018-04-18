@@ -399,6 +399,153 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // from grandparent state of current state
     
+    describe('from grandparent state of current state where grandparent state errors in resume', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        dispatcher.use('start', { resume: [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next(new Error('something went wrong'));
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ], finish: [
+          function(req, res, next) {
+            res.__track += '[F]';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            res.redirect('/from/' + req.state.name);
+          }
+        ]});
+        
+        dispatcher.use('login', { resume: [
+          function(req, res, next) {
+            res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
+            next();
+          },
+          function(err, req, res, next) {
+            res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
+            next(err);
+          }
+        ], finish: [
+          function(req, res, next) {
+            res.__track += '[F]';
+            res.redirect('/from/' + req.state.name);
+          },
+          function(err, req, res, next) {
+            res.__track += '[E]';
+            next(err);
+          }
+        ]});
+      
+        function handler(req, res, next) {
+          res.__track = req.state.name;
+          next();
+        }
+      
+      
+        chai.express.handler(dispatcher.flow('federate', handler))
+          .req(function(req) {
+            request = req;
+            request.query = { state: 'H2' };
+            request.session = { state: {} };
+            request.session.state['H0'] = { name: 'start' };
+            request.session.state['H1'] = { name: 'login', parent: 'H0' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+    
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+    
+    
+      it('should track correctly', function() {
+        expect(response.__track).to.equal('federate login(federate) start(login) E:start(login)[E]');
+      });
+    
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(3);
+        var call = dispatcher._store.load.getCall(0);
+        expect(call.args[1]).to.equal('H2');
+        var call = dispatcher._store.load.getCall(1);
+        expect(call.args[1]).to.equal('H1');
+        var call = dispatcher._store.load.getCall(2);
+        expect(call.args[1]).to.equal('H0');
+      
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(0);
+      
+        expect(dispatcher._store.destroy).to.have.callCount(3);
+        var call = dispatcher._store.destroy.getCall(0);
+        expect(call.args[1]).to.equal('H2');
+        var call = dispatcher._store.destroy.getCall(1);
+        expect(call.args[1]).to.equal('H1');
+        var call = dispatcher._store.destroy.getCall(2);
+        expect(call.args[1]).to.equal('H0');
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state.handle).to.be.null;
+        expect(request.state).to.deep.equal({
+          name: 'start'
+        });
+      });
+    
+      it('should set yieldState', function() {
+        expect(request.yieldState).to.be.an('object');
+        expect(request.yieldState.handle).to.be.null;
+        expect(request.yieldState).to.deep.equal({
+          name: 'login',
+          parent: 'H0'
+        });
+      });
+      
+      it('should set yieldStateStack', function() {
+        expect(request.yieldStateStack).to.be.an('array');
+        expect(request.yieldStateStack).to.have.length(2);
+        expect(request.yieldStateStack).to.deep.equal([ {
+          name: 'login',
+          parent: 'H0'
+        }, {
+          name: 'federate',
+          verifier: 'secret',
+          parent: 'H1'
+        } ]);
+      });
+    
+      it('should remove completed state from session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+    
+      it('should respond', function() {
+        expect(response.getHeader('Location')).to.equal('/from/start');
+      });
+    }); // from grandparent state of current state where grandparent state errors in resume
+    
     describe('from grandparent state of current state where parent state requests state be kept', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
