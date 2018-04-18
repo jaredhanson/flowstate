@@ -745,12 +745,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
     
   }); // prompting via render
   
-  describe('responding immediately', function() {
+  describe('redirecting', function() {
     
-    // FIXME: I think these should be set to normal behavior, and redirects should only lack state
-    //        if they are done from `finish`
-    describe('by redirecting', function() {
-      var dispatcher = new Dispatcher()
+    describe('within flow', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, err;
       
       before(function() {
@@ -789,7 +788,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
     
       it('should correctly invoke state store', function() {
         expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(1);
         expect(dispatcher._store.update).to.have.callCount(0);
         expect(dispatcher._store.destroy).to.have.callCount(0);
       });
@@ -805,17 +804,29 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should not persist state in session', function() {
-        expect(request.session).to.deep.equal({});
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'H1': {
+              name: 'start'
+            }
+          }
+        });
       });
     
       it('should respond', function() {
-        expect(response.getHeader('Location')).to.equal('/from/start');
+        expect(response.getHeader('Location')).to.equal('/from/start?state=H1');
       });
-    }); // by redirecting
+    }); // within flow
     
-    describe('by rendering', function() {
-      var dispatcher = new Dispatcher()
+  }); // redirecting
+  
+  
+  describe('rendering', function() {
+    
+    describe('within flow', function() {
+      var hc = 1;
+      var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
         , request, response, layout, err;
       
       before(function() {
@@ -861,7 +872,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
     
       it('should correctly invoke state store', function() {
         expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(1);
         expect(dispatcher._store.update).to.have.callCount(0);
         expect(dispatcher._store.destroy).to.have.callCount(0);
       });
@@ -877,17 +888,25 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should not persist state in session', function() {
-        expect(request.session).to.deep.equal({});
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'H1': {
+              name: 'start'
+            }
+          }
+        });
       });
     
       it('should render layout', function() {
         expect(layout).to.equal('views/start');
-        expect(response.locals).to.deep.equal({});
+        expect(response.locals).to.deep.equal({
+          state: 'H1'
+        });
       });
-    }); // by rendering
+    }); // within flow
     
-  }); // responding immediately
+  }); // rendering
   
   
   describe('failure', function() {
