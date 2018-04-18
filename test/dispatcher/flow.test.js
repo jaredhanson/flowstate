@@ -33,7 +33,7 @@ describe('Dispatcher#flow', function() {
     });
     
     before(function(done) {
-      dispatcher.use('login', null, [
+      dispatcher.use('login', { resume: [
         function(req, res, next) {
           res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
           next();
@@ -42,7 +42,7 @@ describe('Dispatcher#flow', function() {
           res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
           next(err);
         }
-      ], [
+      ], finish: [
         function(req, res, next) {
           res.__track += '[F]';
           res.redirect('/from/' + req.state.name);
@@ -51,7 +51,7 @@ describe('Dispatcher#flow', function() {
           res.__track += '[E]';
           next(err);
         }
-      ]);
+      ]});
       
       function handler(req, res, next) {
         res.__track = req.state.name;

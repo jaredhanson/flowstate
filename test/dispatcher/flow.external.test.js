@@ -25,11 +25,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -111,11 +111,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent', { scope: 'test' });
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name + '?scope=' + req.locals.scope);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -200,11 +200,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -291,11 +291,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           });
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -374,12 +374,12 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('federate');
         }
       
-        dispatcher.use('federate', [
+        dispatcher.use('federate', { launch: [
           function(req, res, next) {
             req.state.verifier = 'secret';
             res.redirect('/from/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -468,12 +468,12 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('finish');
         }
       
-        dispatcher.use('finish', [
+        dispatcher.use('finish', { launch: [
           function(req, res, next) {
             req.state.touch();
             res.redirect('/from/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -564,11 +564,11 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.render('views/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -660,12 +660,12 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent', { scope: 'test' });
         }
       
-        dispatcher.use('consent', [
+        dispatcher.use('consent', { launch: [
           function(req, res, next) {
             res.locals.scope = req.locals.scope;
             res.render('views/' + req.state.name);
           }
-        ], null);
+        ]});
       
       
         chai.express.handler(dispatcher.flow('start', handler, { external: true }))
@@ -747,6 +747,8 @@ describe('Dispatcher#flow (externally-initiated)', function() {
   
   describe('responding immediately', function() {
     
+    // FIXME: I think these should be set to normal behavior, and redirects should only lack state
+    //        if they are done from `finish`
     describe('by redirecting', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;

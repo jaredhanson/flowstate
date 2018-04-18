@@ -21,7 +21,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -30,7 +30,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -39,7 +39,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -141,7 +141,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -150,7 +150,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -159,7 +159,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -265,7 +265,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -274,7 +274,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -283,9 +283,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
         
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -294,7 +294,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -303,7 +303,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -412,7 +412,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -421,7 +421,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -430,9 +430,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
         
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -442,7 +442,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next();
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -451,7 +451,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -560,7 +560,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -569,7 +569,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -578,7 +578,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
         
         dispatcher.yield('login', 'federate', [
           function(req, res, next) {
@@ -696,7 +696,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -705,7 +705,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -714,7 +714,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -809,7 +809,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -818,7 +818,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -827,7 +827,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
         
         dispatcher.yield('login', 'federate', [
           function(req, res, next) {
@@ -938,7 +938,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -947,7 +947,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -956,7 +956,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             res.redirect('/from/' + req.state.name + '?message=' + err.message);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1062,7 +1062,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1071,7 +1071,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1080,7 +1080,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1174,7 +1174,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1183,7 +1183,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1192,7 +1192,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1290,7 +1290,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1299,7 +1299,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1308,7 +1308,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1394,7 +1394,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1403,7 +1403,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1412,9 +1412,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1423,7 +1423,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1521,7 +1521,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1530,7 +1530,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1539,9 +1539,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1550,7 +1550,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ]);
+        ]});
         
         dispatcher.yield('login', 'federate', [
           function(req, res, next) {
@@ -1664,7 +1664,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1673,7 +1673,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1682,9 +1682,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             req.state.confidence = 0.5;
@@ -1694,7 +1694,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ]);
+        ]});
         
         dispatcher.yield('start', 'login', [
           function(req, res, next) {
@@ -1825,7 +1825,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('start', null, [
+        dispatcher.use('start', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1834,7 +1834,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1843,9 +1843,9 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1854,7 +1854,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -1962,7 +1962,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -1973,7 +1973,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -1983,7 +1983,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2087,7 +2087,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2097,7 +2097,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2107,7 +2107,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2208,7 +2208,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2217,7 +2217,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2227,7 +2227,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2314,7 +2314,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2325,7 +2325,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2335,7 +2335,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2431,7 +2431,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2441,7 +2441,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2451,7 +2451,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2550,7 +2550,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2561,7 +2561,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2570,7 +2570,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -2674,7 +2674,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -2685,7 +2685,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2694,7 +2694,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3036,7 +3036,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should maintain state in session', function() {
+      it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({ state: {} });
       });
     }); // due to state referenced by query param not found
@@ -3054,7 +3054,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3063,7 +3063,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3072,7 +3072,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3131,12 +3131,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(call.args[1]).to.equal('H2');
       });
     
+      // FIXME: This should be the valid state
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state.handle).to.equal('H1');
         expect(request.state).to.deep.equal({ foo: 'bar' });
       });
     
+      // FIXME: this should not be set
       it('should set yieldState', function() {
         expect(request.yieldState).to.be.an('object');
         expect(request.yieldState.handle).to.be.null;
@@ -3147,7 +3149,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { foo: 'bar' }
         } });
@@ -3167,7 +3169,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3176,7 +3178,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3185,7 +3187,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3219,6 +3221,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
     
+      // FIXME: this should preserve error?
       it('should error', function() {
         expect(err).to.be.an.instanceOf(Error);
         expect(err.constructor.name).to.equal('Error');
@@ -3244,12 +3247,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(call.args[1]).to.equal('H2');
       });
     
+      // FIXME: This should be the valid state
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state.handle).to.equal('H1');
         expect(request.state).to.deep.equal({ foo: 'bar' });
       });
     
+      // FIXME: this should not be set
       it('should set yieldState', function() {
         expect(request.yieldState).to.be.an('object');
         expect(request.yieldState.handle).to.be.null;
@@ -3260,7 +3265,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { foo: 'bar' }
         } });
@@ -3337,12 +3342,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(call.args[1]).to.equal('H2');
       });
     
+      // FIXME: should set state to federate here
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state.handle).to.equal('H1');
         expect(request.state).to.deep.equal({ name: 'login' });
       });
     
+      // FIXME: should not yeild
       it('should set yieldState', function() {
         expect(request.yieldState).to.be.an('object');
         expect(request.yieldState.handle).to.be.null;
@@ -3353,7 +3360,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' }
         } });
@@ -3373,12 +3380,12 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', [
+        dispatcher.use('login', { launch: [
           function(req, res, next) {
           },
           function(err, req, res, next) {
           }
-        ]);
+        ]});
         
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3437,12 +3444,14 @@ describe('Dispatcher#flow (resume)', function() {
         expect(call.args[1]).to.equal('H2');
       });
     
+      // FIXME: should keep state what it was
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state.handle).to.equal('H1');
         expect(request.state).to.deep.equal({ name: 'login' });
       });
     
+      // FIXME: should not set yield state
       it('should set yieldState', function() {
         expect(request.yieldState).to.be.an('object');
         expect(request.yieldState.handle).to.be.null;
@@ -3453,7 +3462,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' }
         } });
@@ -3473,7 +3482,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3482,7 +3491,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3491,7 +3500,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3562,7 +3571,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should maintain state in session', function() {
+      it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' },
           'H2': { name: 'federate', verifier: 'secret', parent: 'H1' }
@@ -3583,7 +3592,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3592,7 +3601,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3601,7 +3610,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3672,7 +3681,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should maintain state in session', function() {
+      it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' },
           'H2': { name: 'federate', verifier: 'secret', parent: 'H1' }
@@ -3693,7 +3702,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             req.state.ok = true;
@@ -3704,7 +3713,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -3713,7 +3722,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3787,7 +3796,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({
           state: {
             'H1': {
@@ -3812,7 +3821,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3823,7 +3832,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -3832,7 +3841,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -3905,7 +3914,7 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     
-      it('should maintain state in session', function() {
+      it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({
           state: {
             'H1': {
@@ -3916,8 +3925,6 @@ describe('Dispatcher#flow (resume)', function() {
         });
       });
     }); // encountered while saving state kept after resuming state referenced by query param with error
-    
-    // TODO: Resume through to a synthentic state and keep it, failing with error (and success cases)
     
     describe('encountered while loading parent state', function() {
       var hc = 1;
@@ -3934,7 +3941,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -3943,7 +3950,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3952,7 +3959,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -4025,7 +4032,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' }
         } });
@@ -4047,7 +4054,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', null, [
+        dispatcher.use('login', { resume: [
           function(req, res, next) {
             res.__track += ' ' + req.state.name + '(' + req.yieldState.name + ')';
             next();
@@ -4056,7 +4063,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], [
+        ], finish: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -4065,7 +4072,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += '[E]';
             next(err);
           }
-        ]);
+        ]});
       
         function handler(req, res, next) {
           res.__track = req.state.name;
@@ -4138,7 +4145,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.be.undefined;
       });
     
-      it('should maintain state in session', function() {
+      it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' }
         } });
