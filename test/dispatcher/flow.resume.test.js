@@ -3684,7 +3684,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       before(function(done) {
-        dispatcher.use('login', { launch: [
+        dispatcher.use('login', { spawn: [
           function(req, res, next) {
           },
           function(err, req, res, next) {

@@ -25,7 +25,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
@@ -111,7 +111,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent', { scope: 'test' });
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name + '?scope=' + req.locals.scope);
           }
@@ -200,7 +200,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
@@ -291,7 +291,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           });
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.redirect('/from/' + req.state.name);
           }
@@ -374,7 +374,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('federate');
         }
       
-        dispatcher.use('federate', { launch: [
+        dispatcher.use('federate', { spawn: [
           function(req, res, next) {
             req.state.verifier = 'secret';
             res.redirect('/from/' + req.state.name);
@@ -468,7 +468,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('finish');
         }
       
-        dispatcher.use('finish', { launch: [
+        dispatcher.use('finish', { spawn: [
           function(req, res, next) {
             req.state.touch();
             res.redirect('/from/' + req.state.name);
@@ -564,7 +564,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent');
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.render('views/' + req.state.name);
           }
@@ -660,7 +660,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
           res.prompt('consent', { scope: 'test' });
         }
       
-        dispatcher.use('consent', { launch: [
+        dispatcher.use('consent', { spawn: [
           function(req, res, next) {
             res.locals.scope = req.locals.scope;
             res.render('views/' + req.state.name);
