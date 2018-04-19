@@ -919,7 +919,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
       });
       
       before(function(done) {
-        dispatcher.use('start', { finish: [
+        dispatcher.use('start', { exit: [
           function(req, res, next) {
             res.render('views/finish/' + req.state.name);
           }
@@ -999,7 +999,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
       });
       
       before(function(done) {
-        dispatcher.use('start', { finish: [
+        dispatcher.use('start', { exit: [
           function(req, res, next) {
             res.render('views/finish/' + req.state.name);
           }

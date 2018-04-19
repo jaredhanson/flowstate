@@ -42,7 +42,7 @@ describe('Dispatcher#flow', function() {
           res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
           next(err);
         }
-      ], finish: [
+      ], exit: [
         function(req, res, next) {
           res.__track += '[F]';
           res.redirect('/from/' + req.state.name);

@@ -30,7 +30,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -150,7 +150,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -274,7 +274,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -294,7 +294,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -421,7 +421,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -441,7 +441,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -568,7 +568,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -589,7 +589,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next();
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -716,7 +716,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -852,7 +852,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -965,7 +965,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1094,7 +1094,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -1218,7 +1218,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1330,7 +1330,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1446,7 +1446,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1550,7 +1550,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1677,7 +1677,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1820,7 +1820,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -1981,7 +1981,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -2120,7 +2120,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2244,7 +2244,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2364,7 +2364,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2472,7 +2472,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2588,7 +2588,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2708,7 +2708,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2832,7 +2832,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.locals.message = err.message;
             res.render('views/' + req.state.name);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2952,7 +2952,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -2972,7 +2972,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -3367,7 +3367,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3482,7 +3482,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3795,7 +3795,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -3905,7 +3905,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -4017,7 +4017,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -4136,7 +4136,7 @@ describe('Dispatcher#flow (resume)', function() {
             req.state.keep();
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             next();
@@ -4254,7 +4254,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
@@ -4367,7 +4367,7 @@ describe('Dispatcher#flow (resume)', function() {
             res.__track += ' E:' + req.state.name + '(' + req.yieldState.name + ')';
             next(err);
           }
-        ], finish: [
+        ], exit: [
           function(req, res, next) {
             res.__track += '[F]';
             res.redirect('/from/' + req.state.name);
