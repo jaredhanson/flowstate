@@ -119,14 +119,14 @@ describe('Dispatcher#flow (NEW)', function() {
       }
     
     
-      chai.express.handler(dispatcher.flow('federate', handler))
+      chai.express.handler(dispatcher.flow('/oauth2/redirect', handler))
         .req(function(req) {
           request = req;
           //request.url = '/oauth2/redirect';
           request.query = { state: 'ogWlCcTb8C8' };
           request.session = { state: {} };
-          request.session.state['8KraIxA8PJA'] = { name: 'login', views: 1 };
-          request.session.state['ogWlCcTb8C8'] = { name: 'federate', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', parent: '8KraIxA8PJA' };
+          request.session.state['8KraIxA8PJA'] = { name: '/ebooks/awesome-sauce', views: 1 };
+          request.session.state['ogWlCcTb8C8'] = { name: '/oauth2/redirect', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', parent: '8KraIxA8PJA' };
         })
         .end(function(res) {
           response = res;
@@ -168,7 +168,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.state).to.be.an('object');
       //expect(request.state.handle).to.be.null;
       expect(request.state).to.deep.equal({
-        name: 'login',
+        name: '/ebooks/awesome-sauce',
         views: 1,
       });
     });
@@ -177,7 +177,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.yieldState).to.be.an('object');
       expect(request.yieldState.handle).to.be.null;
       expect(request.yieldState).to.deep.equal({
-        name: 'federate',
+        name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
         parent: '8KraIxA8PJA'
@@ -188,7 +188,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.yieldStateStack).to.be.an('array');
       expect(request.yieldStateStack).to.have.length(1);
       expect(request.yieldStateStack).to.deep.equal([ {
-        name: 'federate',
+        name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
         parent: '8KraIxA8PJA'
@@ -199,7 +199,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.session).to.deep.equal({
         state: {
           "8KraIxA8PJA": {
-            name: 'login',
+            name: '/ebooks/awesome-sauce',
             views: 1,
           }
         }
