@@ -21,7 +21,7 @@ describe('Dispatcher#flow (NEW)', function() {
     
     before(function(done) {
       function handler(req, res, next) {
-        console.log('handler...');
+        console.log('!!!! handler...');
         console.log(req.state);
         
         req.state.client = { id: '1', name: 'Example' }
@@ -32,7 +32,7 @@ describe('Dispatcher#flow (NEW)', function() {
         //res.prompt('consent');
       }
       
-      dispatcher.use('start', { resume: [
+      dispatcher.use('/oauth2/authorize', { resume: [
         function(req, res, next) {
           console.log('RESUME???');
           //res.redirect('/from/' + req.state.name);
@@ -48,7 +48,8 @@ describe('Dispatcher#flow (NEW)', function() {
       ]});
     
     
-      chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+      //chai.express.handler(dispatcher.flow('start', handler, { external: true }))
+      chai.express.handler(dispatcher.flow(handler, { external: true }))
         .req(function(req) {
           request = req;
           request.url = '/oauth2/authorize';
@@ -100,7 +101,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.session).to.deep.equal({
         state: {
           'H1': {
-            name: 'start',
+            name: '/oauth2/authorize',
             client: { id: '1', name: 'Example' }
           }
         }
