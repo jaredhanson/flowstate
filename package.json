@@ -29,7 +29,7 @@
   "main": "./lib",
   "dependencies": {
     "clone": "^1.0.2",
-    "crc": "^3.5.0",
+    "crc": "^3.8.0",
     "debug": "^3.1.0",
     "uid-safe": "^2.1.0",
     "utils-flatten": "^1.0.0"
@@ -39,7 +39,7 @@
     "chai-connect-middleware": "0.3.x",
     "chai-express-handler": "0.0.3",
     "make-node": "^0.3.0",
-    "mocha": "^2.0.0",
+    "mocha": "^2.5.3",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0"
   },
