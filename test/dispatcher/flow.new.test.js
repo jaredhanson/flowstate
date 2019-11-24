@@ -6,10 +6,11 @@ var chai = require('chai')
 
 describe('Dispatcher#flow (NEW)', function() {
   
+  // TODO: Make test case with return_to post parameter, to /authorize
   
-  describe.skip('login and resume', function() {
+  describe.only('login and resume', function() {
     var hc = 1;
-    var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
+    var dispatcher = new Dispatcher()
       , request, response, err;
     
     before(function() {
@@ -21,48 +22,30 @@ describe('Dispatcher#flow (NEW)', function() {
     
     before(function(done) {
       function handler(req, res, next) {
-        console.log('!!!! handler...');
-        console.log(req.state);
-        
-        req.state.client = { id: '1', name: 'Example' }
-        
+        req.state.authN = [ { method: 'password' } ];
         next();
-        
-        
-        //res.prompt('consent');
       }
-      
-      dispatcher.use('/login/password', { resume: [
-        function(req, res, next) {
-          console.log('RESUME???');
-          //res.redirect('/from/' + req.state.name);
-          
-          res.prompt('consent');
-        }
-      ]});
-    
-      dispatcher.use('consent', { launch: [
-        function(req, res, next) {
-          res.redirect('/from/' + req.state.name);
-        }
-      ]});
     
     
       //chai.express.handler(dispatcher.flow('start', handler, { external: true }))
-      chai.express.handler(dispatcher.flow(handler, { external: true }))
+      //chai.express.handler(dispatcher.flow(handler, { external: true }))
+      chai.express.handler(dispatcher.flow(handler))
         .req(function(req) {
           request = req;
           request.method = 'POST';
           request.url = '/login/password';
-          request.query = { state: 'X1' };
+          request.query = { state: 'B1' };
           request.session = {};
+          request.session.state = {};
+          request.session.state['B1'] = {
+            client: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            returnTo: '/continue'
+          };
         })
         .end(function(res) {
           response = res;
           done();
-        })
-        .next(function(err) {
-          console.log(err)
         })
         .dispatch();
     });
@@ -76,22 +59,25 @@ describe('Dispatcher#flow (NEW)', function() {
   
   
     it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(0);
-      expect(dispatcher._store.save).to.have.callCount(1);
-      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.load).to.have.callCount(1);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(2); // FIXME: why 2?
       expect(dispatcher._store.destroy).to.have.callCount(0);
     });
   
+    
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: 'consent',
-        parent: 'H1'
+        returnTo: '/continue',
+        client: 's6BhdRkqt3',
+        redirectURI: 'https://client.example.com/cb',
+        authN: [ { method: 'password' } ]
       });
     });
-  
-    it('should set locals', function() {
-      expect(request.locals).to.deep.equal({});
+    
+    it('should not set locals', function() {
+      expect(request.locals).to.be.undefined;
     });
   
     it('should not set yieldState', function() {
@@ -99,21 +85,20 @@ describe('Dispatcher#flow (NEW)', function() {
     });
   
     it('should persist state in session', function() {
-      //expect(request.session.state['H1'].initiatedAt).to.be.a('number')
-      //delete request.session.state['H1'].initiatedAt;
-    
       expect(request.session).to.deep.equal({
         state: {
-          'H1': {
-            name: '/login/password',
-            client: { id: '1', name: 'Example' }
+          'B1': {
+            client: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            authN: [ { method: 'password' } ],
+            returnTo: '/continue'
           }
         }
       });
     });
   
     it('should respond', function() {
-      expect(response.getHeader('Location')).to.equal('/from/consent?state=H1');
+      expect(response.getHeader('Location')).to.equal('/continue?state=B1');
     });
   }); // login and resume
   
