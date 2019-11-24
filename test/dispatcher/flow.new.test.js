@@ -9,7 +9,7 @@ describe('Dispatcher#flow (NEW)', function() {
   // TODO: Make test case with return_to post parameter, to /authorize
   
   // TODO: test case for when return_to already has a state param.  overwrite or not???
-  describe('login and return to with updated state', function() {
+  describe('return with new state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
@@ -98,9 +98,9 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(response.statusCode).to.equal(302);
       expect(response.getHeader('Location')).to.equal('/continue?state=txn123');
     });
-  }); // login and return to with updated state
+  }); // return with new state
   
-  describe('login and return to without state', function() {
+  describe('return without state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
@@ -173,7 +173,98 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(response.statusCode).to.equal(302);
       expect(response.getHeader('Location')).to.equal('/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb');
     });
-  }); // login and return to without state
+  }); // return without state
+  
+  // TODO: test case where state isn't modified, should only have return_to param in redirect
+  describe('begin transaction and redirect', function() {
+    var t = 0
+      , dispatcher = new Dispatcher({ genh: function() { return 'txn' + t++; } })
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      function handler(req, res, next) {
+        req.state.client = { id: 's6BhdRkqt3' };
+        req.state.redirectURI = 'https://client.example.com/cb';
+        res.redirect('/login');
+      }
+      
+      chai.express.handler(dispatcher.flow(handler, { external: true }))
+        .req(function(req) {
+          request = req;
+          request.method = 'GET';
+          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+          request.session = {};
+          request.session.state = {};
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .next(function(err) {
+          console.log(err)
+        })
+        .dispatch();
+    });
+  
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+  
+  
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(1);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    it('should update state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
+        returnTo: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
+        client: { id: 's6BhdRkqt3' },
+        redirectURI: 'https://client.example.com/cb'
+      });
+    });
+    
+    // FIXME: remove name
+    it('should persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'txn0': {
+            name: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
+            returnTo: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
+            client: { id: 's6BhdRkqt3' },
+            redirectURI: 'https://client.example.com/cb'
+          }
+        }
+      });
+    });
+    
+    it('should not set locals', function() {
+      expect(request.locals).to.be.undefined;
+    });
+  
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+  
+    it('should redirect', function() {
+      expect(response.statusCode).to.equal(302);
+      expect(response.getHeader('Location')).to.equal('/login?state=txn0');
+    });
+  }); // begin transaction and redirect
   
   
   
