@@ -8,8 +8,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   // TODO: Make test case with return_to post parameter, to /authorize
   
-  describe('login and resume', function() {
-    var hc = 1;
+  describe('login and return to with updated state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
@@ -25,22 +24,19 @@ describe('Dispatcher#flow (NEW)', function() {
         req.state.authN = [ { method: 'password' } ];
         next();
       }
-    
-    
-      //chai.express.handler(dispatcher.flow('start', handler, { external: true }))
-      //chai.express.handler(dispatcher.flow(handler, { external: true }))
+      
       chai.express.handler(dispatcher.flow(handler))
         .req(function(req) {
           request = req;
           request.method = 'POST';
-          request.url = '/login/password';
-          request.query = { state: 'B1' };
+          request.url = '/login';
+          request.body = { state: 'txn123' };
           request.session = {};
           request.session.state = {};
-          request.session.state['B1'] = {
+          request.session.state['txn123'] = {
+            returnTo: '/continue',
             client: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb',
-            returnTo: '/continue'
+            redirectURI: 'https://client.example.com/cb'
           };
         })
         .end(function(res) {
@@ -61,18 +57,31 @@ describe('Dispatcher#flow (NEW)', function() {
     it('should correctly invoke state store', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       expect(dispatcher._store.save).to.have.callCount(0);
-      expect(dispatcher._store.update).to.have.callCount(2); // FIXME: why 2?
+      // FIXME: why 2?
+      expect(dispatcher._store.update).to.have.callCount(2);
       expect(dispatcher._store.destroy).to.have.callCount(0);
     });
-  
     
-    it('should set state', function() {
+    it('should update state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         returnTo: '/continue',
         client: 's6BhdRkqt3',
         redirectURI: 'https://client.example.com/cb',
         authN: [ { method: 'password' } ]
+      });
+    });
+    
+    it('should persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'txn123': {
+            client: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            authN: [ { method: 'password' } ],
+            returnTo: '/continue'
+          }
+        }
       });
     });
     
@@ -84,21 +93,8 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.yieldState).to.be.undefined;
     });
   
-    it('should persist state in session', function() {
-      expect(request.session).to.deep.equal({
-        state: {
-          'B1': {
-            client: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb',
-            authN: [ { method: 'password' } ],
-            returnTo: '/continue'
-          }
-        }
-      });
-    });
-  
     it('should respond', function() {
-      expect(response.getHeader('Location')).to.equal('/continue?state=B1');
+      expect(response.getHeader('Location')).to.equal('/continue?state=txn123');
     });
   }); // login and resume
   
