@@ -93,10 +93,86 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.yieldState).to.be.undefined;
     });
   
-    it('should respond', function() {
+    it('should redirect', function() {
+      expect(response.statusCode).to.equal(302);
       expect(response.getHeader('Location')).to.equal('/continue?state=txn123');
     });
-  }); // login and resume
+  }); // login and return to with updated state
+  
+  describe('login and return to without state', function() {
+    var dispatcher = new Dispatcher()
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      function handler(req, res, next) {
+        req.session.user = { id: '248289761001' };
+        next();
+      }
+      
+      chai.express.handler(dispatcher.flow(handler))
+        .req(function(req) {
+          request = req;
+          request.method = 'POST';
+          request.url = '/login';
+          request.body = { return_to: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb' };
+          request.session = {};
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+  
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+  
+  
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(0);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      expect(dispatcher._store.update).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    // FIXME: This is off
+    it('should update state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        name: '/login'
+      });
+    });
+    
+    it('should update session', function() {
+      expect(request.session).to.deep.equal({
+        user: { id: '248289761001' }
+      });
+    });
+    
+    it('should not set locals', function() {
+      expect(request.locals).to.be.undefined;
+    });
+  
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+  
+    it('should redirect', function() {
+      expect(response.statusCode).to.equal(302);
+      expect(response.getHeader('Location')).to.equal('/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb');
+    });
+  }); // login and return to without state
   
   
   
