@@ -8,7 +8,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   // TODO: Make test case with return_to post parameter, to /authorize
   
-  describe.only('login and resume', function() {
+  describe('login and resume', function() {
     var hc = 1;
     var dispatcher = new Dispatcher()
       , request, response, err;
@@ -104,7 +104,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   
   
-  describe('incomplete external state prompting without options', function() {
+  describe.skip('incomplete external state prompting without options', function() {
     var hc = 1;
     var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
       , request, response, err;
@@ -212,7 +212,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   
   
-  describe('returning to location specified in state', function() {
+  describe.skip('returning to location specified in state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
   
@@ -284,7 +284,7 @@ describe('Dispatcher#flow (NEW)', function() {
   }); // returning to location specified in state
   
   
-  describe('returning to location specified in state and restoring prior state', function() {
+  describe.skip('returning to location specified in state and restoring prior state', function() {
     var hc = 1;
     var dispatcher = new Dispatcher()
       , request, response, err;
@@ -418,7 +418,7 @@ describe('Dispatcher#flow (NEW)', function() {
   }); // returning to location specified in state and restoring prior state
   
   
-  describe('returning to location specified in state and restoring prior state with update', function() {
+  describe.skip('returning to location specified in state and restoring prior state with update', function() {
     var hc = 1;
     var dispatcher = new Dispatcher()
       , request, response, err;
