@@ -8,6 +8,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   // TODO: Make test case with return_to post parameter, to /authorize
   
+  // TODO: test case for when return_to already has a state param.  overwrite or not???
   describe('login and return to with updated state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
@@ -35,7 +36,7 @@ describe('Dispatcher#flow (NEW)', function() {
           request.session.state = {};
           request.session.state['txn123'] = {
             returnTo: '/continue',
-            client: 's6BhdRkqt3',
+            client: { id: 's6BhdRkqt3' },
             redirectURI: 'https://client.example.com/cb'
           };
         })
@@ -66,7 +67,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         returnTo: '/continue',
-        client: 's6BhdRkqt3',
+        client: { id: 's6BhdRkqt3' },
         redirectURI: 'https://client.example.com/cb',
         authN: [ { method: 'password' } ]
       });
@@ -76,10 +77,10 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.session).to.deep.equal({
         state: {
           'txn123': {
-            client: 's6BhdRkqt3',
+            returnTo: '/continue',
+            client: { id: 's6BhdRkqt3' },
             redirectURI: 'https://client.example.com/cb',
-            authN: [ { method: 'password' } ],
-            returnTo: '/continue'
+            authN: [ { method: 'password' } ]
           }
         }
       });
