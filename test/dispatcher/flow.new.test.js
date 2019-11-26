@@ -6,9 +6,6 @@ var chai = require('chai')
 
 describe('Dispatcher#flow (NEW)', function() {
   
-  // TODO: Make test case with return_to post parameter, to /authorize
-  
-  // TODO: test case for when return_to already has a state param.  overwrite or not???
   describe('return with new state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
@@ -22,7 +19,7 @@ describe('Dispatcher#flow (NEW)', function() {
     
     before(function(done) {
       function handler(req, res, next) {
-        req.state.authN = [ { method: 'password' } ];
+        req.state.federatedUser = { id: '248289761001', provider: 'https://accounts.google.com' };
         next();
       }
       
@@ -30,8 +27,8 @@ describe('Dispatcher#flow (NEW)', function() {
         .req(function(req) {
           request = req;
           request.method = 'POST';
-          request.url = '/login';
-          request.body = { state: 'txn123' };
+          request.url = '/login/password';
+          request.body = { username: 'aladdin', password: 'opensesame', state: 'txn123' };
           request.session = {};
           request.session.state = {};
           request.session.state['txn123'] = {
@@ -69,7 +66,7 @@ describe('Dispatcher#flow (NEW)', function() {
         returnTo: '/continue',
         client: { id: 's6BhdRkqt3' },
         redirectURI: 'https://client.example.com/cb',
-        authN: [ { method: 'password' } ]
+        federatedUser: { id: '248289761001', provider: 'https://accounts.google.com' }
       });
     });
     
@@ -80,7 +77,7 @@ describe('Dispatcher#flow (NEW)', function() {
             returnTo: '/continue',
             client: { id: 's6BhdRkqt3' },
             redirectURI: 'https://client.example.com/cb',
-            authN: [ { method: 'password' } ]
+            federatedUser: { id: '248289761001', provider: 'https://accounts.google.com' }
           }
         }
       });
@@ -100,7 +97,99 @@ describe('Dispatcher#flow (NEW)', function() {
     });
   }); // return with new state
   
-  describe('return without state', function() {
+  // TODO: test case for when return_to already has a state param.  overwrite or not???
+  describe('return with updated state', function() {
+    var dispatcher = new Dispatcher()
+      , request, response, err;
+    
+    before(function() {
+      sinon.spy(dispatcher._store, 'load');
+      sinon.spy(dispatcher._store, 'save');
+      sinon.spy(dispatcher._store, 'update');
+      sinon.spy(dispatcher._store, 'destroy');
+    });
+    
+    before(function(done) {
+      function handler(req, res, next) {
+        req.state.authN = [ { method: 'password' } ];
+        next();
+      }
+      
+      chai.express.handler(dispatcher.flow(handler))
+        .req(function(req) {
+          request = req;
+          request.method = 'POST';
+          request.url = '/login/password';
+          request.body = { username: 'aladdin', password: 'opensesame', state: 'txn123' };
+          request.session = {};
+          request.session.state = {};
+          request.session.state['txn123'] = {
+            returnTo: '/oauth2/continue',
+            client: { id: 's6BhdRkqt3' },
+            redirectURI: 'https://client.example.com/cb'
+          };
+        })
+        .end(function(res) {
+          response = res;
+          done();
+        })
+        .dispatch();
+    });
+  
+    after(function() {
+      dispatcher._store.destroy.restore();
+      dispatcher._store.update.restore();
+      dispatcher._store.save.restore();
+      dispatcher._store.load.restore();
+    });
+  
+  
+    it('should correctly invoke state store', function() {
+      expect(dispatcher._store.load).to.have.callCount(1);
+      expect(dispatcher._store.save).to.have.callCount(0);
+      // FIXME: why 2?
+      expect(dispatcher._store.update).to.have.callCount(2);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    it('should update state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        returnTo: '/oauth2/continue',
+        client: { id: 's6BhdRkqt3' },
+        redirectURI: 'https://client.example.com/cb',
+        authN: [ { method: 'password' } ]
+      });
+    });
+    
+    it('should persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'txn123': {
+            returnTo: '/oauth2/continue',
+            client: { id: 's6BhdRkqt3' },
+            redirectURI: 'https://client.example.com/cb',
+            authN: [ { method: 'password' } ]
+          }
+        }
+      });
+    });
+    
+    it('should not set locals', function() {
+      expect(request.locals).to.be.undefined;
+    });
+  
+    it('should not set yieldState', function() {
+      expect(request.yieldState).to.be.undefined;
+    });
+  
+    it('should redirect', function() {
+      expect(response.statusCode).to.equal(302);
+      expect(response.getHeader('Location')).to.equal('/oauth2/continue?state=txn123');
+    });
+  }); // return with updated state
+  
+  describe('return to without state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
@@ -121,8 +210,8 @@ describe('Dispatcher#flow (NEW)', function() {
         .req(function(req) {
           request = req;
           request.method = 'POST';
-          request.url = '/login';
-          request.body = { return_to: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb' };
+          request.url = '/login/password';
+          request.body = { username: 'aladdin', password: 'opensesame', return_to: '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb' };
           request.session = {};
         })
         .end(function(res) {
@@ -151,7 +240,7 @@ describe('Dispatcher#flow (NEW)', function() {
     it('should update state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: '/login'
+        name: '/login/password'
       });
     });
     
@@ -171,9 +260,9 @@ describe('Dispatcher#flow (NEW)', function() {
   
     it('should redirect', function() {
       expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb');
+      expect(response.getHeader('Location')).to.equal('/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb');
     });
-  }); // return without state
+  }); // return to without state
   
   // TODO: test case where state isn't modified, should only have return_to param in redirect
   describe('begin transaction and redirect', function() {
@@ -206,9 +295,6 @@ describe('Dispatcher#flow (NEW)', function() {
         .end(function(res) {
           response = res;
           done();
-        })
-        .next(function(err) {
-          console.log(err)
         })
         .dispatch();
     });
