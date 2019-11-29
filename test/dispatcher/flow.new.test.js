@@ -250,6 +250,18 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(dispatcher._store.destroy).to.have.callCount(1);
     });
     
+    it('should set properties on request', function() {
+      expect(request.federatedUser).to.be.an('object');
+      expect(request.federatedUser).to.deep.equal({ id: '248289761001', provider: 'http://server.example.com' });
+    });
+    
+    it('should update state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        accounts: [ { provider: 'https://www.facebook.com' } ]
+      });
+    });
+    
     it('should persist state in session', function() {
       expect(request.session).to.deep.equal({
         state: {
@@ -257,13 +269,6 @@ describe('Dispatcher#flow (NEW)', function() {
             accounts: [ { provider: 'https://www.facebook.com' } ]
           }
         }
-      });
-    });
-    
-    it('should update state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state).to.deep.equal({
-        accounts: [ { provider: 'https://www.facebook.com' } ]
       });
     });
     
