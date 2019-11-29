@@ -220,9 +220,9 @@ describe('Dispatcher#flow (NEW)', function() {
           request.session = {};
           request.session.state = {};
           request.session.state['af0ifjsldkj'] = {
+            provider: 'http://server.example.com',
             returnTo: '/home',
-            state: 'Dxh5N7w_wMQ',
-            provider: 'http://server.example.com'
+            state: 'Dxh5N7w_wMQ'
           };
           request.session.state['Dxh5N7w_wMQ'] = {
             accounts: [ { provider: 'https://www.facebook.com' } ]
@@ -231,9 +231,6 @@ describe('Dispatcher#flow (NEW)', function() {
         .end(function(res) {
           response = res;
           done();
-        })
-        .next(function(err) {
-          console.log(err);
         })
         .dispatch();
     });
@@ -250,7 +247,17 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(dispatcher._store.load).to.have.callCount(2);
       expect(dispatcher._store.save).to.have.callCount(0);
       expect(dispatcher._store.update).to.have.callCount(0);
-      expect(dispatcher._store.destroy).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(1);
+    });
+    
+    it('should persist state in session', function() {
+      expect(request.session).to.deep.equal({
+        state: {
+          'Dxh5N7w_wMQ': {
+            accounts: [ { provider: 'https://www.facebook.com' } ]
+          }
+        }
+      });
     });
     
     it('should update state', function() {
@@ -260,32 +267,17 @@ describe('Dispatcher#flow (NEW)', function() {
       });
     });
     
-    it('should persist state in session', function() {
-      expect(request.session).to.deep.equal({
-        state: {
-          'af0ifjsldkj': {
-            returnTo: '/home',
-            state: 'Dxh5N7w_wMQ',
-            provider: 'http://server.example.com'
-          },
-          'Dxh5N7w_wMQ': {
-            accounts: [ { provider: 'https://www.facebook.com' } ]
-          }
-        }
-      });
-    });
-    
     it('should not set locals', function() {
       expect(request.locals).to.be.undefined;
     });
   
     it('should not set yieldState', function() {
-      expect(request.yieldState).to.be.an('object');
+      expect(request.yieldState).to.be.an('object'); // FIXME: remove yieldState
     });
   
     it('should redirect', function() {
       expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ'); // FIXME: This needs a state param
+      expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ');
     });
   }); // return with new state
   
