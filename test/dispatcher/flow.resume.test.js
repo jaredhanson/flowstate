@@ -53,7 +53,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -105,7 +105,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
       
@@ -115,7 +115,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -177,7 +177,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { s: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -229,7 +229,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
       
@@ -239,7 +239,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -317,8 +317,8 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H0'] = { name: 'start' };
-            request.session.state['H1'] = { name: 'login', parent: 'H0' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H1'] = { name: 'login', state: 'H0' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -373,7 +373,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.null;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         });
       });
       
@@ -382,11 +382,11 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         }, {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -464,8 +464,8 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H0'] = { name: 'start' };
-            request.session.state['H1'] = { name: 'login', parent: 'H0' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H1'] = { name: 'login', state: 'H0' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -520,7 +520,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.null;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         });
       });
       
@@ -529,11 +529,11 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         }, {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -604,7 +604,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -657,7 +657,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com'
         });
       });
@@ -668,7 +668,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com'
         } ]);
       });
@@ -973,7 +973,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { s: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .end(function(res) {
             response = res;
@@ -1025,7 +1025,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
       
@@ -1035,7 +1035,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -1483,7 +1483,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.undefined;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H1'
+          state: 'H1'
         });
       });
       
@@ -1492,7 +1492,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H1'
+          state: 'H1'
         }, {
           name: 'federate'
         } ]);
@@ -1623,7 +1623,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.undefined;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com'
         });
       });
@@ -1633,7 +1633,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com'
         }, {
           name: 'federate',
@@ -1782,7 +1782,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.undefined;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com',
           confidence: 0.5
         });
@@ -1793,7 +1793,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H1',
+          state: 'H1',
           issuer: 'https://id.example.com',
           confidence: 0.5
         }, {
@@ -1866,7 +1866,7 @@ describe('Dispatcher#flow (resume)', function() {
             request = req;
             request.query = { state: 'H2' };
             request.session = { state: {} };
-            request.session.state['H2'] = { name: 'login', parent: 'H1' };
+            request.session.state['H2'] = { name: 'login', state: 'H1' };
             request.session.state['H1'] = { name: 'start', foo: 'bar' };
           })
           .end(function(res) {
@@ -1919,7 +1919,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.null;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H1'
+          state: 'H1'
         });
       });
       
@@ -1928,7 +1928,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H1'
+          state: 'H1'
         }, {
           name: 'federate'
         } ]);
@@ -2375,8 +2375,8 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H0'] = { name: 'start' };
-            request.session.state['H1'] = { name: 'login', parent: 'H0' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H1'] = { name: 'login', state: 'H0' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -2435,7 +2435,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState.handle).to.be.null;
         expect(request.yieldState).to.deep.equal({
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         });
       });
       
@@ -2444,11 +2444,11 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldStateStack).to.have.length(2);
         expect(request.yieldStateStack).to.deep.equal([ {
           name: 'login',
-          parent: 'H0'
+          state: 'H0'
         }, {
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         } ]);
       });
     
@@ -2486,7 +2486,7 @@ describe('Dispatcher#flow (resume)', function() {
             request = req;
             request.query = { state: 'H2' };
             request.session = { state: {} };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -2538,7 +2538,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -2575,7 +2575,7 @@ describe('Dispatcher#flow (resume)', function() {
             request = req;
             request.query = { state: 'H2' };
             request.session = { state: {} };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -2625,7 +2625,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -2765,7 +2765,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { foo: 'bar' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -2824,7 +2824,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -2880,7 +2880,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { foo: 'bar' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -2940,7 +2940,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -2976,7 +2976,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3035,7 +3035,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -3078,7 +3078,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3137,7 +3137,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.yieldState).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -3193,7 +3193,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3242,7 +3242,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -3253,7 +3253,7 @@ describe('Dispatcher#flow (resume)', function() {
       it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' },
-          'H2': { name: 'federate', verifier: 'secret', parent: 'H1' }
+          'H2': { name: 'federate', verifier: 'secret', state: 'H1' }
         } });
       });
     }); // encountered while destroying current state
@@ -3303,7 +3303,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3352,7 +3352,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -3363,7 +3363,7 @@ describe('Dispatcher#flow (resume)', function() {
       it('should maintain existing session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' },
-          'H2': { name: 'federate', verifier: 'secret', parent: 'H1' }
+          'H2': { name: 'federate', verifier: 'secret', state: 'H1' }
         } });
       });
     }); // encountered while destroying current state after error
@@ -3375,7 +3375,7 @@ describe('Dispatcher#flow (resume)', function() {
     
       before(function() {
         sinon.stub(dispatcher._store, 'load')
-          .onCall(0).yields(null, { name: 'federate', verifier: 'secret', parent: 'H1' })
+          .onCall(0).yields(null, { name: 'federate', verifier: 'secret', state: 'H1' })
           .onCall(1).yields(new Error('something went wrong loading state'));
         sinon.spy(dispatcher._store, 'save');
         sinon.spy(dispatcher._store, 'update');
@@ -3415,7 +3415,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3466,7 +3466,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -3488,7 +3488,7 @@ describe('Dispatcher#flow (resume)', function() {
     
       before(function() {
         sinon.stub(dispatcher._store, 'load')
-          .onCall(0).yields(null, { name: 'federate', verifier: 'secret', parent: 'H1' })
+          .onCall(0).yields(null, { name: 'federate', verifier: 'secret', state: 'H1' })
           .onCall(1).yields(new Error('something went wrong loading state'));
         sinon.spy(dispatcher._store, 'save');
         sinon.spy(dispatcher._store, 'update');
@@ -3528,7 +3528,7 @@ describe('Dispatcher#flow (resume)', function() {
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H1'] = { name: 'login' };
-            request.session.state['H2'] = { name: 'federate', verifier: 'secret', parent: 'H1' };
+            request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
           })
           .res(function(res) {
             response = res;
@@ -3579,7 +3579,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     

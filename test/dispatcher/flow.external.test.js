@@ -64,7 +64,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -150,7 +150,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -239,7 +239,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -330,7 +330,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -418,7 +418,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.deep.equal({
           name: 'federate',
           verifier: 'secret',
-          parent: 'H1',
+          state: 'H1',
           returnTo: '/'
         });
       });
@@ -441,7 +441,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
             'H2': {
               name: 'federate',
               verifier: 'secret',
-              parent: 'H1',
+              state: 'H1',
               returnTo: '/'
             }
           }
@@ -513,7 +513,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'finish',
-          parent: 'H1',
+          state: 'H1',
           returnTo: '/'
         });
       });
@@ -535,7 +535,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
             },
             'H2': {
               name: 'finish',
-              parent: 'H1',
+              state: 'H1',
               returnTo: '/'
             }
           }
@@ -614,7 +614,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -711,7 +711,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     
@@ -1154,7 +1154,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           name: 'consent',
-          parent: 'H1'
+          state: 'H1'
         });
       });
     

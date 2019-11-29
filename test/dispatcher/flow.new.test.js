@@ -219,7 +219,7 @@ describe('Dispatcher#flow (NEW)', function() {
           request.session.state = {};
           request.session.state['af0ifjsldkj'] = {
             returnTo: '/home',
-            parent: 'Dxh5N7w_wMQ',
+            state: 'Dxh5N7w_wMQ',
             provider: 'http://server.example.com'
           };
           request.session.state['Dxh5N7w_wMQ'] = {
@@ -265,7 +265,7 @@ describe('Dispatcher#flow (NEW)', function() {
         state: {
           'af0ifjsldkj': {
             returnTo: '/home',
-            parent: 'Dxh5N7w_wMQ',
+            state: 'Dxh5N7w_wMQ',
             provider: 'http://server.example.com'
           },
           'Dxh5N7w_wMQ': {
@@ -622,7 +622,7 @@ describe('Dispatcher#flow (NEW)', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
         name: 'consent',
-        parent: 'H1'
+        state: 'H1'
       });
     });
   
@@ -775,7 +775,7 @@ describe('Dispatcher#flow (NEW)', function() {
           request.query = { state: 'ogWlCcTb8C8' };
           request.session = { state: {} };
           request.session.state['8KraIxA8PJA'] = { name: '/ebooks/awesome-sauce', views: 1 };
-          request.session.state['ogWlCcTb8C8'] = { name: '/oauth2/redirect', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', parent: '8KraIxA8PJA' };
+          request.session.state['ogWlCcTb8C8'] = { name: '/oauth2/redirect', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', state: '8KraIxA8PJA' };
         })
         .end(function(res) {
           response = res;
@@ -829,7 +829,7 @@ describe('Dispatcher#flow (NEW)', function() {
         name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
-        parent: '8KraIxA8PJA'
+        state: '8KraIxA8PJA'
       });
     });
     
@@ -840,7 +840,7 @@ describe('Dispatcher#flow (NEW)', function() {
         name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
-        parent: '8KraIxA8PJA'
+        state: '8KraIxA8PJA'
       } ]);
     });
   
@@ -924,7 +924,7 @@ describe('Dispatcher#flow (NEW)', function() {
           request.query = { state: 'ogWlCcTb8C8' };
           request.session = { state: {} };
           request.session.state['8KraIxA8PJA'] = { name: '/ebooks/awesome-sauce', views: 1 };
-          request.session.state['ogWlCcTb8C8'] = { name: '/oauth2/redirect', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', parent: '8KraIxA8PJA' };
+          request.session.state['ogWlCcTb8C8'] = { name: '/oauth2/redirect', verifier: 'secret', returnTo: '/ebooks/awesome-sauce', state: '8KraIxA8PJA' };
         })
         .end(function(res) {
           response = res;
@@ -984,7 +984,7 @@ describe('Dispatcher#flow (NEW)', function() {
         name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
-        parent: '8KraIxA8PJA'
+        state: '8KraIxA8PJA'
       });
     });
     
@@ -995,7 +995,7 @@ describe('Dispatcher#flow (NEW)', function() {
         name: '/oauth2/redirect',
         verifier: 'secret',
         returnTo: "/ebooks/awesome-sauce",
-        parent: '8KraIxA8PJA'
+        state: '8KraIxA8PJA'
       } ]);
     });
   
