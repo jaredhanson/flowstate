@@ -6,6 +6,8 @@ var chai = require('chai')
 
 describe('Dispatcher#flow (NEW)', function() {
   
+  // TODO: make a way to "preserve" state in a return_to that did not have it
+  
   describe('return with new state', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
@@ -19,7 +21,7 @@ describe('Dispatcher#flow (NEW)', function() {
     
     before(function(done) {
       function handler(req, res, next) {
-        req.state.federatedUser = { id: '248289761001', provider: 'https://accounts.google.com' };
+        req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
         next();
       }
       
@@ -59,12 +61,6 @@ describe('Dispatcher#flow (NEW)', function() {
     
     it('should update state', function() {
       expect(request.state).to.be.an('object');
-      
-      // FIXME: remove name
-      expect(request.state).to.deep.equal({
-        name: '/login/password',
-        federatedUser: { id: '248289761001', provider: 'https://accounts.google.com' }
-      });
     });
     
     it('should persist state in session', function() {
