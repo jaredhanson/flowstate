@@ -183,6 +183,7 @@ describe('Dispatcher#flow (NEW)', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
+    /*
     dispatcher.yield('/home', '/oauth2/redirect&code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj', [
       function(req, res, next) {
         res.__track += ' <' + req.yieldState.name + '>';
@@ -194,6 +195,7 @@ describe('Dispatcher#flow (NEW)', function() {
         next(err);
       }
     ]);
+      */
     
     
     before(function() {
@@ -223,7 +225,6 @@ describe('Dispatcher#flow (NEW)', function() {
             provider: 'http://server.example.com'
           };
           request.session.state['Dxh5N7w_wMQ'] = {
-            name: '/home', // FIXME: remove name
             accounts: [ { provider: 'https://www.facebook.com' } ]
           };
         })
@@ -255,7 +256,6 @@ describe('Dispatcher#flow (NEW)', function() {
     it('should update state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        name: '/home',
         accounts: [ { provider: 'https://www.facebook.com' } ]
       });
     });
@@ -269,7 +269,6 @@ describe('Dispatcher#flow (NEW)', function() {
             provider: 'http://server.example.com'
           },
           'Dxh5N7w_wMQ': {
-            name: '/home',
             accounts: [ { provider: 'https://www.facebook.com' } ]
           }
         }
