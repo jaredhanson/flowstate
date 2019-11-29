@@ -183,6 +183,19 @@ describe('Dispatcher#flow (NEW)', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
     
+    dispatcher.yield('/home', '/oauth2/redirect&code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj', [
+      function(req, res, next) {
+        res.__track += ' <' + req.yieldState.name + '>';
+        //req.state.issuer = req.yieldState.issuer;
+        next();
+      },
+      function(err, req, res, next) {
+        res.__track += ' <E:' + req.yieldState.name + '>';
+        next(err);
+      }
+    ]);
+    
+    
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
@@ -206,9 +219,11 @@ describe('Dispatcher#flow (NEW)', function() {
           request.session.state = {};
           request.session.state['af0ifjsldkj'] = {
             returnTo: '/home',
+            parent: 'Dxh5N7w_wMQ',
             provider: 'http://server.example.com'
           };
           request.session.state['Dxh5N7w_wMQ'] = {
+            name: '/home', // FIXME: remove name
             accounts: [ { provider: 'https://www.facebook.com' } ]
           };
         })
@@ -231,7 +246,7 @@ describe('Dispatcher#flow (NEW)', function() {
   
   
     it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(1);
+      expect(dispatcher._store.load).to.have.callCount(2);
       expect(dispatcher._store.save).to.have.callCount(0);
       expect(dispatcher._store.update).to.have.callCount(0);
       expect(dispatcher._store.destroy).to.have.callCount(0);
@@ -240,8 +255,8 @@ describe('Dispatcher#flow (NEW)', function() {
     it('should update state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        returnTo: '/home',
-        provider: 'http://server.example.com'
+        name: '/home',
+        accounts: [ { provider: 'https://www.facebook.com' } ]
       });
     });
     
@@ -250,9 +265,11 @@ describe('Dispatcher#flow (NEW)', function() {
         state: {
           'af0ifjsldkj': {
             returnTo: '/home',
+            parent: 'Dxh5N7w_wMQ',
             provider: 'http://server.example.com'
           },
           'Dxh5N7w_wMQ': {
+            name: '/home',
             accounts: [ { provider: 'https://www.facebook.com' } ]
           }
         }
@@ -264,12 +281,12 @@ describe('Dispatcher#flow (NEW)', function() {
     });
   
     it('should not set yieldState', function() {
-      expect(request.yieldState).to.be.undefined;
+      expect(request.yieldState).to.be.an('object');
     });
   
     it('should redirect', function() {
       expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/home?state=af0ifjsldkj'); // FIXME: This needs a state param
+      expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ'); // FIXME: This needs a state param
     });
   }); // return with new state
   
