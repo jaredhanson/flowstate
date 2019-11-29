@@ -362,8 +362,7 @@ describe('Dispatcher#flow (NEW)', function() {
         accounts: [
           { id: '1207059', provider: 'https://www.facebook.com' },
           { id: '248289761001', provider: 'http://server.example.com' }
-        ],
-        "returnTo": "/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj" // FIXME: remove
+        ]
       });
     });
     
@@ -374,8 +373,7 @@ describe('Dispatcher#flow (NEW)', function() {
             accounts: [
               { id: '1207059', provider: 'https://www.facebook.com' },
               { id: '248289761001', provider: 'http://server.example.com' }
-            ],
-            "returnTo": "/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj" // FIXME: remove
+            ]
           }
         }
       });
