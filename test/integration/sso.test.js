@@ -87,7 +87,7 @@ describe('integration: SSO', function() {
       });
     }); // and returning home
     
-    describe('and returning home with preserved state', function() {
+    describe('and returning to report with preserved state', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -115,7 +115,7 @@ describe('integration: SSO', function() {
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
               provider: 'http://server.example.com',
-              returnTo: '/home',
+              returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
@@ -156,7 +156,7 @@ describe('integration: SSO', function() {
         });
       });
     
-      it('should persist state in session', function() {
+      it('should remove state from session', function() {
         expect(request.session).to.deep.equal({
           state: {
             'Dxh5N7w_wMQ': {
@@ -176,11 +176,11 @@ describe('integration: SSO', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
       });
-    }); // and returning home with preserved state
+    }); // and returning to report with preserved state
     
-    describe('and returning home with preserved state by using array notation', function() {
+    describe('and returning to report with preserved state by using array notation', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -208,7 +208,7 @@ describe('integration: SSO', function() {
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
               provider: 'http://server.example.com',
-              returnTo: '/home',
+              returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
@@ -249,7 +249,7 @@ describe('integration: SSO', function() {
         });
       });
     
-      it('should persist state in session', function() {
+      it('should remove state from session', function() {
         expect(request.session).to.deep.equal({
           state: {
             'Dxh5N7w_wMQ': {
@@ -269,11 +269,11 @@ describe('integration: SSO', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
       });
-    }); // and returning home with preserved state by using array notation
+    }); // and returning to report with preserved state by using array notation
     
-    describe('and returning home with preserved state after default handling', function() {
+    describe('and returning to report with preserved state and session established by default handler', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -306,7 +306,7 @@ describe('integration: SSO', function() {
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
               provider: 'http://server.example.com',
-              returnTo: '/home',
+              returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
@@ -371,9 +371,9 @@ describe('integration: SSO', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
       });
-    }); // and returning home with preserved state after default handling
+    }); // and returning to report with preserved state and session established by default handler
   
   }); // redirect back from OAuth 2.0 authorization server
   
