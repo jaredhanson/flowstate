@@ -379,7 +379,7 @@ describe('integration: SSO', function() {
   
   describe('redirect back from OAuth service provider', function() {
     
-    describe('and returning home with preserved state after default handling', function() {
+    describe('and returning to report with preserved state and session established by default handler', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -412,7 +412,7 @@ describe('integration: SSO', function() {
             request.session.state = {};
             request.session.state['oauth_XXXXXXXX'] = {
               provider: 'http://server.example.com',
-              returnTo: '/home',
+              returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ',
               tokenSecret: 'XXXXXXXX-XXXXXXXX'
             };
@@ -478,7 +478,7 @@ describe('integration: SSO', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
       });
     }); // and returning home with preserved state after default handling
     
