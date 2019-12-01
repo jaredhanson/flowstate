@@ -4,7 +4,7 @@ var chai = require('chai')
   , Dispatcher = require('../../lib/manager');
 
 
-describe('Dispatcher#flow (SSO)', function() {
+describe('integration: SSO', function() {
   
   describe('redirect back from OAuth 2.0 authorization server', function() {
   
