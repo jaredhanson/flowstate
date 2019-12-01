@@ -42,9 +42,6 @@ describe('integration: SSO', function() {
             response = res;
             done();
           })
-          .next(function(err) {
-            console.log(err);
-          })
           .dispatch();
       });
   
@@ -60,7 +57,7 @@ describe('integration: SSO', function() {
         expect(dispatcher._store.load).to.have.callCount(1);
         expect(dispatcher._store.save).to.have.callCount(0);
         expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(1);
       });
     
       it('should update state', function() {
@@ -72,15 +69,8 @@ describe('integration: SSO', function() {
       });
     
       // FIXME: this state should be removed
-      it('should persist state in session', function() {
-        expect(request.session).to.deep.equal({
-          state: {
-            'af0ifjsldkj': {
-              returnTo: '/home',
-              provider: 'http://server.example.com'
-            }
-          }
-        });
+      it('should remove state from session', function() {
+        expect(request.session).to.deep.equal({});
       });
     
       it('should not set locals', function() {
@@ -93,7 +83,7 @@ describe('integration: SSO', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home?state=af0ifjsldkj'); // FIXME: This needs a state param
+        expect(response.getHeader('Location')).to.equal('/home');
       });
     }); // and returning home
     
