@@ -482,7 +482,7 @@ describe('integration: SSO', function() {
       });
     }); // and returning to report with state updated by yield handler
     
-    describe.skip('and returning to report with state updated by yield handler that overrides default handler', function() {
+    describe('and returning to report with state updated by yield handler that overrides default handler', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
