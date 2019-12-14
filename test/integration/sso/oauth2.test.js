@@ -1,7 +1,7 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../lib/manager');
+  , Dispatcher = require('../../../lib/manager');
 
 
 describe('integration: SSO', function() {
