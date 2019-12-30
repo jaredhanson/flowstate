@@ -35,11 +35,13 @@ describe('integration: sso/oauth', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth/callback?oauth_token=XXXXXXXX&oauth_verifier=YYYYYYYY';
             request.query = { oauth_token: 'XXXXXXXX', oauth_verifier: 'VVVVVVVV' };
             request.session = {};
             request.session.state = {};
             request.session.state['oauth_XXXXXXXX'] = {
+              recipient: 'http://client.example.com/oauth/callback',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ',

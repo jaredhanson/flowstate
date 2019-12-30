@@ -29,11 +29,13 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/home'
             };
@@ -63,8 +65,9 @@ describe('integration: sso/oauth2', function() {
       it('should update state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          returnTo: '/home',
-          provider: 'http://server.example.com'
+          recipient: 'http://client.example.com/oauth2/redirect',
+          provider: 'http://server.example.com',
+          returnTo: '/home'
         });
       });
     
@@ -109,11 +112,13 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -207,11 +212,13 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -312,11 +319,13 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -424,11 +433,13 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
+            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'

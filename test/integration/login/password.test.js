@@ -165,12 +165,21 @@ describe('integration: login/password', function() {
       expect(dispatcher._store.load).to.have.callCount(1);
       expect(dispatcher._store.save).to.have.callCount(0);
       expect(dispatcher._store.update).to.have.callCount(0);
-      //expect(dispatcher._store.destroy).to.have.callCount(0);
+      expect(dispatcher._store.destroy).to.have.callCount(0);
+    });
+    
+    it('should preserve state', function() {
+      expect(request.state).to.be.an('object');
+      expect(request.state).to.deep.equal({
+        client: 's6BhdRkqt3',
+        redirectURI: 'https://client.example.com/cb',
+        returnTo: '/oauth2/continue'
+      });
     });
 
     it('should respond', function() {
       expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/login');
+      expect(response.getHeader('Location')).to.equal('/login?state=nIeC6G7V8vA');
     });
   }); // logging in and continuing with preserved state
   
