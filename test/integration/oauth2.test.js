@@ -22,11 +22,11 @@ describe('integration: oauth2', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler(dispatcher.flow(handler, { external: true }))
+      chai.express.handler(dispatcher.flow(handler, { external: true, continue: '/oauth2/continue' }))
         .req(function(req) {
           request = req;
           request.method = 'POST';
-          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+          request.url = '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
         })
@@ -58,8 +58,8 @@ describe('integration: oauth2', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            name: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
-            returnTo: '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+            name: '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
+            returnTo: '/oauth2/continue'
           }
         }
       });
