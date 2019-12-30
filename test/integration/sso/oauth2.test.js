@@ -22,6 +22,7 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          req.state.complete();
           next();
         }
       
@@ -29,13 +30,11 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/home'
             };
@@ -65,7 +64,6 @@ describe('integration: sso/oauth2', function() {
       it('should update state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          recipient: 'http://client.example.com/oauth2/redirect',
           provider: 'http://server.example.com',
           returnTo: '/home'
         });
@@ -105,6 +103,7 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          req.state.complete();
           next();
         }
       
@@ -112,13 +111,11 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -200,6 +197,7 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          req.state.complete();
           next();
         }
       
@@ -212,13 +210,11 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -312,6 +308,7 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          req.state.complete();
           next();
         }
       
@@ -319,13 +316,11 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
@@ -421,6 +416,7 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          req.state.complete();
           next();
         }
         
@@ -433,13 +429,11 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.headers['host'] = 'client.example.com';
             request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              recipient: 'http://client.example.com/oauth2/redirect',
               provider: 'http://server.example.com',
               returnTo: '/report/magic-quadrant',
               state: 'Dxh5N7w_wMQ'
