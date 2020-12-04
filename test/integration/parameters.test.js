@@ -57,15 +57,12 @@ describe('integration: parameters', function() {
         dispatcher._store.load.restore();
       });
   
-  
-      /*
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(2);
-        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(1);
         expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(1);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
       });
-      */
     
       it('should update state', function() {
         expect(request.state).to.be.an('object');
@@ -76,18 +73,17 @@ describe('integration: parameters', function() {
         });
       });
     
-      /*
       it('should persist state in session', function() {
         expect(request.session).to.deep.equal({
-          user: { id: '248289761001' },
           state: {
-            'Dxh5N7w_wMQ': {
-              accounts: [ { id: '1207059', provider: 'https://www.facebook.com' } ]
+            'XXXXXXXX': {
+              name: '/',
+              provider: 'https://www.example.com',
+              returnTo: '/'
             }
           }
         });
       });
-      */
     
       it('should not set locals', function() {
         expect(request.locals).to.be.undefined;
@@ -101,8 +97,6 @@ describe('integration: parameters', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        // TODO: Should have state param here
-        // TODO: should be /login/federated
         expect(response.getHeader('Location')).to.equal('/login/federated?state=XXXXXXXX');
       });
     }); // and returning home with preserved state after default handling
