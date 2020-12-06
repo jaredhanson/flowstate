@@ -6,6 +6,93 @@ var chai = require('chai')
 
 describe('integration: sso/oauth2', function() {
   
+  describe('redirecting to authorization service', function() {
+    
+    describe('from referring page', function() {
+      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          req.state.provider = 'https://server.example.com';
+          res.redirect('https://server.example.com/authorize');
+        }
+      
+        chai.express.handler(dispatcher.flow(handler))
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+            
+            request = req;
+            request.method = 'GET';
+            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
+            request.headers = {
+              'referer': 'https://www.example.com/dashboard'
+            }
+            request.query = { provider: 'https://server.example.com' };
+            request.session = {};
+            request.session.state = {};
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+  
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+  
+  
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(1);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+    
+      it('should update state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          name: '/login/federated?provider=https%3A%2F%2Fserver.example.com',
+          provider: 'https://server.example.com',
+          returnTo: 'https://www.example.com/dashboard'
+        });
+      });
+      
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'XXXXXXXX': {
+              name: '/login/federated?provider=https%3A%2F%2Fserver.example.com',
+              provider: 'https://server.example.com',
+              returnTo: 'https://www.example.com/dashboard'
+            }
+          }
+        });
+      });
+  
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('https://server.example.com/authorize?state=XXXXXXXX');
+      });
+    }); // from referring page
+    
+  });
+  
   describe('redirect back from OAuth 2.0 authorization server', function() {
   
     describe('and returning home', function() {
