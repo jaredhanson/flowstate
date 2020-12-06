@@ -118,7 +118,7 @@ describe('integration: sso/oauth2', function() {
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fwww.example.com/welcome';
             request.headers = {
-              'referer': 'https://www.example.com/dashboard'
+              'referer': 'https://www.example.com/signup'
             }
             request.query = { provider: 'https://server.example.com', return_to: 'https://www.example.com/welcome' };
             request.session = {};
