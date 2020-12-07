@@ -36,6 +36,7 @@ describe('integration: sso/oauth2', function() {
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
             request.headers = {
+              'host': 'www.example.com',
               'referer': 'https://www.example.com/dashboard'
             }
             request.query = { provider: 'https://server.example.com' };
@@ -118,6 +119,7 @@ describe('integration: sso/oauth2', function() {
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fwww.example.com/welcome';
             request.headers = {
+              'host': 'www.example.com',
               'referer': 'https://www.example.com/signup'
             }
             request.query = { provider: 'https://server.example.com', return_to: 'https://www.example.com/welcome' };
@@ -171,6 +173,104 @@ describe('integration: sso/oauth2', function() {
         expect(response.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=XXXXXXXX');
       });
     }); // with return_to parameter
+    
+    describe('with state', function() {
+      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+  
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+  
+      before(function(done) {
+        function handler(req, res, next) {
+          req.state.provider = 'https://server.example.net';
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3');
+        }
+    
+        chai.express.handler(dispatcher.flow(handler))
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+          
+            request = req;
+            request.method = 'GET';
+            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net';
+            request.headers = {
+              'host': 'server.example.com',
+              'referer': 'https://server.example.com/login'
+            }
+            request.query = { provider: 'https://server.example.net' };
+            request.session = {};
+            request.session.state = {};
+            request.session.state['00000000'] = {
+              returnTo: 'https://client.example.com/cb',
+              state: 'xyz'
+            };
+            request.session.state['11111111'] = {
+              returnTo: '/continue'
+            };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+
+
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(0);
+        expect(dispatcher._store.save).to.have.callCount(1);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+  
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          name: '/login/federated?provider=https%3A%2F%2Fserver.example.net',
+          provider: 'https://server.example.net',
+          returnTo: 'https://server.example.com/login'
+        });
+      });
+    
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            '00000000': {
+              returnTo: 'https://client.example.com/cb',
+              state: 'xyz'
+            },
+            '11111111': {
+              returnTo: '/continue'
+            },
+            'XXXXXXXX': {
+              name: '/login/federated?provider=https%3A%2F%2Fserver.example.net',
+              provider: 'https://server.example.net',
+              returnTo: 'https://server.example.com/login'
+            }
+          }
+        });
+      });
+
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&state=XXXXXXXX');
+      });
+    }); // with state
     
   });
   
