@@ -200,20 +200,19 @@ describe('integration: sso/oauth2', function() {
           
             request = req;
             request.method = 'GET';
-            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net';
+            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
             request.headers = {
               'host': 'server.example.com',
               'referer': 'https://server.example.com/login'
             }
-            request.query = { provider: 'https://server.example.net' };
+            request.query = { provider: 'https://server.example.net', state: '00000000' };
             request.session = {};
             request.session.state = {};
             request.session.state['00000000'] = {
-              returnTo: 'https://client.example.com/cb',
+              returnTo: '/continue',
+              clientID: 'af0ifjsldkj',
+              redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
-            };
-            request.session.state['11111111'] = {
-              returnTo: '/continue'
             };
           })
           .end(function(res) {
@@ -232,18 +231,20 @@ describe('integration: sso/oauth2', function() {
 
 
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.load).to.have.callCount(1);
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(1);
         expect(dispatcher._store.destroy).to.have.callCount(0);
       });
   
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          name: '/login/federated?provider=https%3A%2F%2Fserver.example.net',
           provider: 'https://server.example.net',
-          returnTo: 'https://server.example.com/login'
+          clientID: 'af0ifjsldkj',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz',
+          returnTo: '/continue'
         });
       });
     
@@ -251,24 +252,27 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             '00000000': {
-              returnTo: 'https://client.example.com/cb',
-              state: 'xyz'
-            },
-            '11111111': {
+              provider: 'https://server.example.net',
+              clientID: 'af0ifjsldkj',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz',
               returnTo: '/continue'
             },
+            /*
             'XXXXXXXX': {
-              name: '/login/federated?provider=https%3A%2F%2Fserver.example.net',
+              name: '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=11111111',
               provider: 'https://server.example.net',
               returnTo: 'https://server.example.com/login'
             }
+            */
           }
         });
       });
 
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&state=XXXXXXXX');
+        //expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&state=XXXXXXXX');
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&state=00000000');
       });
     }); // with state
     
