@@ -67,7 +67,6 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          name: '/login/federated?provider=https%3A%2F%2Fserver.example.com',
           provider: 'https://server.example.com',
           returnTo: 'https://www.example.com/dashboard'
         });
@@ -77,7 +76,6 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             'XXXXXXXX': {
-              name: '/login/federated?provider=https%3A%2F%2Fserver.example.com',
               provider: 'https://server.example.com',
               returnTo: 'https://www.example.com/dashboard'
             }
@@ -150,7 +148,6 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          name: '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fwww.example.com/welcome',
           provider: 'https://server.example.com',
           returnTo: 'https://www.example.com/welcome'
         });
@@ -160,7 +157,6 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             'XXXXXXXX': {
-              name: '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fwww.example.com/welcome',
               provider: 'https://server.example.com',
               returnTo: 'https://www.example.com/welcome'
             }

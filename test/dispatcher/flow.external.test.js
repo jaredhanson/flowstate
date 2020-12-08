@@ -16,6 +16,8 @@ describe('Dispatcher#flow (externally-initiated)', function() {
   
   describe('redirecting', function() {
     
+    // removed due to use of state name
+    /*
     describe('within flow', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -89,12 +91,15 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         expect(response.getHeader('Location')).to.equal('/from/start?state=H1');
       });
     }); // within flow
+    */
     
   }); // redirecting
   
   
   describe('rendering', function() {
     
+    // removed due to use of state name
+    /*
     describe('within flow', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -176,6 +181,7 @@ describe('Dispatcher#flow (externally-initiated)', function() {
         });
       });
     }); // within flow
+    */
     
   }); // rendering
   

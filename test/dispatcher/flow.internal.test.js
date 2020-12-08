@@ -8,6 +8,8 @@ describe('Dispatcher#flow (internally-driven)', function() {
   
   describe('rendering', function() {
   
+    // removed due to use of state name
+    /*
     describe('without any state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -84,7 +86,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(response.locals).to.deep.equal({});
       });
     }); // without any state
+    */
     
+    // removed due to use of state name
+    /*
     describe('without any state in final handler', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -165,7 +170,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(response.locals).to.deep.equal({});
       });
     }); // without any state in final handler
+    */
     
+    // removed due to use of state name
+    /*
     describe('without any state in final error handler', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -255,7 +263,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(response.locals).to.deep.equal({ message: 'something went wrong' });
       });
     }); // without any state in final error handler
+    */
     
+    // removed due to use of state name
+    /*
     describe('from new state yielding to state from query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -350,7 +361,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
         });
       });
     }); // from new state yielding to state from query param
+    */
     
+    // removed due to use of state name
+    /*
     describe('from new state yielding to state from body param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -445,6 +459,7 @@ describe('Dispatcher#flow (internally-driven)', function() {
         });
       });
     }); // from new state yielding to state from body param
+    */
     
     describe('from current state carried in query param', function() {
       var hc = 1;
@@ -751,6 +766,8 @@ describe('Dispatcher#flow (internally-driven)', function() {
   
   describe('redirecting', function() {
     
+    // REmoved, due to state name not being applicable.  See if this should test a different case
+    /*
     describe('without any state', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -819,7 +836,10 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(response.getHeader('Location')).to.equal('/from/login');
       });
     }); // without any state
+    */
     
+    // REmoved, due to state name not being applicable.  See if this should test a different case
+    /*
     describe('from new state yielding to state from query param', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -903,6 +923,7 @@ describe('Dispatcher#flow (internally-driven)', function() {
         expect(response.getHeader('Location')).to.equal('/from/login?state=H1');
       });
     }); // from new state yielding to state from query param
+    */
     
     describe('from current state carried in query param', function() {
       var hc = 1;

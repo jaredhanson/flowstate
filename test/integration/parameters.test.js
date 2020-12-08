@@ -67,7 +67,6 @@ describe('integration: parameters', function() {
       it('should update state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          name: '/',
           provider: 'https://www.example.com',
           returnTo: '/'
         });
@@ -77,7 +76,6 @@ describe('integration: parameters', function() {
         expect(request.session).to.deep.equal({
           state: {
             'XXXXXXXX': {
-              name: '/',
               provider: 'https://www.example.com',
               returnTo: '/'
             }

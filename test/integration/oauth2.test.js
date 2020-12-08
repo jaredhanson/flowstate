@@ -58,7 +58,6 @@ describe('integration: oauth2', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            name: '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb',
             returnTo: '/oauth2/continue'
           }
         }
