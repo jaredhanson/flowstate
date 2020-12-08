@@ -441,10 +441,6 @@ describe('integration: sso/oauth2', function() {
         expect(request.locals).to.be.undefined;
       });
   
-      it('should not set yieldState', function() {
-        expect(request.yieldState).to.be.an('object'); // FIXME: remove yieldState
-      });
-  
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');

@@ -364,6 +364,7 @@ describe('Dispatcher#flow (resume)', function() {
       });
     
       // FIXME: should not yeild
+      /*
       it('should set yieldState', function() {
         expect(request.yieldState).to.be.an('object');
         expect(request.yieldState.handle).to.be.null;
@@ -373,6 +374,7 @@ describe('Dispatcher#flow (resume)', function() {
           state: 'H1'
         });
       });
+      */
     
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
