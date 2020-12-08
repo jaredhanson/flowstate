@@ -286,6 +286,8 @@ describe('Dispatcher#flow (resume)', function() {
       });
     }); // due to state referenced by query param not found
     
+    // NOTE: This can be removed, state names no longer used.
+    /*
     describe('due to state not being registered', function() {
       var hc = 1;
       var dispatcher = new Dispatcher({ genh: function() { return 'H' + hc++; } })
@@ -362,6 +364,7 @@ describe('Dispatcher#flow (resume)', function() {
         expect(request.state.handle).to.equal('H1');
         expect(request.state).to.deep.equal({ name: 'login' });
       });
+      */
     
       // FIXME: should not yeild
       /*
@@ -376,12 +379,14 @@ describe('Dispatcher#flow (resume)', function() {
       });
       */
     
+      /*
       it('should remove completed state from session', function() {
         expect(request.session).to.deep.equal({ state: {
           'H1': { name: 'login' }
         } });
       });
     }); // due to state not being registered
+    */
     
   }); // failure
   
