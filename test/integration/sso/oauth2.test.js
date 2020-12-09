@@ -426,7 +426,7 @@ describe('integration: sso/oauth2', function() {
         expect(dispatcher._store.destroy).to.have.callCount(1);
       });
     
-      it('should update state', function() {
+      it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           provider: 'http://server.example.com',
@@ -446,9 +446,9 @@ describe('integration: sso/oauth2', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('https://client.example.com/');
       });
-    }); // and returning home
+    }); // and returning to location
     
-    describe('and returning to report with preserved state', function() {
+    describe('and resuming state', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -471,17 +471,22 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+            request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+            request.headers = {
+              'host': 'client.example.com'
+            }
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
               provider: 'http://server.example.com',
-              returnTo: '/report/magic-quadrant',
-              state: 'Dxh5N7w_wMQ'
+              resume: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
-              accounts: [ { id: '1207059', provider: 'https://www.facebook.com' } ]
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
             };
           })
           .end(function(res) {
@@ -511,10 +516,11 @@ describe('integration: sso/oauth2', function() {
         expect(request.federatedUser).to.deep.equal({ id: '248289761001', provider: 'http://server.example.com' });
       });
     
-      it('should update state', function() {
+      it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          accounts: [ { id: '1207059', provider: 'https://www.facebook.com' } ]
+          provider: 'http://server.example.com',
+          resume: 'Dxh5N7w_wMQ'
         });
       });
     
@@ -522,7 +528,10 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             'Dxh5N7w_wMQ': {
-              accounts: [ { id: '1207059', provider: 'https://www.facebook.com' } ]
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
             }
           }
         });
@@ -534,9 +543,12 @@ describe('integration: sso/oauth2', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('/continue?state=Dxh5N7w_wMQ');
       });
-    }); // and returning to report with preserved state
+    }); // and resuming state
+    
+    // TODO: Test case for popping return data into state and/or query params
+    //       (for example, when a session is not established, but the return to page needs info)
     
     // FIXME: make sure this is testing for correct behavior
     //        broke as a result fo removing _yield from Manager
