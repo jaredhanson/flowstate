@@ -186,7 +186,7 @@ describe('integration: sso/oauth2', function() {
           req.state.push({
             provider: 'https://server.example.net'
           });
-          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3');
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
         chai.express.handler(dispatcher.flow(handler))
@@ -262,10 +262,11 @@ describe('integration: sso/oauth2', function() {
 
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&state=XXXXXXXX');
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=XXXXXXXX');
       });
     }); // with state
     
+    // TODO: Test case for state overriding any return_to parameter in query
   });
   
   describe('redirect back from OAuth 2.0 authorization server', function() {
