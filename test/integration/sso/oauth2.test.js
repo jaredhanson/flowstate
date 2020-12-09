@@ -21,7 +21,9 @@ describe('integration: sso/oauth2', function() {
     
       before(function(done) {
         function handler(req, res, next) {
-          req.state.provider = 'https://server.example.com';
+          req.state.push({
+            provider: 'https://server.example.com'
+          });
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
       
@@ -102,7 +104,9 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
-          req.state.provider = 'https://server.example.com';
+          req.state.push({
+            provider: 'https://server.example.com'
+          });
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
     
@@ -207,7 +211,7 @@ describe('integration: sso/oauth2', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['00000000'] = {
-              returnTo: '/continue',
+              location: '/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
@@ -239,7 +243,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           provider: 'https://server.example.net',
-          returnTo: '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000'
+          resume: '00000000'
         });
       });
     
@@ -247,14 +251,14 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             '00000000': {
+              location: '/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
-              state: 'xyz',
-              returnTo: '/continue'
+              state: 'xyz'
             },
             'XXXXXXXX': {
               provider: 'https://server.example.net',
-              returnTo: '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000'
+              resume: '00000000'
             }
           }
         });
