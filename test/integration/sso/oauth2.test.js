@@ -368,9 +368,9 @@ describe('integration: sso/oauth2', function() {
     
   });
   
-  describe('redirect back from OAuth 2.0 authorization server', function() {
+  describe('redirect from authorization server', function() {
   
-    describe('and returning home', function() {
+    describe('and returning to location', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -392,13 +392,16 @@ describe('integration: sso/oauth2', function() {
           .req(function(req) {
             request = req;
             request.method = 'GET';
-            request.url = '/oauth2/redirect?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+            request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+            request.headers = {
+              'host': 'client.example.com'
+            }
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
               provider: 'http://server.example.com',
-              returnTo: '/home'
+              returnTo: 'https://client.example.com/'
             };
           })
           .end(function(res) {
@@ -427,11 +430,10 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
           provider: 'http://server.example.com',
-          returnTo: '/home'
+          returnTo: 'https://client.example.com/'
         });
       });
-    
-      // FIXME: this state should be removed
+      
       it('should remove state from session', function() {
         expect(request.session).to.deep.equal({});
       });
@@ -440,13 +442,9 @@ describe('integration: sso/oauth2', function() {
         expect(request.locals).to.be.undefined;
       });
   
-      it('should not set yieldState', function() {
-        expect(request.yieldState).to.be.undefined;
-      });
-  
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/home');
+        expect(response.getHeader('Location')).to.equal('https://client.example.com/');
       });
     }); // and returning home
     
