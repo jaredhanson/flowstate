@@ -270,7 +270,102 @@ describe('integration: sso/oauth2', function() {
       });
     }); // with state
     
-    // TODO: Test case for state overriding any return_to parameter in query
+    describe('with state and return_to parameter', function() {
+      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+  
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+  
+      before(function(done) {
+        function handler(req, res, next) {
+          req.state.push({
+            provider: 'https://server.example.net'
+          });
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
+        }
+    
+        chai.express.handler(dispatcher.flow(handler))
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+          
+            request = req;
+            request.method = 'GET';
+            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&return_to=https%3A%2F%2Fserver.example.com/welcome&state=00000000';
+            request.headers = {
+              'host': 'server.example.com',
+              'referer': 'https://server.example.com/login?state=00000000'
+            }
+            request.query = { provider: 'https://server.example.net', return_to: 'https://server.example.com/welcome', state: '00000000' };
+            request.session = {};
+            request.session.state = {};
+            request.session.state['00000000'] = {
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+
+
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(1);
+        expect(dispatcher._store.save).to.have.callCount(1);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(0);
+      });
+  
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          provider: 'https://server.example.net',
+          resume: '00000000'
+        });
+      });
+    
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            },
+            'XXXXXXXX': {
+              provider: 'https://server.example.net',
+              resume: '00000000'
+            }
+          }
+        });
+      });
+
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=XXXXXXXX');
+      });
+    }); // with state and return_to parameter
+    
   });
   
   describe('redirect back from OAuth 2.0 authorization server', function() {
