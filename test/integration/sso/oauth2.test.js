@@ -21,9 +21,9 @@ describe('integration: sso/oauth2', function() {
     
       before(function(done) {
         function handler(req, res, next) {
-          req.state.push({
+          res.pushState({
             provider: 'https://server.example.com'
-          });
+          }, 'https://client.example.com/cb', false);
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
       
@@ -69,6 +69,7 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
+          location: 'https://client.example.com/cb',
           provider: 'https://server.example.com',
           returnTo: 'https://client.example.com/'
         });
@@ -78,6 +79,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             'XXXXXXXX': {
+              location: 'https://client.example.com/cb',
               provider: 'https://server.example.com',
               returnTo: 'https://client.example.com/'
             }
