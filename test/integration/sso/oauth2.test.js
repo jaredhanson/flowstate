@@ -548,7 +548,7 @@ describe('integration: sso/oauth2', function() {
       });
     }); // and resuming state
     
-    describe.skip('and resuming state yeilding parameters', function() {
+    describe('and resuming state yeilding parameters', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
     
@@ -606,13 +606,8 @@ describe('integration: sso/oauth2', function() {
       it('should correctly invoke state store', function() {
         expect(dispatcher._store.load).to.have.callCount(2);
         expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(1);
         expect(dispatcher._store.destroy).to.have.callCount(1);
-      });
-    
-      it('should set properties on request', function() {
-        expect(request.federatedUser).to.be.an('object');
-        expect(request.federatedUser).to.deep.equal({ id: '248289761001', provider: 'http://server.example.com' });
       });
     
       it('should set state', function() {
@@ -623,14 +618,18 @@ describe('integration: sso/oauth2', function() {
         });
       });
     
-      it('should remove state from session', function() {
+      it('should remove state from session and update resuming state', function() {
         expect(request.session).to.deep.equal({
           state: {
             'Dxh5N7w_wMQ': {
               location: '/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
+              state: 'xyz',
+              federatedUser: {
+                id: '248289761001',
+                provider: 'http://server.example.com'
+              }
             }
           }
         });
