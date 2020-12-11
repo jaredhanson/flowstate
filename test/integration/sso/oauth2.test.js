@@ -392,8 +392,7 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          req.state.complete();
-          next();
+          res.popState();
         }
       
         chai.express.handler(dispatcher.flow(handler))
@@ -471,8 +470,100 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          req.state.complete();
-          next();
+          res.popState();
+        }
+      
+        chai.express.handler(dispatcher.flow(handler))
+          .req(function(req) {
+            request = req;
+            request.method = 'GET';
+            request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+            request.headers = {
+              'host': 'client.example.com'
+            }
+            request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
+            request.session = {};
+            request.session.state = {};
+            request.session.state['af0ifjsldkj'] = {
+              provider: 'http://server.example.com',
+              resume: 'Dxh5N7w_wMQ'
+            };
+            request.session.state['Dxh5N7w_wMQ'] = {
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            };
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+  
+      after(function() {
+        dispatcher._store.destroy.restore();
+        dispatcher._store.update.restore();
+        dispatcher._store.save.restore();
+        dispatcher._store.load.restore();
+      });
+  
+  
+      it('should correctly invoke state store', function() {
+        expect(dispatcher._store.load).to.have.callCount(2);
+        expect(dispatcher._store.save).to.have.callCount(0);
+        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(dispatcher._store.destroy).to.have.callCount(1);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          provider: 'http://server.example.com',
+          resume: 'Dxh5N7w_wMQ'
+        });
+      });
+    
+      it('should remove state from session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            'Dxh5N7w_wMQ': {
+              location: '/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+      });
+    
+      it('should not set locals', function() {
+        expect(request.locals).to.be.undefined;
+      });
+  
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('/continue?state=Dxh5N7w_wMQ');
+      });
+    }); // and resuming state
+    
+    describe.skip('and resuming state yeilding parameters', function() {
+      var dispatcher = new Dispatcher()
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(dispatcher._store, 'load');
+        sinon.spy(dispatcher._store, 'save');
+        sinon.spy(dispatcher._store, 'update');
+        sinon.spy(dispatcher._store, 'destroy');
+      });
+    
+      before(function(done) {
+        // TODO: test case with multiple handlers
+        function handler(req, res, next) {
+          req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+          res.popState({ federatedUser: req.federatedUser });
         }
       
         chai.express.handler(dispatcher.flow(handler))
@@ -553,7 +644,7 @@ describe('integration: sso/oauth2', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('/continue?state=Dxh5N7w_wMQ');
       });
-    }); // and resuming state
+    }); // and resuming state yeilding parameters
     
     // TODO: Test case for popping return data into state and/or query params
     //       (for example, when a session is not established, but the return to page needs info)
@@ -581,6 +672,8 @@ describe('integration: sso/oauth2', function() {
         }
       
         function defaultHandler(req, res, next) {
+          console.log('DEFAULT HANDLER IS!');
+          
           req.session.user = { id: req.federatedUser.id };
           next();
         }
