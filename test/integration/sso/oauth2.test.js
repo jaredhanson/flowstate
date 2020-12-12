@@ -569,8 +569,8 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
-          req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.resumeState({ federatedUser: req.federatedUser });
+          req.federatedUser = { id: '248289761001', provider: 'http://server.example.net' };
+          res.resumeState({ amount: 123.50 });
         }
       
         chai.express.handler(dispatcher.flow(handler))
@@ -579,13 +579,13 @@ describe('integration: sso/oauth2', function() {
             request.method = 'GET';
             request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.headers = {
-              'host': 'client.example.com'
+              'host': 'server.example.com'
             }
             request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
-              provider: 'http://server.example.com',
+              provider: 'http://server.example.net',
               resume: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
@@ -620,7 +620,7 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          provider: 'http://server.example.com',
+          provider: 'http://server.example.net',
           resume: 'Dxh5N7w_wMQ'
         });
       });
@@ -633,10 +633,7 @@ describe('integration: sso/oauth2', function() {
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz',
-              federatedUser: {
-                id: '248289761001',
-                provider: 'http://server.example.com'
-              }
+              amount: 123.50
             }
           }
         });
