@@ -1,7 +1,8 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../../lib/manager');
+  , Dispatcher = require('../../../lib/manager')
+  , state = require('../../../lib/middleware/state')
 
   // TODO: Move this to login/federated
 describe('integration: sso/oauth2', function() {
@@ -9,15 +10,7 @@ describe('integration: sso/oauth2', function() {
   describe('redirecting to authorization server', function() {
     
     describe('from referring page', function() {
-      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
-      });
+      var request, response, err;
     
       before(function(done) {
         function handler(req, res, next) {
@@ -26,8 +19,8 @@ describe('integration: sso/oauth2', function() {
           }, 'https://client.example.com/cb', false);
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
-      
-        chai.express.handler(dispatcher.flow(handler))
+        
+        chai.express.handler([state({ genh: function() { return 'XXXXXXXX' } }), handler])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -51,20 +44,15 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
   
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
   
-  
+      /*
       it('should correctly invoke state store', function() {
         expect(dispatcher._store.load).to.have.callCount(0);
         expect(dispatcher._store.save).to.have.callCount(1);
         expect(dispatcher._store.update).to.have.callCount(0);
         expect(dispatcher._store.destroy).to.have.callCount(0);
       });
+      */
     
       it('should set state', function() {
         expect(request.state).to.be.an('object');
