@@ -392,7 +392,7 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.popState();
+          res.resumeState();
         }
       
         chai.express.handler(dispatcher.flow(handler))
@@ -470,7 +470,7 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.popState();
+          res.resumeState();
         }
       
         chai.express.handler(dispatcher.flow(handler))
@@ -563,7 +563,7 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.popState({ federatedUser: req.federatedUser });
+          res.resumeState({ federatedUser: req.federatedUser });
         }
       
         chai.express.handler(dispatcher.flow(handler))
