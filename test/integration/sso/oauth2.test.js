@@ -410,6 +410,7 @@ describe('integration: sso/oauth2', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              location: 'https://client.example.com/cb',
               provider: 'http://server.example.com',
               returnTo: 'https://client.example.com/'
             };
@@ -439,6 +440,7 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
+          location: 'https://client.example.com/cb',
           provider: 'http://server.example.com',
           returnTo: 'https://client.example.com/'
         });
@@ -488,6 +490,7 @@ describe('integration: sso/oauth2', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              location: 'https://client.example.com/cb',
               provider: 'http://server.example.com',
               resume: 'Dxh5N7w_wMQ'
             };
@@ -523,6 +526,7 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
+          location: 'https://client.example.com/cb',
           provider: 'http://server.example.com',
           resume: 'Dxh5N7w_wMQ'
         });
