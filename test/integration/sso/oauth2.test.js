@@ -475,7 +475,7 @@ describe('integration: sso/oauth2', function() {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
           res.resumeState({
-            user: { id: '248289761001' }
+            flag: true
           });
         }
       
@@ -533,9 +533,7 @@ describe('integration: sso/oauth2', function() {
           state: {
             'XXXXXXXX': {
               location: 'https://client.example.com/',
-              user: {
-                id: '248289761001'
-              }
+              flag: true
             }
           }
         });
