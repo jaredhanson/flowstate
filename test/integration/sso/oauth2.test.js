@@ -585,6 +585,7 @@ describe('integration: sso/oauth2', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['af0ifjsldkj'] = {
+              location: 'https://server.example.com/cb',
               provider: 'http://server.example.net',
               resume: 'Dxh5N7w_wMQ'
             };
@@ -620,6 +621,7 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
+          location: 'https://server.example.com/cb',
           provider: 'http://server.example.net',
           resume: 'Dxh5N7w_wMQ'
         });
