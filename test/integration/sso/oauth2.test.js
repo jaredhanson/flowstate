@@ -3,6 +3,7 @@ var chai = require('chai')
   , sinon = require('sinon')
   , Dispatcher = require('../../../lib/manager')
   , state = require('../../../lib/middleware/state')
+  , SessionStore = require('../../../lib/stores/session')
 
   // TODO: Move this to login/federated
 describe('integration: sso/oauth2', function() {
@@ -10,7 +11,15 @@ describe('integration: sso/oauth2', function() {
   describe('redirecting to authorization server', function() {
     
     describe('from referring page', function() {
-      var request, response, err;
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
     
       before(function(done) {
         function handler(req, res, next) {
@@ -20,7 +29,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
         
-        chai.express.handler([state({ genh: function() { return 'XXXXXXXX' } }), handler])
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -45,14 +54,12 @@ describe('integration: sso/oauth2', function() {
       });
   
   
-      /*
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
       });
-      */
     
       it('should set state', function() {
         expect(request.state).to.be.an('object');
