@@ -4,7 +4,7 @@ var chai = require('chai')
   , Dispatcher = require('../../lib/manager');
 
 
-describe('Dispatcher#flow (internally-driven)', function() {
+describe.skip('Dispatcher#flow (internally-driven)', function() {
   
   describe('rendering', function() {
   
