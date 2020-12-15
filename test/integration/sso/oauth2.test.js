@@ -89,14 +89,14 @@ describe('integration: sso/oauth2', function() {
     }); // from referring page
     
     describe('with return_to parameter', function() {
-      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
   
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
   
       before(function(done) {
@@ -107,7 +107,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
     
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -131,19 +131,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
 
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-
 
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(0);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
       });
   
       it('should set state', function() {
@@ -174,14 +167,14 @@ describe('integration: sso/oauth2', function() {
     }); // with return_to parameter
     
     describe('with state', function() {
-      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
   
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
   
       before(function(done) {
@@ -192,7 +185,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -226,19 +219,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
 
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-
 
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(1);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
       });
   
       it('should set state', function() {
@@ -275,14 +261,14 @@ describe('integration: sso/oauth2', function() {
     }); // with state
     
     describe('with state and return_to parameter', function() {
-      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
   
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
   
       before(function(done) {
@@ -293,7 +279,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -324,19 +310,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
 
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-
 
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(1);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(0);
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
       });
   
       it('should set state', function() {
