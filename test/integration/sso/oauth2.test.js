@@ -37,6 +37,7 @@ describe('integration: sso/oauth2', function() {
             }
             
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
             request.headers = {
@@ -115,6 +116,7 @@ describe('integration: sso/oauth2', function() {
             }
           
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fclient.example.com/welcome';
             request.headers = {
@@ -196,6 +198,7 @@ describe('integration: sso/oauth2', function() {
             //        /login/federated resource, but rather /continue.   Need to handle
             //       this on push state, to set the resume state to the parent state.
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
             request.headers = {
@@ -287,6 +290,7 @@ describe('integration: sso/oauth2', function() {
             }
           
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&return_to=https%3A%2F%2Fserver.example.com/welcome&state=00000000';
             request.headers = {
@@ -375,6 +379,7 @@ describe('integration: sso/oauth2', function() {
         chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.headers = {
@@ -449,6 +454,7 @@ describe('integration: sso/oauth2', function() {
         chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.headers = {
@@ -530,6 +536,7 @@ describe('integration: sso/oauth2', function() {
         chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.headers = {
@@ -618,6 +625,7 @@ describe('integration: sso/oauth2', function() {
         chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
             request.headers = {

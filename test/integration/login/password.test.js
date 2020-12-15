@@ -34,6 +34,7 @@ describe('integration: login/password', function() {
             }
             
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/password';
             request.headers = {
@@ -102,6 +103,7 @@ describe('integration: login/password', function() {
             }
             
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'GET';
             request.url = '/login/password';
             request.headers = {
@@ -146,7 +148,7 @@ describe('integration: login/password', function() {
   describe('verifying', function() {
     
     // TODO: this needs work on the referer stuff
-    describe('logging in', function() {
+    describe.skip('from same resource as referring page', function() {
       var store = new SessionStore()
         , request, response, err;
   
@@ -175,6 +177,7 @@ describe('integration: login/password', function() {
             }
           
             request = req;
+            request.connection = { encrypted: true };
             request.method = 'POST';
             request.url = '/login/password';
             request.headers = {
@@ -182,6 +185,7 @@ describe('integration: login/password', function() {
               'referer': 'https://www.example.com/login/password'
             }
             request.body = { username: 'Aladdin', password: 'open sesame' };
+            request.session = {};
           })
           .res(function(res) {
             response = res;
@@ -199,12 +203,24 @@ describe('integration: login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
       });
+      
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        // FIXME: This should not have a returnTo
+        expect(request.state).to.deep.equal({
+          returnTo: 'https://www.example.com/login/password'
+        });
+      });
+      
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
 
       it('should respond', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('https://www.example.com/login/password');
       });
-    }); // logging in
+    }); // from same resource as referring page
     
   });
   
