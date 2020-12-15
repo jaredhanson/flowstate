@@ -65,7 +65,6 @@ describe('integration: login/password', function() {
         });
       });
       
-      // TODO: This should persist something or pass forward the return_to on query param? - the latter
       it('should not persist state in session', function() {
         expect(request.session).to.deep.equal({});
       });
@@ -73,8 +72,9 @@ describe('integration: login/password', function() {
       it('should render', function() {
         expect(response.statusCode).to.equal(200);
         expect(response).to.render('login/password');
-        // TODO: need to pass return_to here
-        expect(response.locals).to.deep.equal({});
+        expect(response.locals).to.deep.equal({
+          returnTo: 'https://www.example.com/'
+        });
       });
     }); // from referring page
     
