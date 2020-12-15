@@ -1,33 +1,110 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../../lib/manager');
+  , Dispatcher = require('../../../lib/manager')
+  , state = require('../../../lib/middleware/state')
+  , SessionStore = require('../../../lib/stores/session');
 
 
 describe('integration: login/password', function() {
   
   describe('logging in', function() {
-    var dispatcher = new Dispatcher()
+    var store = new SessionStore()
       , request, response, err;
   
     before(function() {
-      sinon.spy(dispatcher._store, 'load');
-      sinon.spy(dispatcher._store, 'save');
-      sinon.spy(dispatcher._store, 'update');
-      sinon.spy(dispatcher._store, 'destroy');
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
     });
   
     before(function(done) {
       function handler(req, res, next) {
+        console.log('HANDLER!');
+        console.log(req.state);
+        
         req.user = { id: '1000', username: 'Aladdin' };
-        next();
+        //next();
+        res.resumeState();
       }
     
-      chai.express.handler(dispatcher.flow(handler))
+      chai.express.handler([state({ store: store }), handler])
         .req(function(req) {
+          req.header = function(name) {
+            var lc = name.toLowerCase();
+            return this.headers[lc];
+          }
+          
           request = req;
           request.method = 'POST';
           request.url = '/login/password';
+          request.headers = {
+            'host': 'www.example.com',
+            'referer': 'https://www.example.com/login/password'
+          }
+          request.body = { username: 'Aladdin', password: 'open sesame' };
+        })
+        .res(function(res) {
+          response = res;
+        })
+        .end(function(res) {
+          done();
+        })
+        .dispatch();
+    });
+
+
+    it('should correctly invoke state store', function() {
+      expect(store.load).to.have.callCount(0);
+      expect(store.save).to.have.callCount(0);
+      expect(store.update).to.have.callCount(0);
+      expect(store.destroy).to.have.callCount(0);
+    });
+
+    it('should respond', function() {
+      expect(response.statusCode).to.equal(302);
+      expect(response.getHeader('Location')).to.equal('https://www.example.com/login/password');
+    });
+  }); // logging in
+  
+  // TODO: modify this for default handler, nexting
+  /*
+  describe.only('logging in', function() {
+    var store = new SessionStore()
+      , request, response, err;
+  
+    before(function() {
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
+    });
+  
+    before(function(done) {
+      function handler(req, res, next) {
+        console.log('HANDLER!');
+        console.log(req.state);
+        
+        req.user = { id: '1000', username: 'Aladdin' };
+        //next();
+        res.resumeState();
+      }
+    
+      chai.express.handler([state({ store: store }), handler])
+        .req(function(req) {
+          req.header = function(name) {
+            var lc = name.toLowerCase();
+            return this.headers[lc];
+          }
+          
+          request = req;
+          request.method = 'POST';
+          request.url = '/login/password';
+          request.headers = {
+            'host': 'www.example.com',
+            'referer': 'https://www.example.com/login/password'
+          }
           request.body = { username: 'Aladdin', password: 'open sesame' };
         })
         .res(function(res) {
@@ -39,25 +116,19 @@ describe('integration: login/password', function() {
         .dispatch();
     });
 
-    after(function() {
-      dispatcher._store.destroy.restore();
-      dispatcher._store.update.restore();
-      dispatcher._store.save.restore();
-      dispatcher._store.load.restore();
-    });
-
 
     it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(0);
-      expect(dispatcher._store.save).to.have.callCount(0);
-      expect(dispatcher._store.update).to.have.callCount(0);
-      expect(dispatcher._store.destroy).to.have.callCount(0);
+      expect(store.load).to.have.callCount(0);
+      expect(store.save).to.have.callCount(0);
+      expect(store.update).to.have.callCount(0);
+      expect(store.destroy).to.have.callCount(0);
     });
 
     it('should respond', function() {
       expect(response.statusCode).to.equal(200);
     });
   }); // logging in
+  */
   
   describe('logging in and continuing', function() {
     var dispatcher = new Dispatcher()
