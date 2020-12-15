@@ -686,6 +686,8 @@ describe('integration: sso/oauth2', function() {
       });
     }); // and resuming state yeilding parameters
     
+    // TODO: Test case without returnTo
+    
     // TODO: Test case for popping return data into state and/or query params
     //       (for example, when a session is not established, but the return to page needs info)
     
