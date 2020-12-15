@@ -148,7 +148,7 @@ describe('integration: login/password', function() {
   describe('verifying', function() {
     
     // TODO: this needs work on the referer stuff
-    describe.skip('from same resource as referring page', function() {
+    describe('from same resource as referring page', function() {
       var store = new SessionStore()
         , request, response, err;
   
@@ -166,10 +166,14 @@ describe('integration: login/password', function() {
         
           req.user = { id: '1000', username: 'Aladdin' };
           //next();
-          res.resumeState();
+          res.resumeState(next);
+        }
+        
+        function goHome(req, res, next) {
+          res.redirect('/home')
         }
     
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([state({ store: store }), handler, goHome])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -206,10 +210,7 @@ describe('integration: login/password', function() {
       
       it('should set state', function() {
         expect(request.state).to.be.an('object');
-        // FIXME: This should not have a returnTo
-        expect(request.state).to.deep.equal({
-          returnTo: 'https://www.example.com/login/password'
-        });
+        expect(request.state).to.deep.equal({});
       });
       
       it('should not persist state in session', function() {
@@ -218,7 +219,7 @@ describe('integration: login/password', function() {
 
       it('should respond', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://www.example.com/login/password');
+        expect(response.getHeader('Location')).to.equal('/home');
       });
     }); // from same resource as referring page
     
