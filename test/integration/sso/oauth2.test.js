@@ -356,14 +356,14 @@ describe('integration: sso/oauth2', function() {
   describe('redirect from authorization server', function() {
   
     describe('and returning to location', function() {
-      var dispatcher = new Dispatcher()
+      var store = new SessionStore()
         , request, response, err;
     
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
     
       before(function(done) {
@@ -372,7 +372,7 @@ describe('integration: sso/oauth2', function() {
           res.resumeState();
         }
       
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
             request.method = 'GET';
@@ -396,19 +396,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
   
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-  
   
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(1);
-        expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(1);
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
       });
     
       it('should set state', function() {
@@ -435,25 +428,25 @@ describe('integration: sso/oauth2', function() {
     }); // and returning to location
     
     describe('and returning to location yeilding parameters', function() {
-      var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
     
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
           res.resumeState({
-            flag: true
+            foo: 'bar'
           });
         }
       
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
             request.method = 'GET';
@@ -477,20 +470,13 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
   
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-  
   
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(1);
-        expect(dispatcher._store.save).to.have.callCount(1);
-        expect(dispatcher._store.update).to.have.callCount(0);
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
         // FIXME: destroy shouldn't be called here?
-        expect(dispatcher._store.destroy).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(1);
       });
     
       it('should set state', function() {
@@ -507,7 +493,7 @@ describe('integration: sso/oauth2', function() {
           state: {
             'XXXXXXXX': {
               location: 'https://client.example.com/',
-              flag: true
+              foo: 'bar'
             }
           }
         });
@@ -524,14 +510,14 @@ describe('integration: sso/oauth2', function() {
     }); // and returning to location yeilding parameters
     
     describe('and resuming state', function() {
-      var dispatcher = new Dispatcher()
+      var store = new SessionStore()
         , request, response, err;
     
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
     
       before(function(done) {
@@ -541,7 +527,7 @@ describe('integration: sso/oauth2', function() {
           res.resumeState();
         }
       
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
             request.method = 'GET';
@@ -571,19 +557,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
   
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-  
   
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(2);
-        expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(0);
-        expect(dispatcher._store.destroy).to.have.callCount(1);
+        expect(store.load).to.have.callCount(2);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
       });
     
       it('should set state', function() {
@@ -619,24 +598,24 @@ describe('integration: sso/oauth2', function() {
     }); // and resuming state
     
     describe('and resuming state yeilding parameters', function() {
-      var dispatcher = new Dispatcher()
+      var store = new SessionStore()
         , request, response, err;
     
       before(function() {
-        sinon.spy(dispatcher._store, 'load');
-        sinon.spy(dispatcher._store, 'save');
-        sinon.spy(dispatcher._store, 'update');
-        sinon.spy(dispatcher._store, 'destroy');
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
       });
     
       before(function(done) {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.net' };
-          res.resumeState({ amount: 123.50 });
+          res.resumeState({ foo: 'bar' });
         }
       
-        chai.express.handler(dispatcher.flow(handler))
+        chai.express.handler([state({ store: store }), handler])
           .req(function(req) {
             request = req;
             request.method = 'GET';
@@ -666,19 +645,12 @@ describe('integration: sso/oauth2', function() {
           .dispatch();
       });
   
-      after(function() {
-        dispatcher._store.destroy.restore();
-        dispatcher._store.update.restore();
-        dispatcher._store.save.restore();
-        dispatcher._store.load.restore();
-      });
-  
   
       it('should correctly invoke state store', function() {
-        expect(dispatcher._store.load).to.have.callCount(2);
-        expect(dispatcher._store.save).to.have.callCount(0);
-        expect(dispatcher._store.update).to.have.callCount(1);
-        expect(dispatcher._store.destroy).to.have.callCount(1);
+        expect(store.load).to.have.callCount(2);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(1);
       });
     
       it('should set state', function() {
@@ -698,7 +670,7 @@ describe('integration: sso/oauth2', function() {
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz',
-              amount: 123.50
+              foo: 'bar'
             }
           }
         });
