@@ -147,7 +147,6 @@ describe('integration: login/password', function() {
   
   describe('verifying', function() {
     
-    // TODO: this needs work on the referer stuff
     describe('from same resource as referring page', function() {
       var store = new SessionStore()
         , request, response, err;
@@ -161,11 +160,7 @@ describe('integration: login/password', function() {
   
       before(function(done) {
         function handler(req, res, next) {
-          console.log('HANDLER!');
-          console.log(req.state);
-        
           req.user = { id: '1000', username: 'Aladdin' };
-          //next();
           res.resumeState(next);
         }
         
