@@ -1,20 +1,22 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../lib/manager');
+  , Dispatcher = require('../../lib/manager')
+  , state = require('../../lib/middleware/state')
+  , SessionStore = require('../../lib/stores/session');
 
 
 describe('integration: oauth2', function() {
   
   describe('redirecting for login', function() {
-    var dispatcher = new Dispatcher({ genh: function() { return 'XXXXXXXX' } })
+    var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
       , request, response, err;
   
     before(function() {
-      sinon.spy(dispatcher._store, 'load');
-      sinon.spy(dispatcher._store, 'save');
-      sinon.spy(dispatcher._store, 'update');
-      sinon.spy(dispatcher._store, 'destroy');
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
     });
   
     before(function(done) {
@@ -22,9 +24,10 @@ describe('integration: oauth2', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler(dispatcher.flow(handler, { external: true, continue: '/oauth2/continue' }))
+      chai.express.handler([state({ external: true, continue: '/oauth2/continue', store: store }), handler])
         .req(function(req) {
           request = req;
+          request.connection = { encrypted: true };
           request.method = 'POST';
           request.url = '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
@@ -39,19 +42,12 @@ describe('integration: oauth2', function() {
         .dispatch();
     });
 
-    after(function() {
-      dispatcher._store.destroy.restore();
-      dispatcher._store.update.restore();
-      dispatcher._store.save.restore();
-      dispatcher._store.load.restore();
-    });
-
 
     it('should correctly invoke state store', function() {
-      expect(dispatcher._store.load).to.have.callCount(0);
-      expect(dispatcher._store.save).to.have.callCount(1);
-      expect(dispatcher._store.update).to.have.callCount(0);
-      expect(dispatcher._store.destroy).to.have.callCount(0);
+      expect(store.load).to.have.callCount(0);
+      expect(store.save).to.have.callCount(1);
+      expect(store.update).to.have.callCount(0);
+      expect(store.destroy).to.have.callCount(0);
     });
     
     it('should persist state in session', function() {
