@@ -24,12 +24,12 @@ describe('integration: oauth2', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler([state({ external: true, continue: '/oauth2/continue', store: store }), handler])
+      chai.express.handler([state({ external: true, continue: '/continue', store: store }), handler])
         .req(function(req) {
           request = req;
           request.connection = { encrypted: true };
           request.method = 'POST';
-          request.url = '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
         })
@@ -54,7 +54,7 @@ describe('integration: oauth2', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            location: '/oauth2/continue'
+            location: '/continue'
           }
         }
       });
