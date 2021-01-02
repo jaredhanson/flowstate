@@ -54,7 +54,7 @@ describe('integration: oauth2', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            returnTo: '/oauth2/continue'
+            location: '/oauth2/continue'
           }
         }
       });
