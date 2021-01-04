@@ -50,6 +50,7 @@ describe('Dispatcher#flow (resume)', function() {
         chai.express.handler(dispatcher.flow('federate', handler))
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };
@@ -139,6 +140,7 @@ describe('Dispatcher#flow (resume)', function() {
         chai.express.handler(dispatcher.flow('federate', handler))
           .req(function(req) {
             request = req;
+            request.connection = { encrypted: true };
             request.query = { state: 'H2' };
             request.session = { state: {} };
             request.session.state['H2'] = { name: 'federate', verifier: 'secret', state: 'H1' };

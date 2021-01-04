@@ -112,6 +112,7 @@ describe('Dispatcher#flow (NEW)', function() {
       chai.express.handler(dispatcher.flow(handler))
         .req(function(req) {
           request = req;
+          request.connection = { encrypted: true };
           request.method = 'POST';
           request.url = '/login/password';
           request.body = { username: 'aladdin', password: 'opensesame', state: 'txn123' };

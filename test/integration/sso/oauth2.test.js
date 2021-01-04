@@ -235,7 +235,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'https://server.example.net',
-          resume: '00000000'
+          state: '00000000'
         });
       });
     
@@ -251,7 +251,7 @@ describe('integration: sso/oauth2', function() {
             'XXXXXXXX': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
-              resume: '00000000'
+              state: '00000000'
             }
           }
         });
@@ -327,7 +327,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'https://server.example.net',
-          resume: '00000000'
+          state: '00000000'
         });
       });
     
@@ -343,7 +343,7 @@ describe('integration: sso/oauth2', function() {
             'XXXXXXXX': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
-              resume: '00000000'
+              state: '00000000'
             }
           }
         });
@@ -548,7 +548,7 @@ describe('integration: sso/oauth2', function() {
             request.session.state['af0ifjsldkj'] = {
               location: 'https://client.example.com/cb',
               provider: 'http://server.example.com',
-              resume: 'Dxh5N7w_wMQ'
+              state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
               location: '/continue',
@@ -577,7 +577,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.deep.equal({
           location: 'https://client.example.com/cb',
           provider: 'http://server.example.com',
-          resume: 'Dxh5N7w_wMQ'
+          state: 'Dxh5N7w_wMQ'
         });
       });
     
@@ -637,7 +637,7 @@ describe('integration: sso/oauth2', function() {
             request.session.state['af0ifjsldkj'] = {
               location: 'https://server.example.com/cb',
               provider: 'http://server.example.net',
-              resume: 'Dxh5N7w_wMQ'
+              state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
               location: '/continue',
@@ -666,7 +666,7 @@ describe('integration: sso/oauth2', function() {
         expect(request.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'http://server.example.net',
-          resume: 'Dxh5N7w_wMQ'
+          state: 'Dxh5N7w_wMQ'
         });
       });
     
