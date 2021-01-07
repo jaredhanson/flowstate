@@ -29,6 +29,9 @@ describe('integration: oauth2', function() {
           request = req;
           request.connection = { encrypted: true };
           request.method = 'POST';
+          request.headers = {
+            'host': 'server.example.com'
+          }
           request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
@@ -54,7 +57,7 @@ describe('integration: oauth2', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            location: '/continue'
+            location: 'https://server.example.com/continue'
           }
         }
       });
