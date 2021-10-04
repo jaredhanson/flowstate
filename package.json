@@ -30,9 +30,10 @@
   "dependencies": {
     "clone": "^1.0.2",
     "crc": "^3.8.0",
-    "debug": "^3.1.0",
+    "debug": "^3.2.7",
     "uid-safe": "^2.1.0",
-    "utils-flatten": "^1.0.0"
+    "utils-flatten": "^1.0.0",
+    "utils-merge": "^1.0.1"
   },
   "devDependencies": {
     "chai": "^3.0.0",

@@ -23,6 +23,8 @@ describe('integration: sso/oauth2', function() {
     
       before(function(done) {
         function handler(req, res, next) {
+          req.state.complete();
+          
           res.pushState({
             provider: 'https://server.example.com'
           }, 'https://client.example.com/cb', false);
@@ -102,6 +104,8 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
+          req.state.complete();
+          
           res.pushState({
             provider: 'https://server.example.com'
           }, 'https://client.example.com/cb', false);
@@ -181,6 +185,8 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
+          req.state.complete();
+          
           res.pushState({
             provider: 'https://server.example.net'
           }, 'https://server.example.com/cb', false);
@@ -276,6 +282,8 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
+          req.state.complete();
+          
           res.pushState({
             provider: 'https://server.example.net'
           }, 'https://server.example.com/cb', false);
@@ -354,6 +362,111 @@ describe('integration: sso/oauth2', function() {
         expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=XXXXXXXX');
       });
     }); // with state and return_to parameter
+    
+    describe('with state intended for this resource', function() {
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+  
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
+  
+      before(function(done) {
+        function handler(req, res, next) {
+          console.log('**** STATE');
+          console.log(req.state)
+          
+          req.state.complete();
+          
+          res.pushState({
+            provider: 'https://server.example.net'
+          }, 'https://server.example.com/cb', false);
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
+        }
+    
+        chai.express.handler([state({ store: store }), handler])
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+          
+            // TODO: this shouldn't load the state, since it is not intended for the
+            //        /login/federated resource, but rather /continue.   Need to handle
+            //       this on push state, to set the resume state to the parent state.
+            request = req;
+            request.connection = { encrypted: true };
+            request.method = 'GET';
+            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
+            request.headers = {
+              'host': 'server.example.com',
+              'referer': 'https://server.example.com/login?state=00000000'
+            }
+            request.query = { provider: 'https://server.example.net', state: '00000000' };
+            request.session = {};
+            request.session.state = {};
+            request.session.state['00000000'] = {
+              location: 'https://server.example.com/login/federated',
+              provider: 'https://myshopify.com',
+              shop: 'example.myshopify.com',
+              returnTo: '/'
+            };
+          })
+          .end(function(res) {
+            response = res;
+            
+            console.log('** DONE');
+            console.log(request.session)
+            
+            done();
+          })
+          .dispatch();
+      });
+
+
+      it('should correctly invoke state store', function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+      });
+  
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          location: 'https://server.example.com/cb',
+          provider: 'https://server.example.net',
+          returnTo: '/'
+        });
+      });
+    
+      it('should persist state in session', function() {
+        expect(request.session).to.deep.equal({
+          state: {
+            // FIXME: This is the complted state, and should be removed from session
+            '00000000': {
+              location: 'https://server.example.com/login/federated',
+              provider: 'https://myshopify.com',
+              shop: 'example.myshopify.com',
+              returnTo: '/'
+            },
+            'XXXXXXXX': {
+              location: 'https://server.example.com/cb',
+              provider: 'https://server.example.net',
+              returnTo: '/'
+            }
+          }
+        });
+      });
+
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=XXXXXXXX');
+      });
+    }); // with state intended for this resource
     
   });
   
