@@ -8,7 +8,7 @@ var chai = require('chai')
 
 describe('integration: login/password', function() {
   
-  describe('prompting', function() {
+  describe('GET /login/password', function() {
     
     describe('from referring page', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
@@ -26,7 +26,7 @@ describe('integration: login/password', function() {
           res.render('login/password');
         }
         
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -94,7 +94,7 @@ describe('integration: login/password', function() {
           res.render('login/password');
         }
         
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -157,7 +157,7 @@ describe('integration: login/password', function() {
           res.render('login/password');
         }
         
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -176,10 +176,9 @@ describe('integration: login/password', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['00000000'] = {
-              location: '/continue',
+              location: '/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
+              redirectURI: 'https://client.example.com/cb'
             };
           })
           .end(function(res) {
@@ -208,10 +207,9 @@ describe('integration: login/password', function() {
         expect(request.session).to.deep.equal({
           state: {
             '00000000': {
-              location: '/continue',
+              location: '/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
+              redirectURI: 'https://client.example.com/cb'
             }
           }
         });
