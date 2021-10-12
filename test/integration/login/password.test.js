@@ -224,9 +224,9 @@ describe('integration: login/password', function() {
       });
     }); // as part of a transaction
     
-  });
+  }); // GET /login/password
   
-  describe('verifying', function() {
+  describe('POST /login/password', function() {
     
     describe('from same resource as referring page', function() {
       var store = new SessionStore()
@@ -245,11 +245,12 @@ describe('integration: login/password', function() {
           res.resumeState(next);
         }
         
-        function goHome(req, res, next) {
+        function redirect(req, res, next) {
           res.redirect('/home')
         }
     
-        chai.express.handler([state({ store: store }), handler, goHome])
+        // TODO: Consider initializing state middleware with a default return to URL
+        chai.express.handler([ state({ store: store }), handler, redirect ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -293,13 +294,13 @@ describe('integration: login/password', function() {
         expect(request.session).to.deep.equal({});
       });
 
-      it('should respond', function() {
+      it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('/home');
       });
     }); // from same resource as referring page
     
-  });
+  }); // POST /login/password
   
   // TODO: modify this for default handler, nexting
   /*
@@ -366,20 +367,20 @@ describe('integration: login/password', function() {
   describe('logging in and continuing', function() {
     var dispatcher = new Dispatcher()
       , request, response, err;
-  
+
     before(function() {
       sinon.spy(dispatcher._store, 'load');
       sinon.spy(dispatcher._store, 'save');
       sinon.spy(dispatcher._store, 'update');
       sinon.spy(dispatcher._store, 'destroy');
     });
-  
+
     before(function(done) {
       function handler(req, res, next) {
         req.user = { id: '1000', username: 'Aladdin' };
         next();
       }
-    
+  
       chai.express.handler(dispatcher.flow(handler, { continue: '/login' }))
         .req(function(req) {
           request = req;
