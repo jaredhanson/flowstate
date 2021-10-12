@@ -1,7 +1,6 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../../lib/manager')
   , state = require('../../../lib/middleware/state')
   , SessionStore = require('../../../lib/stores/session');
 
