@@ -10,6 +10,69 @@ describe('integration: login/password', function() {
   
   describe('GET /login/password', function() {
     
+    describe('without referrer', function() {
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          res.render('login/password');
+        }
+        
+        chai.express.handler([ state({ store: store }), handler ])
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+            
+            request = req;
+            request.connection = { encrypted: true };
+            request.method = 'GET';
+            request.url = '/login/password';
+            request.headers = {
+              'host': 'www.example.com'
+            }
+            request.session = {};
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+  
+  
+      it('should correctly invoke state store', function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({});
+      });
+      
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+  
+      it('should render', function() {
+        expect(response.statusCode).to.equal(200);
+        expect(response).to.render('login/password');
+        expect(response.locals).to.deep.equal({});
+      });
+    }); // without referrer
+    
     describe('from referring page', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
@@ -77,69 +140,6 @@ describe('integration: login/password', function() {
         });
       });
     }); // from referring page
-    
-    describe('without referrer', function() {
-      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(store, 'load');
-        sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
-        sinon.spy(store, 'destroy');
-      });
-    
-      before(function(done) {
-        function handler(req, res, next) {
-          res.render('login/password');
-        }
-        
-        chai.express.handler([ state({ store: store }), handler ])
-          .req(function(req) {
-            req.header = function(name) {
-              var lc = name.toLowerCase();
-              return this.headers[lc];
-            }
-            
-            request = req;
-            request.connection = { encrypted: true };
-            request.method = 'GET';
-            request.url = '/login/password';
-            request.headers = {
-              'host': 'www.example.com'
-            }
-            request.session = {};
-          })
-          .end(function(res) {
-            response = res;
-            done();
-          })
-          .dispatch();
-      });
-  
-  
-      it('should correctly invoke state store', function() {
-        expect(store.load).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-      });
-    
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({});
-      });
-      
-      it('should not persist state in session', function() {
-        expect(request.session).to.deep.equal({});
-      });
-  
-      it('should render', function() {
-        expect(response.statusCode).to.equal(200);
-        expect(response).to.render('login/password');
-        expect(response.locals).to.deep.equal({});
-      });
-    }); // without referrer
     
     describe('as part of a transaction', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
