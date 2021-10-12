@@ -140,7 +140,7 @@ describe('integration: login/password', function() {
       });
     }); // with referrer
     
-    describe('with return_to query parameter', function() {
+    describe('with return_to parameter', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
@@ -206,9 +206,9 @@ describe('integration: login/password', function() {
           returnTo: 'https://www.example.com/welcome'
         });
       });
-    }); // with return_to query parameter
+    }); // with return_to parameter
     
-    describe('with return_to query parameter and referrer', function() {
+    describe('with return_to parameter and referrer', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
@@ -275,9 +275,9 @@ describe('integration: login/password', function() {
           returnTo: 'https://www.example.com/welcome'
         });
       });
-    }); // with return_to query parameter and referrer
+    }); // with return_to parameter and referrer
     
-    describe('with state query parameter', function() {
+    describe('with state parameter', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
@@ -358,7 +358,7 @@ describe('integration: login/password', function() {
           state: '00000000'
         });
       });
-    }); // as part of a transaction
+    }); // with state parameter
     
   }); // GET /login/password
   
@@ -436,7 +436,7 @@ describe('integration: login/password', function() {
       });
     }); // from same resource as referring page
     
-    describe('returning to location', function() {
+    describe('with return_to parameter', function() {
       var store = new SessionStore()
         , request, response, err;
   
@@ -507,9 +507,9 @@ describe('integration: login/password', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('https://www.example.com/');
       });
-    }); // returning to location
+    }); // with return_to parameter
     
-    describe('resuming transaction', function() {
+    describe('with state parameter', function() {
       var store = new SessionStore()
         , request, response, err;
   
@@ -594,7 +594,7 @@ describe('integration: login/password', function() {
         expect(response.statusCode).to.equal(302);
         expect(response.getHeader('Location')).to.equal('/oauth2/authorize/continue?state=00000000');
       });
-    }); // resuming transaction
+    }); // with state parameter
     
   }); // POST /login/password
   
