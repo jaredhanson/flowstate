@@ -6,7 +6,7 @@ var chai = require('chai')
   , SessionStore = require('../../lib/stores/session');
 
 
-describe('integration: oauth2', function() {
+describe('GET /oauth2/authorize', function() {
   
   describe('redirecting for login', function() {
     var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
