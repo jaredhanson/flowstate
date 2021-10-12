@@ -299,6 +299,79 @@ describe('integration: login/password', function() {
       });
     }); // from same resource as referring page
     
+    describe('returning to location', function() {
+      var store = new SessionStore()
+        , request, response, err;
+  
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
+  
+      before(function(done) {
+        function handler(req, res, next) {
+          req.user = { id: '1000', username: 'Aladdin' };
+          res.resumeState(next);
+        }
+        
+        function redirect(req, res, next) {
+          res.redirect('/home')
+        }
+    
+        chai.express.handler([ state({ store: store }), handler, redirect ])
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+          
+            request = req;
+            request.connection = { encrypted: true };
+            request.method = 'POST';
+            request.url = '/login/password';
+            request.headers = {
+              'host': 'www.example.com',
+              'referer': 'https://www.example.com/login/password'
+            }
+            request.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/' };
+            request.session = {};
+          })
+          .res(function(res) {
+            response = res;
+          })
+          .end(function(res) {
+            done();
+          })
+          .dispatch();
+      });
+
+
+      it('should correctly invoke state store', function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+      });
+      
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          returnTo: 'https://www.example.com/'
+        });
+      });
+      
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+
+      it('should redirect', function() {
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('https://www.example.com/');
+      });
+    }); // returning to location
+    
     describe('resuming transaction', function() {
       var store = new SessionStore()
         , request, response, err;
@@ -363,7 +436,9 @@ describe('integration: login/password', function() {
       
       it('should set state', function() {
         expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({ state: '00000000' });
+        expect(request.state).to.deep.equal({
+          state: '00000000'
+        });
       });
       
       it('should preserve state in session', function() {
