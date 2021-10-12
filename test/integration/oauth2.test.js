@@ -1,13 +1,13 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , Dispatcher = require('../../lib/manager')
   , state = require('../../lib/middleware/state')
   , SessionStore = require('../../lib/stores/session');
 
 
 describe('GET /oauth2/authorize', function() {
   
+  // TODO: Consider making this touch the state in order to save it.
   describe('redirecting for login', function() {
     var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
       , request, response, err;
@@ -24,7 +24,7 @@ describe('GET /oauth2/authorize', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler([state({ external: true, continue: '/continue', store: store }), handler])
+      chai.express.handler([ state({ external: true, continue: '/oauth2/authorize/continue', store: store }), handler ])
         .req(function(req) {
           request = req;
           request.connection = { encrypted: true };
@@ -32,7 +32,7 @@ describe('GET /oauth2/authorize', function() {
           request.headers = {
             'host': 'server.example.com'
           }
-          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+          request.url = '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
         })
@@ -57,16 +57,16 @@ describe('GET /oauth2/authorize', function() {
       expect(request.session).to.deep.equal({
         state: {
           'XXXXXXXX': {
-            location: 'https://server.example.com/continue'
+            location: 'https://server.example.com/oauth2/authorize/continue'
           }
         }
       });
     });
 
-    it('should respond', function() {
+    it('should redirect', function() {
       expect(response.statusCode).to.equal(302);
       expect(response.getHeader('Location')).to.equal('/login?state=XXXXXXXX');
     });
   }); // redirecting for login
   
-});
+}); // GET /oauth2/authorize

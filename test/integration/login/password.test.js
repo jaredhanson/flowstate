@@ -312,7 +312,8 @@ describe('GET /login/password', function() {
           request.session.state['00000000'] = {
             location: '/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb'
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
           };
         })
         .end(function(res) {
@@ -343,7 +344,8 @@ describe('GET /login/password', function() {
           '00000000': {
             location: '/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb'
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
           }
         }
       });
@@ -549,7 +551,8 @@ describe('POST /login/password', function() {
           request.session.state['00000000'] = {
             location: '/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb'
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
           };
         })
         .res(function(res) {
@@ -582,7 +585,8 @@ describe('POST /login/password', function() {
           '00000000': {
             location: '/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb'
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
           }
         }
       });
