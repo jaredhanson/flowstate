@@ -9,7 +9,7 @@ describe('integration: login/password', function() {
   
   describe('GET /login/password', function() {
     
-    describe('without referrer', function() {
+    describe('without parameters', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
@@ -70,9 +70,9 @@ describe('integration: login/password', function() {
         expect(response).to.render('login/password');
         expect(response.locals).to.deep.equal({});
       });
-    }); // without referrer
+    }); // without parameters
     
-    describe('from referring page', function() {
+    describe('with referrer', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
@@ -138,9 +138,146 @@ describe('integration: login/password', function() {
           returnTo: 'https://www.example.com/'
         });
       });
-    }); // from referring page
+    }); // with referrer
     
-    describe('as part of a transaction', function() {
+    describe('with return_to query parameter', function() {
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          res.render('login/password');
+        }
+        
+        chai.express.handler([ state({ store: store }), handler ])
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+            
+            request = req;
+            request.connection = { encrypted: true };
+            request.method = 'GET';
+            request.url = '/login/password';
+            request.query = { return_to: 'https://www.example.com/welcome' };
+            request.headers = {
+              'host': 'www.example.com'
+            }
+            request.session = {};
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+  
+  
+      it('should correctly invoke state store', function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          returnTo: 'https://www.example.com/welcome'
+        });
+      });
+      
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+  
+      it('should render', function() {
+        expect(response.statusCode).to.equal(200);
+        expect(response).to.render('login/password');
+        expect(response.locals).to.deep.equal({
+          returnTo: 'https://www.example.com/welcome'
+        });
+      });
+    }); // with return_to query parameter
+    
+    describe('with return_to query parameter and referrer', function() {
+      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+        , request, response, err;
+    
+      before(function() {
+        sinon.spy(store, 'load');
+        sinon.spy(store, 'save');
+        sinon.spy(store, 'update');
+        sinon.spy(store, 'destroy');
+      });
+    
+      before(function(done) {
+        function handler(req, res, next) {
+          res.render('login/password');
+        }
+        
+        chai.express.handler([ state({ store: store }), handler ])
+          .req(function(req) {
+            req.header = function(name) {
+              var lc = name.toLowerCase();
+              return this.headers[lc];
+            }
+            
+            request = req;
+            request.connection = { encrypted: true };
+            request.method = 'GET';
+            request.url = '/login/password';
+            request.query = { return_to: 'https://www.example.com/welcome' };
+            request.headers = {
+              'host': 'www.example.com',
+              'referer': 'https://www.example.com/'
+            }
+            request.session = {};
+          })
+          .end(function(res) {
+            response = res;
+            done();
+          })
+          .dispatch();
+      });
+  
+  
+      it('should correctly invoke state store', function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+      });
+    
+      it('should set state', function() {
+        expect(request.state).to.be.an('object');
+        expect(request.state).to.deep.equal({
+          returnTo: 'https://www.example.com/welcome'
+        });
+      });
+      
+      it('should not persist state in session', function() {
+        expect(request.session).to.deep.equal({});
+      });
+  
+      it('should render', function() {
+        expect(response.statusCode).to.equal(200);
+        expect(response).to.render('login/password');
+        expect(response.locals).to.deep.equal({
+          returnTo: 'https://www.example.com/welcome'
+        });
+      });
+    }); // with return_to query parameter and referrer
+    
+    describe('with state query parameter', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
     
