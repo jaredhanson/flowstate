@@ -310,7 +310,7 @@ describe('GET /login/password', function() {
           request.session = {};
           request.session.state = {};
           request.session.state['00000000'] = {
-            location: '/oauth2/authorize/continue',
+            location: 'https://www.example.com/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
             redirectURI: 'https://client.example.com/cb',
             state: 'xyz'
@@ -342,7 +342,7 @@ describe('GET /login/password', function() {
       expect(request.session).to.deep.equal({
         state: {
           '00000000': {
-            location: '/oauth2/authorize/continue',
+            location: 'https://www.example.com/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
             redirectURI: 'https://client.example.com/cb',
             state: 'xyz'
@@ -549,7 +549,7 @@ describe('POST /login/password', function() {
           request.session = {};
           request.session.state = {};
           request.session.state['00000000'] = {
-            location: '/oauth2/authorize/continue',
+            location: 'https://www.example.com/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
             redirectURI: 'https://client.example.com/cb',
             state: 'xyz'
@@ -583,7 +583,7 @@ describe('POST /login/password', function() {
       expect(request.session).to.deep.equal({
         state: {
           '00000000': {
-            location: '/oauth2/authorize/continue',
+            location: 'https://www.example.com/oauth2/authorize/continue',
             clientID: 's6BhdRkqt3',
             redirectURI: 'https://client.example.com/cb',
             state: 'xyz'
@@ -594,7 +594,7 @@ describe('POST /login/password', function() {
 
     it('should redirect', function() {
       expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/oauth2/authorize/continue?state=00000000');
+      expect(response.getHeader('Location')).to.equal('https://www.example.com/oauth2/authorize/continue?state=00000000');
     });
   }); // with state parameter
   
