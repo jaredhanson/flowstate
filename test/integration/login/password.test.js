@@ -35,7 +35,7 @@ describe('GET /login/password', function() {
           request.method = 'GET';
           request.url = '/login/password';
           request.headers = {
-            'host': 'www.example.com'
+            'host': 'server.example.com'
           }
           request.session = {};
         })
@@ -98,8 +98,8 @@ describe('GET /login/password', function() {
           request.method = 'GET';
           request.url = '/login/password';
           request.headers = {
-            'host': 'www.example.com',
-            'referer': 'https://www.example.com/'
+            'host': 'server.example.com',
+            'referer': 'https://server.example.com/'
           }
           request.session = {};
         })
@@ -121,7 +121,7 @@ describe('GET /login/password', function() {
     it('should set state', function() {
       expect(request.state).to.be.an('object');
       expect(request.state).to.deep.equal({
-        returnTo: 'https://www.example.com/'
+        returnTo: 'https://server.example.com/'
       });
     });
     
@@ -133,7 +133,7 @@ describe('GET /login/password', function() {
       expect(response.statusCode).to.equal(200);
       expect(response).to.render('login/password');
       expect(response.locals).to.deep.equal({
-        returnTo: 'https://www.example.com/'
+        returnTo: 'https://server.example.com/'
       });
     });
   }); // with referrer
@@ -167,7 +167,7 @@ describe('GET /login/password', function() {
           request.url = '/login/password';
           request.query = { return_to: 'https://www.example.com/welcome' };
           request.headers = {
-            'host': 'www.example.com'
+            'host': 'server.example.com'
           }
           request.session = {};
         })
@@ -235,8 +235,8 @@ describe('GET /login/password', function() {
           request.url = '/login/password';
           request.query = { return_to: 'https://www.example.com/welcome' };
           request.headers = {
-            'host': 'www.example.com',
-            'referer': 'https://www.example.com/'
+            'host': 'server.example.com',
+            'referer': 'https://server.example.com/'
           }
           request.session = {};
         })
@@ -303,8 +303,8 @@ describe('GET /login/password', function() {
           request.method = 'GET';
           request.url = '/login/password?state=00000000';
           request.headers = {
-            'host': 'www.example.com',
-            'referer': 'https://www.example.com/'
+            'host': 'server.example.com',
+            'referer': 'https://server.example.com/'
           }
           request.query = { state: '00000000' };
           request.session = {};

@@ -7,7 +7,6 @@ var chai = require('chai')
 
 describe('[OAuth 2.0] GET /authorize', function() {
   
-  // TODO: Consider making this touch the state in order to save it.
   describe('redirecting for login after modifying state', function() {
     var store = new SessionStore({ genh: function() { return '00000000' } })
       , request, response, err;
