@@ -46,7 +46,6 @@ describe('GET /login/password', function() {
         .dispatch();
     });
 
-
     it('should correctly invoke state store', function() {
       expect(store.load).to.have.callCount(0);
       expect(store.save).to.have.callCount(0);
@@ -109,7 +108,6 @@ describe('GET /login/password', function() {
         })
         .dispatch();
     });
-
 
     it('should correctly invoke state store', function() {
       expect(store.load).to.have.callCount(0);
@@ -178,7 +176,6 @@ describe('GET /login/password', function() {
         .dispatch();
     });
 
-
     it('should correctly invoke state store', function() {
       expect(store.load).to.have.callCount(0);
       expect(store.save).to.have.callCount(0);
@@ -246,7 +243,6 @@ describe('GET /login/password', function() {
         })
         .dispatch();
     });
-
 
     it('should correctly invoke state store', function() {
       expect(store.load).to.have.callCount(0);

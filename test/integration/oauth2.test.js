@@ -47,7 +47,6 @@ describe('[OAuth 2.0] GET /authorize', function() {
         .dispatch();
     });
 
-
     it('should correctly invoke state store', function() {
       expect(store.load).to.have.callCount(0);
       expect(store.save).to.have.callCount(1);
