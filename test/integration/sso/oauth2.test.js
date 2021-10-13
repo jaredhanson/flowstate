@@ -459,7 +459,7 @@ describe('integration: sso/oauth2', function() {
     
   });
   
-  describe('redirect from authorization server', function() {
+  describe('GET /oauth2/redirect', function() {
   
     describe('and returning to location', function() {
       var store = new SessionStore()
