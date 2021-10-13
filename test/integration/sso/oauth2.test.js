@@ -264,7 +264,7 @@ describe('integration: sso/oauth2', function() {
     }); // with state parameter
     
     describe('with state and return_to parameter', function() {
-      var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
+      var store = new SessionStore({ genh: function() { return 'xyz' } })
         , request, response, err;
   
       before(function() {
@@ -276,8 +276,6 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
-          req.state.complete();
-          
           res.pushState({
             provider: 'https://server.example.net'
           }, 'https://server.example.com/cb', false);
@@ -303,7 +301,7 @@ describe('integration: sso/oauth2', function() {
             request.session = {};
             request.session.state = {};
             request.session.state['00000000'] = {
-              location: '/continue',
+              location: 'https://server.example.com/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
@@ -337,12 +335,12 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             '00000000': {
-              location: '/continue',
+              location: 'https://server.example.com/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
             },
-            'XXXXXXXX': {
+            'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
               state: '00000000'
@@ -353,7 +351,7 @@ describe('integration: sso/oauth2', function() {
 
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=XXXXXXXX');
+        expect(response.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=xyz');
       });
     }); // with state and return_to parameter
     
