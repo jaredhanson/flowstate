@@ -1,7 +1,6 @@
 var chai = require('chai')
   , expect = require('chai').expect
-  , sinon = require('sinon')
-  , Dispatcher = require('../../../lib/manager');
+  , sinon = require('sinon');
 
 
 describe('integration: sso/oauth', function() {
@@ -11,6 +10,8 @@ describe('integration: sso/oauth', function() {
     // FIXME: make sure this is testing for correct behavior
     //        broke as a result fo removing _yield from Manager
     //        (same problem in oauth2 tests.)
+    
+    /*
     describe.skip('and returning to report with preserved state and session established by default handler', function() {
       var dispatcher = new Dispatcher()
         , request, response, err;
@@ -114,6 +115,7 @@ describe('integration: sso/oauth', function() {
         expect(response.getHeader('Location')).to.equal('/report/magic-quadrant?state=Dxh5N7w_wMQ');
       });
     }); // and returning home with preserved state after default handling
+    */
     
   }); // redirect back from OAuth service provider
   
