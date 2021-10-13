@@ -24,7 +24,7 @@ describe('GET /oauth2/authorize', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler([ state({ external: true, continue: '/oauth2/authorize/continue', store: store }), handler ])
+      chai.express.handler([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
         .req(function(req) {
           request = req;
           request.connection = { encrypted: true };
@@ -32,7 +32,7 @@ describe('GET /oauth2/authorize', function() {
           request.headers = {
             'host': 'server.example.com'
           }
-          request.url = '/oauth2/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
         })
@@ -57,7 +57,7 @@ describe('GET /oauth2/authorize', function() {
       expect(request.session).to.deep.equal({
         state: {
           '00000000': {
-            location: 'https://server.example.com/oauth2/authorize/continue'
+            location: 'https://server.example.com/authorize/continue'
           }
         }
       });
