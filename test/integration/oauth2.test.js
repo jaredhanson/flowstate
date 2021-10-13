@@ -5,10 +5,10 @@ var chai = require('chai')
   , SessionStore = require('../../lib/stores/session');
 
 
-describe('GET /oauth2/authorize', function() {
+describe('[OAuth 2.0] GET /authorize', function() {
   
   // TODO: Consider making this touch the state in order to save it.
-  describe('redirecting for login', function() {
+  describe('redirecting for login after modifying state', function() {
     var store = new SessionStore({ genh: function() { return '00000000' } })
       , request, response, err;
   
@@ -21,6 +21,9 @@ describe('GET /oauth2/authorize', function() {
   
     before(function(done) {
       function handler(req, res, next) {
+        req.state.clientID = req.query.client_id;
+        req.state.redirectURI = req.query.redirect_uri;
+        req.state.state = req.query.state;
         res.redirect('/login');
       }
     
@@ -57,7 +60,10 @@ describe('GET /oauth2/authorize', function() {
       expect(request.session).to.deep.equal({
         state: {
           '00000000': {
-            location: 'https://server.example.com/authorize/continue'
+            location: 'https://server.example.com/authorize/continue',
+            clientID: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
           }
         }
       });
