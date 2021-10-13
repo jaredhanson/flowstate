@@ -187,7 +187,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
@@ -282,7 +282,7 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler ])
           .req(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
