@@ -721,10 +721,14 @@ describe('integration: sso/oauth2', function() {
         // TODO: test case with multiple handlers
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.net' };
-          res.resumeState({ foo: 'bar' });
+          res.resumeState({ beep: 'boop' }, next);
+        }
+        
+        function redirect(req, res, next) {
+          res.redirect('/home')
         }
       
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler, redirect ])
           .req(function(req) {
             request = req;
             request.connection = { encrypted: true };
@@ -742,7 +746,7 @@ describe('integration: sso/oauth2', function() {
               state: 'Dxh5N7w_wMQ'
             };
             request.session.state['Dxh5N7w_wMQ'] = {
-              location: '/continue',
+              location: 'https://server.example.com/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
@@ -776,11 +780,11 @@ describe('integration: sso/oauth2', function() {
         expect(request.session).to.deep.equal({
           state: {
             'Dxh5N7w_wMQ': {
-              location: '/continue',
+              location: 'https://server.example.com/oauth2/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz',
-              foo: 'bar'
+              beep: 'boop'
             }
           }
         });
@@ -792,7 +796,7 @@ describe('integration: sso/oauth2', function() {
   
       it('should redirect', function() {
         expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/continue?state=Dxh5N7w_wMQ');
+        expect(response.getHeader('Location')).to.equal('https://server.example.com/oauth2/authorize/continue?state=Dxh5N7w_wMQ');
       });
     }); // and resuming state yeilding parameters
     
