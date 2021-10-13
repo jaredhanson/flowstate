@@ -355,6 +355,7 @@ describe('integration: sso/oauth2', function() {
       });
     }); // with state and return_to parameter
     
+    // FIXME: This test needs reviewing
     describe('with state intended for this resource', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;
@@ -409,10 +410,6 @@ describe('integration: sso/oauth2', function() {
           })
           .end(function(res) {
             response = res;
-            
-            console.log('** DONE');
-            console.log(request.session)
-            
             done();
           })
           .dispatch();
