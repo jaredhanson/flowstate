@@ -475,10 +475,14 @@ describe('integration: sso/oauth2', function() {
       before(function(done) {
         function handler(req, res, next) {
           req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.resumeState();
+          res.resumeState(next);
+        }
+        
+        function redirect(req, res, next) {
+          res.redirect('/home')
         }
       
-        chai.express.handler([state({ store: store }), handler])
+        chai.express.handler([ state({ store: store }), handler, redirect ])
           .req(function(req) {
             request = req;
             request.connection = { encrypted: true };
@@ -522,10 +526,6 @@ describe('integration: sso/oauth2', function() {
       
       it('should remove state from session', function() {
         expect(request.session).to.deep.equal({});
-      });
-    
-      it('should not set locals', function() {
-        expect(request.locals).to.be.undefined;
       });
   
       it('should redirect', function() {
