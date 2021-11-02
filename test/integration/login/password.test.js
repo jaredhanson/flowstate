@@ -169,90 +169,63 @@ describe('GET /login/password', function() {
       .listen();
   }); // should initialize state with return to query parameter in preference to referrer header and render with state
   
-  describe('with state parameter', function() {
-    var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
-      , request, response, err;
-  
-    before(function() {
-      sinon.spy(store, 'load');
-      sinon.spy(store, 'save');
-      sinon.spy(store, 'update');
-      sinon.spy(store, 'destroy');
-    });
-  
-    before(function(done) {
-      function handler(req, res, next) {
-        res.render('login/password');
-      }
-      
-      chai.express.use([ state({ store: store }), handler ])
-        .request(function(req) {
-          req.header = function(name) {
-            var lc = name.toLowerCase();
-            return this.headers[lc];
-          }
-          
-          request = req;
-          request.connection = { encrypted: true };
-          request.method = 'GET';
-          request.url = '/login/password?state=00000000';
-          request.headers = {
-            'host': 'server.example.com',
-            'referer': 'https://server.example.com/'
-          }
-          request.query = { state: '00000000' };
-          request.session = {};
-          request.session.state = {};
-          request.session.state['00000000'] = {
-            location: 'https://www.example.com/oauth2/authorize/continue',
-            clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb',
-            state: 'xyz'
-          };
-        })
-        .finish(function() {
-          response = this;
-          done();
-        })
-        .listen();
-    });
+  it('should initialize state with state query parameter and render with state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
 
-
-    it('should correctly invoke state store', function() {
-      expect(store.load).to.have.callCount(1);
-      expect(store.save).to.have.callCount(0);
-      expect(store.update).to.have.callCount(0);
-      expect(store.destroy).to.have.callCount(0);
-    });
+    function handler(req, res, next) {
+      res.render('login/password');
+    }
     
-    it('should set state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state).to.deep.equal({
-        state: '00000000'
-      });
-    });
-    
-    it('should preserve state in session', function() {
-      expect(request.session).to.deep.equal({
-        state: {
-          '00000000': {
-            location: 'https://www.example.com/oauth2/authorize/continue',
-            clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb',
-            state: 'xyz'
-          }
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.method = 'GET';
+        req.url = '/login/password?state=00000000';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login'
         }
-      });
-    });
-
-    it('should render', function() {
-      expect(response.statusCode).to.equal(200);
-      expect(response).to.render('login/password');
-      expect(response.locals).to.deep.equal({
-        state: '00000000'
-      });
-    });
-  }); // with state parameter
+        req.connection = { encrypted: true };
+        req.query = { state: '00000000' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['00000000'] = {
+          location: 'https://www.example.com/oauth2/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          state: '00000000'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: 'https://www.example.com/oauth2/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(this.statusCode).to.equal(200);
+        expect(this).to.render('login/password')
+                    .with.deep.locals({ state: '00000000' });
+        done();
+      })
+      .listen();
+  }); // should initialize state with state query parameter and render with state
   
 }); // GET /login/password
   
