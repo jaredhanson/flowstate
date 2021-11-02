@@ -193,7 +193,7 @@ describe('GET /login/password', function() {
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
-          location: 'https://www.example.com/oauth2/authorize/continue',
+          location: 'https://server.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
           redirectURI: 'https://client.example.com/cb',
           state: 'xyz'
@@ -211,7 +211,7 @@ describe('GET /login/password', function() {
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
-              location: 'https://www.example.com/oauth2/authorize/continue',
+              location: 'https://server.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
@@ -252,8 +252,8 @@ describe('POST /login/password', function() {
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
-          'host': 'www.example.com',
-          'referer': 'https://www.example.com/login/password'
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login/password'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame' };
@@ -275,7 +275,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // from same resource as referring page
   
-  it('with return_to parameter', function(done) {
+  it('should initialize state with return to body parameter and redirect to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -296,11 +296,11 @@ describe('POST /login/password', function() {
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
-          'host': 'www.example.com',
-          'referer': 'https://www.example.com/login/password'
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login/password'
         }
         req.connection = { encrypted: true };
-        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/' };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://client.example.com/' };
         req.session = {};
       })
       .finish(function() {
@@ -311,13 +311,13 @@ describe('POST /login/password', function() {
         
         expect(this.req.state).to.be.an('object');
         expect(this.req.state).to.deep.equal({
-          returnTo: 'https://www.example.com/'
+          returnTo: 'https://client.example.com/'
         });
         
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://www.example.com/');
+        expect(this.getHeader('Location')).to.equal('https://client.example.com/');
         
         done();
       })

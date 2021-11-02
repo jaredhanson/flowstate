@@ -150,7 +150,7 @@ describe('GET /login', function() {
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
-          location: 'https://www.example.com/oauth2/authorize/continue',
+          location: 'https://server.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
           redirectURI: 'https://client.example.com/cb',
           state: 'xyz'
@@ -168,7 +168,7 @@ describe('GET /login', function() {
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
-              location: 'https://www.example.com/oauth2/authorize/continue',
+              location: 'https://server.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz'
