@@ -16,7 +16,7 @@ describe('POST /account/select', function() {
 
     function handler(req, res, next) {
       res.resumeState({
-        selectedSession: req.body.session_selector
+        selectedSession: req.body.selected_session
       }, next);
     }
     
@@ -32,7 +32,7 @@ describe('POST /account/select', function() {
           'host': 'server.example.com'
         }
         req.connection = { encrypted: true };
-        req.body = { session_selector: 'a001', state: '00000000' };
+        req.body = { selected_session: 'a001', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
