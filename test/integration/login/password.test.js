@@ -23,8 +23,8 @@ describe('GET /login/password', function() {
         res.render('login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -39,11 +39,11 @@ describe('GET /login/password', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -85,8 +85,8 @@ describe('GET /login/password', function() {
         res.render('login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -102,11 +102,11 @@ describe('GET /login/password', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -152,8 +152,8 @@ describe('GET /login/password', function() {
         res.render('login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -169,11 +169,11 @@ describe('GET /login/password', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -219,8 +219,8 @@ describe('GET /login/password', function() {
         res.render('login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -237,11 +237,11 @@ describe('GET /login/password', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -287,8 +287,8 @@ describe('GET /login/password', function() {
         res.render('login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -312,11 +312,11 @@ describe('GET /login/password', function() {
             state: 'xyz'
           };
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
 
@@ -382,8 +382,10 @@ describe('POST /login/password', function() {
       }
   
       // TODO: Consider initializing state middleware with a default return to URL
-      chai.express.handler([ state({ store: store }), handler, redirect ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler, redirect ])
+        .request(function(req, res) {
+          response = res;
+          
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -400,13 +402,10 @@ describe('POST /login/password', function() {
           request.body = { username: 'Aladdin', password: 'open sesame' };
           request.session = {};
         })
-        .res(function(res) {
-          response = res;
-        })
-        .end(function(res) {
+        .finish(function() {
           done();
         })
-        .dispatch();
+        .listen();
     });
 
 
@@ -453,8 +452,10 @@ describe('POST /login/password', function() {
         res.redirect('/home')
       }
   
-      chai.express.handler([ state({ store: store }), handler, redirect ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler, redirect ])
+        .request(function(req, res) {
+          response = res;
+          
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -471,13 +472,10 @@ describe('POST /login/password', function() {
           request.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/' };
           request.session = {};
         })
-        .res(function(res) {
-          response = res;
-        })
-        .end(function(res) {
+        .finish(function() {
           done();
         })
-        .dispatch();
+        .listen();
     });
 
 
@@ -526,8 +524,10 @@ describe('POST /login/password', function() {
         res.redirect('/home')
       }
       
-      chai.express.handler([ state({ store: store }), handler, redirect ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler, redirect ])
+        .request(function(req, res) {
+          response = res;
+          
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -551,13 +551,10 @@ describe('POST /login/password', function() {
             state: 'xyz'
           };
         })
-        .res(function(res) {
-          response = res;
-        })
-        .end(function(res) {
+        .finish(function() {
           done();
         })
-        .dispatch();
+        .listen();
     });
 
 

@@ -28,8 +28,10 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
         
-        chai.express.handler([ state({ store: store }), handler ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler ])
+          .request(function(req, res) {
+            response = res;
+            
             req.header = function(name) {
               var lc = name.toLowerCase();
               return this.headers[lc];
@@ -46,11 +48,10 @@ describe('integration: sso/oauth2', function() {
             request.query = { provider: 'https://server.example.com' };
             request.session = {};
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
             done();
           })
-          .dispatch();
+          .listen();
       });
   
   
@@ -107,8 +108,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
         }
     
-        chai.express.handler([ state({ store: store }), handler ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler ])
+          .request(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
               return this.headers[lc];
@@ -125,11 +126,11 @@ describe('integration: sso/oauth2', function() {
             request.query = { provider: 'https://server.example.com', return_to: 'https://client.example.com/welcome' };
             request.session = {};
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
 
 
@@ -186,8 +187,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler([ state({ store: store }), handler ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler ])
+          .request(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
               return this.headers[lc];
@@ -214,11 +215,11 @@ describe('integration: sso/oauth2', function() {
               state: 'xyz'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
 
 
@@ -281,8 +282,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler([ state({ store: store }), handler ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler ])
+          .request(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
               return this.headers[lc];
@@ -306,11 +307,11 @@ describe('integration: sso/oauth2', function() {
               state: 'xyz'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
 
 
@@ -379,8 +380,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
-        chai.express.handler([state({ store: store }), handler])
-          .req(function(req) {
+        chai.express.use([state({ store: store }), handler])
+          .request(function(req) {
             req.header = function(name) {
               var lc = name.toLowerCase();
               return this.headers[lc];
@@ -407,11 +408,11 @@ describe('integration: sso/oauth2', function() {
               returnTo: '/'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
 
 
@@ -481,8 +482,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('/home')
         }
       
-        chai.express.handler([ state({ store: store }), handler, redirect ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler, redirect ])
+          .request(function(req) {
             request = req;
             request.connection = { encrypted: true };
             request.method = 'GET';
@@ -499,11 +500,11 @@ describe('integration: sso/oauth2', function() {
               returnTo: 'https://client.example.com/'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
   
   
@@ -556,8 +557,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('/home')
         }
       
-        chai.express.handler([ state({ store: store }), handler, redirect ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler, redirect ])
+          .request(function(req) {
             request = req;
             request.connection = { encrypted: true };
             request.method = 'GET';
@@ -574,11 +575,11 @@ describe('integration: sso/oauth2', function() {
               returnTo: 'https://client.example.com/'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
   
   
@@ -638,8 +639,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('/home')
         }
       
-        chai.express.handler([ state({ store: store }), handler, redirect ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler, redirect ])
+          .request(function(req) {
             request = req;
             request.connection = { encrypted: true };
             request.method = 'GET';
@@ -662,11 +663,11 @@ describe('integration: sso/oauth2', function() {
               state: 'xyz'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
   
   
@@ -727,8 +728,8 @@ describe('integration: sso/oauth2', function() {
           res.redirect('/home')
         }
       
-        chai.express.handler([ state({ store: store }), handler, redirect ])
-          .req(function(req) {
+        chai.express.use([ state({ store: store }), handler, redirect ])
+          .request(function(req) {
             request = req;
             request.connection = { encrypted: true };
             request.method = 'GET';
@@ -751,11 +752,11 @@ describe('integration: sso/oauth2', function() {
               state: 'xyz'
             };
           })
-          .end(function(res) {
-            response = res;
+          .finish(function() {
+            response = this;
             done();
           })
-          .dispatch();
+          .listen();
       });
   
   

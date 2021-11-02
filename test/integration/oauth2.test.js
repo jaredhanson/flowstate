@@ -26,8 +26,10 @@ describe('[OAuth 2.0] GET /authorize', function() {
         res.redirect('/login');
       }
     
-      chai.express.handler([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
+        .request(function(req, res) {
+          response = res;
+          
           request = req;
           request.connection = { encrypted: true };
           request.method = 'POST';
@@ -38,13 +40,10 @@ describe('[OAuth 2.0] GET /authorize', function() {
           request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
           request.session = {};
         })
-        .res(function(res) {
-          response = res;
-        })
-        .end(function(res) {
+        .finish(function() {
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -94,8 +93,10 @@ describe('GET /oauth2/authorize/continue', function() {
         res.redirect('/consent');
       }
     
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req, res) {
+          response = res;
+          
           request = req;
           request.connection = { encrypted: true };
           request.method = 'GET';
@@ -113,13 +114,10 @@ describe('GET /oauth2/authorize/continue', function() {
             state: 'xyz'
           };
         })
-        .res(function(res) {
-          response = res;
-        })
-        .end(function(res) {
+        .finish(function() {
           done();
         })
-        .dispatch();
+        .listen();
     });
 
 

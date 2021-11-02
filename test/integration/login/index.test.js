@@ -23,8 +23,8 @@ describe('GET /login', function() {
         res.redirect('/login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -39,11 +39,11 @@ describe('GET /login', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -84,8 +84,8 @@ describe('GET /login', function() {
         res.redirect('/login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -101,11 +101,11 @@ describe('GET /login', function() {
           }
           request.session = {};
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
@@ -148,8 +148,8 @@ describe('GET /login', function() {
         res.redirect('/login/password');
       }
       
-      chai.express.handler([ state({ store: store }), handler ])
-        .req(function(req) {
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req) {
           req.header = function(name) {
             var lc = name.toLowerCase();
             return this.headers[lc];
@@ -173,11 +173,11 @@ describe('GET /login', function() {
             state: 'xyz'
           };
         })
-        .end(function(res) {
-          response = res;
+        .finish(function() {
+          response = this;
           done();
         })
-        .dispatch();
+        .listen();
     });
 
     it('should correctly invoke state store', function() {
