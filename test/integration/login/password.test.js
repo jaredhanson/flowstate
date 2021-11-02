@@ -276,7 +276,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // from same resource as referring page
   
-  it('should initialize state with return to body parameter and redirect back to location', function(done) {
+  it('should initialize state with return to body parameter and return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -319,7 +319,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return to body parameter and redirect back to location
+  }); // should initialize state with return to body parameter and return to location
   
   it('should initialize state with state body parameter and resume state', function(done) {
     var store = new SessionStore();

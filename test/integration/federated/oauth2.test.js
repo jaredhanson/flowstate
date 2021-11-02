@@ -115,7 +115,7 @@ describe('integration: sso/oauth2', function() {
   
   describe('GET /oauth2/redirect', function() {
   
-    it('should consume state from state query parameter and return to location', function(done) {
+    it('should consume state with state query parameter and return to location', function(done) {
       var store = new SessionStore();
       sinon.spy(store, 'load');
       sinon.spy(store, 'save');
@@ -123,7 +123,6 @@ describe('integration: sso/oauth2', function() {
       sinon.spy(store, 'destroy');
   
       function handler(req, res, next) {
-        req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
         res.resumeState(next);
       }
       
