@@ -200,7 +200,7 @@ describe('GET /login/federated', function() {
     }
 
     chai.express.use([ state({ store: store }), handler ])
-      .request(function(req) {
+      .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&return_to=https%3A%2F%2Fserver.example.com/welcome&state=00000000';
         req.headers = {

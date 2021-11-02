@@ -115,78 +115,58 @@ describe('integration: sso/oauth2', function() {
   
   describe('GET /oauth2/redirect', function() {
   
-    describe('and returning to location', function() {
-      var store = new SessionStore()
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(store, 'load');
-        sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
-        sinon.spy(store, 'destroy');
-      });
-    
-      before(function(done) {
-        function handler(req, res, next) {
-          req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
-          res.resumeState(next);
-        }
-        
-        function redirect(req, res, next) {
-          res.redirect('/home')
-        }
+    it('should consume state from state query parameter and return to location', function(done) {
+      var store = new SessionStore();
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
+  
+      function handler(req, res, next) {
+        req.federatedUser = { id: '248289761001', provider: 'http://server.example.com' };
+        res.resumeState(next);
+      }
       
-        chai.express.use([ state({ store: store }), handler, redirect ])
-          .request(function(req) {
-            request = req;
-            request.connection = { encrypted: true };
-            request.method = 'GET';
-            request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
-            request.headers = {
-              'host': 'client.example.com'
-            }
-            request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
-            request.session = {};
-            request.session.state = {};
-            request.session.state['af0ifjsldkj'] = {
-              location: 'https://client.example.com/cb',
-              provider: 'http://server.example.com',
-              returnTo: 'https://client.example.com/'
-            };
-          })
-          .finish(function() {
-            response = this;
-            done();
-          })
-          .listen();
-      });
-  
-  
-      it('should correctly invoke state store', function() {
-        expect(store.load).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(1);
-      });
+      function redirect(req, res, next) {
+        res.redirect('/home')
+      }
     
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
-          provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
-        });
-      });
-      
-      it('should remove state from session', function() {
-        expect(request.session).to.deep.equal({});
-      });
-  
-      it('should redirect', function() {
-        expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://client.example.com/');
-      });
-    }); // and returning to location
+      chai.express.use([ state({ store: store }), handler, redirect ])
+        .request(function(req, res) {
+          req.method = 'GET';
+          req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+          req.headers = {
+            'host': 'client.example.com'
+          }
+          req.connection = { encrypted: true };
+          req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
+          req.session = {};
+          req.session.state = {};
+          req.session.state['af0ifjsldkj'] = {
+            location: 'https://client.example.com/cb',
+            provider: 'http://server.example.com',
+            returnTo: 'https://client.example.com/'
+          };
+        })
+        .finish(function() {
+          expect(store.load).to.have.callCount(1);
+          expect(store.save).to.have.callCount(0);
+          expect(store.update).to.have.callCount(0);
+          expect(store.destroy).to.have.callCount(1);
+          
+          expect(this.req.state).to.deep.equal({
+            location: 'https://client.example.com/cb',
+            provider: 'http://server.example.com',
+            returnTo: 'https://client.example.com/'
+          });
+          expect(this.req.session).to.deep.equal({});
+          
+          expect(this.statusCode).to.equal(302);
+          expect(this.getHeader('Location')).to.equal('https://client.example.com/');
+          done();
+        })
+        .listen();
+    }); // should consume state from state query parameter and return to location
     
     describe('and returning to location yeilding parameters', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
