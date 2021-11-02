@@ -167,6 +167,7 @@ describe('integration: sso/oauth2', function() {
         .listen();
     }); // should consume state with state query parameter and return to location
     
+    // FIXME: Review this test
     it('and returning to location yeilding parameters', function(done) {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } });
       sinon.spy(store, 'load');
