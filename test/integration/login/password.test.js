@@ -269,6 +269,7 @@ describe('POST /login/password', function() {
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
+        // TODO: Should this return to referrer?
         expect(this.getHeader('Location')).to.equal('/home');
         done();
       })
@@ -283,7 +284,6 @@ describe('POST /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
-      req.user = { id: '1000', username: 'Aladdin' };
       res.resumeState(next);
     }
     
@@ -309,20 +309,17 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.be.an('object');
         expect(this.req.state).to.deep.equal({
           returnTo: 'https://client.example.com/'
         });
-        
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://client.example.com/');
-        
         done();
       })
       .listen();
-  }); // with return_to parameter
+  }); // should initialize state with return to body parameter and redirect to location
   
   describe('with state parameter', function() {
     var store = new SessionStore()
