@@ -9,164 +9,113 @@ describe('integration: sso/oauth2', function() {
   
   describe('GET /login/federated', function() {
     
-    describe('with referrer', function() {
-      var store = new SessionStore({ genh: function() { return 'xyz' } })
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(store, 'load');
-        sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
-        sinon.spy(store, 'destroy');
-      });
-    
-      before(function(done) {
-        function handler(req, res, next) {
-          res.pushState({
-            provider: 'https://server.example.com'
-          }, 'https://client.example.com/cb', false);
-          res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
-        }
-        
-        chai.express.use([ state({ store: store }), handler ])
-          .request(function(req, res) {
-            response = res;
-            
-            req.header = function(name) {
-              var lc = name.toLowerCase();
-              return this.headers[lc];
-            }
-            
-            request = req;
-            request.connection = { encrypted: true };
-            request.method = 'GET';
-            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
-            request.headers = {
-              'host': 'client.example.com',
-              'referer': 'https://client.example.com/'
-            }
-            request.query = { provider: 'https://server.example.com' };
-            request.session = {};
-          })
-          .finish(function() {
-            done();
-          })
-          .listen();
-      });
+    it('should initialize state with referrer header and redirect with state', function(done) {
+      var store = new SessionStore({ genh: function() { return 'xyz' } });
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
   
-  
-      it('should correctly invoke state store', function() {
-        expect(store.load).to.have.callCount(0);
-        expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-      });
-    
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
-          provider: 'https://server.example.com',
-          returnTo: 'https://client.example.com/'
-        });
-      });
+      function handler(req, res, next) {
+        res.pushState({
+          provider: 'https://server.example.com'
+        }, 'https://client.example.com/cb', false);
+        res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
+      }
       
-      it('should persist state in session', function() {
-        expect(request.session).to.deep.equal({
-          state: {
-            'xyz': {
-              location: 'https://client.example.com/cb',
-              provider: 'https://server.example.com',
-              returnTo: 'https://client.example.com/'
-            }
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req, res) {
+          req.method = 'GET';
+          req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
+          req.headers = {
+            'host': 'client.example.com',
+            'referer': 'https://client.example.com/login'
           }
-        });
-      });
-  
-      it('should redirect', function() {
-        expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
-      });
-    }); // with referrer
-    
-    describe('with return_to parameter and referrer', function() {
-      var store = new SessionStore({ genh: function() { return 'xyz' } })
-        , request, response, err;
-  
-      before(function() {
-        sinon.spy(store, 'load');
-        sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
-        sinon.spy(store, 'destroy');
-      });
-  
-      before(function(done) {
-        function handler(req, res, next) {
-          res.pushState({
-            provider: 'https://server.example.com'
-          }, 'https://client.example.com/cb', false);
-          res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
-        }
-    
-        chai.express.use([ state({ store: store }), handler ])
-          .request(function(req) {
-            req.header = function(name) {
-              var lc = name.toLowerCase();
-              return this.headers[lc];
-            }
+          req.connection = { encrypted: true };
+          req.query = { provider: 'https://server.example.com' };
+          req.session = {};
+        })
+        .finish(function() {
+          expect(store.load).to.have.callCount(0);
+          expect(store.save).to.have.callCount(1);
+          expect(store.update).to.have.callCount(0);
+          expect(store.destroy).to.have.callCount(0);
           
-            request = req;
-            request.connection = { encrypted: true };
-            request.method = 'GET';
-            request.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fclient.example.com/welcome';
-            request.headers = {
-              'host': 'client.example.com',
-              'referer': 'https://client.example.com/'
+          expect(this.req.state).to.deep.equal({
+            location: 'https://client.example.com/cb',
+            provider: 'https://server.example.com',
+            returnTo: 'https://client.example.com/login'
+          });
+          expect(this.req.session).to.deep.equal({
+            state: {
+              'xyz': {
+                location: 'https://client.example.com/cb',
+                provider: 'https://server.example.com',
+                returnTo: 'https://client.example.com/login'
+              }
             }
-            request.query = { provider: 'https://server.example.com', return_to: 'https://client.example.com/welcome' };
-            request.session = {};
-          })
-          .finish(function() {
-            response = this;
-            done();
-          })
-          .listen();
-      });
-
-
-      it('should correctly invoke state store', function() {
-        expect(store.load).to.have.callCount(0);
-        expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-      });
-  
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
-          provider: 'https://server.example.com',
-          returnTo: 'https://client.example.com/welcome'
-        });
-      });
+          });
+          
+          expect(this.statusCode).to.equal(302);
+          expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
+          done();
+        })
+        .listen();
+    }); // should initialize state with referrer header and redirect with state
     
-      it('should persist state in session', function() {
-        expect(request.session).to.deep.equal({
-          state: {
-            'xyz': {
-              location: 'https://client.example.com/cb',
-              provider: 'https://server.example.com',
-              returnTo: 'https://client.example.com/welcome'
-            }
-          }
-        });
-      });
+    it('should initialize state with return to query parameter in preference to referrer header and redirect with state', function(done) {
+      var store = new SessionStore({ genh: function() { return 'xyz' } });
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
 
-      it('should redirect', function() {
-        expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
-      });
-    }); // with return_to parameter and referrer
+      function handler(req, res, next) {
+        res.pushState({
+          provider: 'https://server.example.com'
+        }, 'https://client.example.com/cb', false);
+        res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
+      }
+  
+      chai.express.use([ state({ store: store }), handler ])
+        .request(function(req, res) {
+          req.method = 'GET';
+          req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com&return_to=https%3A%2F%2Fclient.example.com/welcome';
+          req.headers = {
+            'host': 'client.example.com',
+            'referer': 'https://client.example.com/login'
+          }
+          req.connection = { encrypted: true };
+          req.query = { provider: 'https://server.example.com', return_to: 'https://client.example.com/welcome' };
+          req.session = {};
+        })
+        .finish(function() {
+          expect(store.load).to.have.callCount(0);
+          expect(store.save).to.have.callCount(1);
+          expect(store.update).to.have.callCount(0);
+          expect(store.destroy).to.have.callCount(0);
+          
+          expect(this.req.state).to.deep.equal({
+            location: 'https://client.example.com/cb',
+            provider: 'https://server.example.com',
+            returnTo: 'https://client.example.com/welcome'
+          });
+          expect(this.req.session).to.deep.equal({
+            state: {
+              'xyz': {
+                location: 'https://client.example.com/cb',
+                provider: 'https://server.example.com',
+                returnTo: 'https://client.example.com/welcome'
+              }
+            }
+          });
+          
+          expect(this.statusCode).to.equal(302);
+          expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
+          done();
+        })
+        .listen();
+    }); // should initialize state with return to query parameter in preference to referrer header and redirect with state
     
     describe('with state parameter', function() {
       var store = new SessionStore({ genh: function() { return 'xyz' } })
