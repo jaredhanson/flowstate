@@ -102,8 +102,8 @@ describe('GET /login', function() {
         req.headers = {
           'host': 'server.example.com'
         }
-        req.query = { return_to: 'https://client.example.com/' };
         req.connection = { encrypted: true };
+        req.query = { return_to: 'https://client.example.com/' };
         req.session = {};
       })
       .finish(function() {
