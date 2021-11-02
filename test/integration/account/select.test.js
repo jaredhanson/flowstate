@@ -16,7 +16,7 @@ describe('POST /account/select', function() {
 
     function handler(req, res, next) {
       res.resumeState({
-        sessionSelector: req.body.session_selector
+        selectedSession: req.body.session_selector
       }, next);
     }
     
@@ -58,7 +58,7 @@ describe('POST /account/select', function() {
               clientID: 's6BhdRkqt3',
               redirectURI: 'https://client.example.com/cb',
               state: 'xyz',
-              sessionSelector: 'a001'
+              selectedSession: 'a001'
             }
           }
         });
