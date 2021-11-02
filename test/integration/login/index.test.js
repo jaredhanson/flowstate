@@ -19,7 +19,7 @@ describe('GET /login', function() {
     }
     
     chai.express.use([ state({ store: store }), handler ])
-      .request(function(req) {
+      .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
@@ -56,7 +56,7 @@ describe('GET /login', function() {
     }
     
     chai.express.use([ state({ store: store }), handler ])
-      .request(function(req) {
+      .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
@@ -96,7 +96,7 @@ describe('GET /login', function() {
     }
     
     chai.express.use([ state({ store: store }), handler ])
-      .request(function(req) {
+      .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
@@ -136,7 +136,7 @@ describe('GET /login', function() {
     }
     
     chai.express.use([ state({ store: store }), handler ])
-      .request(function(req) {
+      .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login?state=00000000';
         req.headers = {
