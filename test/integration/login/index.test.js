@@ -84,7 +84,47 @@ describe('GET /login', function() {
       .listen();
   }); // should initialize state with referrer header and redirect without state parameter
   
-  it('should initialize state with state parameter and redirect with same state parameter', function(done) {
+  it('should initialize state with retury to query parameter and redirect without state parameter', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      res.redirect('/login/password');
+    }
+    
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req) {
+        req.method = 'GET';
+        req.url = '/login';
+        req.headers = {
+          'host': 'server.example.com'
+        }
+        req.query = { return_to: 'https://client.example.com/' };
+        req.connection = { encrypted: true };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          returnTo: 'https://client.example.com/'
+        });
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login/password');
+        done();
+      })
+      .listen();
+  }); // should initialize state with retury to query parameter and redirect without state parameter
+  
+  it('should initialize state with state query parameter and redirect with same state parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -139,6 +179,6 @@ describe('GET /login', function() {
         done();
       })
       .listen();
-  }); // with state parameter
+  }); // should initialize state with state query parameter and redirect with same state parameter
   
 });
