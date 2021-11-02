@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login', function() {
     
-  it('should initialize state without properties and redirect without state parameter', function(done) {
+  it('should initialize state without properties and redirect without state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -42,9 +42,9 @@ describe('GET /login', function() {
         done();
       })
       .listen();
-  }); // should redirect without state parameter
+  }); // should initialize state without properties and redirect without state
   
-  it('should initialize state with referrer header and redirect without state parameter', function(done) {
+  it('should initialize state with referrer header and redirect without state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -77,14 +77,15 @@ describe('GET /login', function() {
         });
         expect(this.req.session).to.deep.equal({});
         
+        // TODO: Should this set a return_to parameter?
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('/login/password');
         done();
       })
       .listen();
-  }); // should initialize state with referrer header and redirect without state parameter
+  }); // should initialize state with referrer header and redirect without state
   
-  it('should initialize state with retury to query parameter and redirect without state parameter', function(done) {
+  it('should initialize state with return to query parameter and redirect without state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -117,14 +118,15 @@ describe('GET /login', function() {
         });
         expect(this.req.session).to.deep.equal({});
         
+        // TODO: Should this set a return_to parameter?
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('/login/password');
         done();
       })
       .listen();
-  }); // should initialize state with retury to query parameter and redirect without state parameter
+  }); // should initialize state with return to query parameter and redirect without state
   
-  it('should initialize state with state query parameter and redirect with same state parameter', function(done) {
+  it('should initialize state with state query parameter and redirect with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -179,6 +181,6 @@ describe('GET /login', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter and redirect with same state parameter
+  }); // should initialize state with state query parameter and redirect with state
   
 });
