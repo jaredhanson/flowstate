@@ -1,7 +1,8 @@
 /* global describe, it */
 
-var flowstate = require('..');
 var expect = require('chai').expect;
+var sinon = require('sinon');
+var flowstate = require('..');
 
 
 describe('flowstate', function() {
@@ -15,4 +16,8 @@ describe('flowstate', function() {
     expect(flowstate.MissingStateError).to.be.a('function');
   });
   
+});
+
+afterEach(function() {
+  sinon.restore();
 });

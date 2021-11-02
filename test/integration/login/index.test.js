@@ -7,18 +7,15 @@ var chai = require('chai')
 
 describe('GET /login', function() {
     
-  describe('without parameters', function() {
+  it('without parameters', function(done) {
     var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
       , request, response, err;
   
-    before(function() {
       sinon.spy(store, 'load');
       sinon.spy(store, 'save');
       sinon.spy(store, 'update');
       sinon.spy(store, 'destroy');
-    });
   
-    before(function(done) {
       function handler(req, res, next) {
         res.redirect('/login/password');
       }
@@ -41,31 +38,41 @@ describe('GET /login', function() {
         })
         .finish(function() {
           response = this;
+          
+          expect(store.load).to.have.callCount(0);
+          expect(store.save).to.have.callCount(0);
+          expect(store.update).to.have.callCount(0);
+          expect(store.destroy).to.have.callCount(0);
+          
+          expect(request.state).to.be.an('object');
+          expect(request.state).to.deep.equal({});
+          
+          expect(request.session).to.deep.equal({});
+          
+          expect(response.statusCode).to.equal(302);
+          expect(response.getHeader('Location')).to.equal('/login/password');
+          
           done();
         })
         .listen();
-    });
 
+        /*
     it('should correctly invoke state store', function() {
-      expect(store.load).to.have.callCount(0);
-      expect(store.save).to.have.callCount(0);
-      expect(store.update).to.have.callCount(0);
-      expect(store.destroy).to.have.callCount(0);
+      
     });
   
     it('should set state', function() {
-      expect(request.state).to.be.an('object');
-      expect(request.state).to.deep.equal({});
+      
     });
     
     it('should not persist state in session', function() {
-      expect(request.session).to.deep.equal({});
+      
     });
 
     it('should redirect', function() {
-      expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/login/password');
+      
     });
+        */
   }); // without parameters
   
   describe('with referrer', function() {
