@@ -169,7 +169,7 @@ describe('GET /login/password', function() {
       .listen();
   }); // should initialize state with return to query parameter in preference to referrer header and render with state
   
-  it('should initialize state with state query parameter and render with state', function(done) {
+  it('should load state with state query parameter and render with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -225,7 +225,7 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter and render with state
+  }); // should load state with state query parameter and render with state
   
 }); // GET /login/password
   
@@ -321,7 +321,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with return to body parameter and return to location
   
-  it('should initialize state with state body parameter and resume state', function(done) {
+  it('should load state with state body parameter and resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -377,6 +377,52 @@ describe('POST /login/password', function() {
         
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
+        done();
+      })
+      .listen();
+  }); // should initialize state with state body parameter and resume state
+  
+  it('should initialize state by ignoring invalid state body parameter and not resume state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      res.resumeState(next);
+    }
+    
+    function redirect(req, res, next) {
+      res.redirect('/home')
+    }
+    
+    chai.express.use([ state({ store: store }), handler, redirect ])
+      .request(function(req, res) {
+        req.method = 'POST';
+        req.url = '/login/password';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login/password'
+        }
+        req.connection = { encrypted: true };
+        req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
+        req.session = {};
+        req.session.state = {};
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1); // FIXME: should onl be called once
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({});
+        expect(this.req.session).to.deep.equal({
+          state: {}
+        });
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/home');
         done();
       })
       .listen();
