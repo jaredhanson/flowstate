@@ -1,7 +1,7 @@
 var chai = require('chai')
   , expect = require('chai').expect
   , sinon = require('sinon')
-  , loadState = require('../../lib/middleware/load')
+  //, loadState = require('../../lib/middleware/load')
   , ExpiredStateError = require('../../lib/errors/expiredstateerror');
 
 /*
