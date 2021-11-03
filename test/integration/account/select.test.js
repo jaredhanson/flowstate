@@ -8,7 +8,7 @@ var chai = require('chai')
 describe('POST /account/select', function() {
   
   it('should initialize state with state body parameter and resume state with yielded parameters', function(done) {
-    var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } });
+    var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
     sinon.spy(store, 'update');

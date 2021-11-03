@@ -7,69 +7,59 @@ var chai = require('chai')
 
 describe('[OAuth 2.0] GET /authorize', function() {
   
-  describe('redirecting for login after modifying state', function() {
+  it('redirecting for login after modifying state', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } })
       , request, response, err;
   
-    before(function() {
-      sinon.spy(store, 'load');
-      sinon.spy(store, 'save');
-      sinon.spy(store, 'update');
-      sinon.spy(store, 'destroy');
-    });
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      req.state.clientID = req.query.client_id;
+      req.state.redirectURI = req.query.redirect_uri;
+      req.state.state = req.query.state;
+      res.redirect('/login');
+    }
   
-    before(function(done) {
-      function handler(req, res, next) {
-        req.state.clientID = req.query.client_id;
-        req.state.redirectURI = req.query.redirect_uri;
-        req.state.state = req.query.state;
-        res.redirect('/login');
-      }
-    
-      chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
-        .request(function(req, res) {
-          response = res;
-          
-          request = req;
-          request.connection = { encrypted: true };
-          request.method = 'POST';
-          request.headers = {
-            'host': 'server.example.com'
-          }
-          request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
-          request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
-          request.session = {};
-        })
-        .finish(function() {
-          done();
-        })
-        .listen();
-    });
-
-    it('should correctly invoke state store', function() {
-      expect(store.load).to.have.callCount(0);
-      expect(store.save).to.have.callCount(1);
-      expect(store.update).to.have.callCount(0);
-      expect(store.destroy).to.have.callCount(0);
-    });
-    
-    it('should persist state in session', function() {
-      expect(request.session).to.deep.equal({
-        state: {
-          '00000000': {
-            location: 'https://server.example.com/authorize/continue',
-            clientID: 's6BhdRkqt3',
-            redirectURI: 'https://client.example.com/cb',
-            state: 'xyz'
-          }
+    chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
+      .request(function(req, res) {
+        response = res;
+        
+        request = req;
+        request.connection = { encrypted: true };
+        request.method = 'POST';
+        request.headers = {
+          'host': 'server.example.com'
         }
-      });
-    });
-
-    it('should redirect', function() {
-      expect(response.statusCode).to.equal(302);
-      expect(response.getHeader('Location')).to.equal('/login?state=00000000');
-    });
+        request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+        request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
+        request.session = {};
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(1);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(request.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(response.statusCode).to.equal(302);
+        expect(response.getHeader('Location')).to.equal('/login?state=00000000');
+        
+        done();
+      })
+      .listen();
   }); // redirecting for login
   
 }); // GET /oauth2/authorize
