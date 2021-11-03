@@ -244,51 +244,6 @@ describe('GET /login/password', function() {
   
 describe('POST /login/password', function() {
   
-  it('from same resource as referring page', function(done) {
-    var store = new SessionStore()
-    sinon.spy(store, 'load');
-    sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      res.resumeState(next);
-    }
-    
-    function redirect(req, res, next) {
-      res.redirect('/home')
-    }
-
-    // TODO: Consider initializing state middleware with a default return to URL
-    chai.express.use([ state({ store: store }), handler, redirect ])
-      .request(function(req, res) {
-        req.method = 'POST';
-        req.url = '/login/password';
-        req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
-        }
-        req.connection = { encrypted: true };
-        req.body = { username: 'Aladdin', password: 'open sesame' };
-        req.session = {};
-      })
-      .finish(function() {
-        expect(store.load).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.req.state).to.deep.equal({});
-        expect(this.req.session).to.deep.equal({});
-        
-        expect(this.statusCode).to.equal(302);
-        // TODO: Should this return to referrer?
-        expect(this.getHeader('Location')).to.equal('/home');
-        done();
-      })
-      .listen();
-  }); // from same resource as referring page
-  
   it('should initialize state with return to body parameter and return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
@@ -422,8 +377,7 @@ describe('POST /login/password', function() {
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
+          'host': 'server.example.com'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
