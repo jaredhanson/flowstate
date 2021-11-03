@@ -41,15 +41,13 @@ describe('Response', function() {
           // FIXME: why is returnTo in the state?
           expect(this.req.state).to.deep.equal({
             location: 'https://www.example.com/hello',
-            name: 'Jane Doe',
-            returnTo: '/'
+            name: 'Jane Doe'
           });
           expect(this.req.session).to.deep.equal({
             state: {
               '00000000': {
                 location: 'https://www.example.com/hello',
-                name: 'Jane Doe',
-                returnTo: '/'
+                name: 'Jane Doe'
               }
             }
           });
