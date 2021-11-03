@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('[OAuth 2.0] GET /authorize', function() {
   
-  it('redirecting for login after modifying state', function(done) {
+  it('should save state for continue endpoint and redirect with state', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -23,12 +23,12 @@ describe('[OAuth 2.0] GET /authorize', function() {
   
     chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
       .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'POST';
+        req.method = 'GET';
+        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
           'host': 'server.example.com'
         }
-        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+        req.connection = { encrypted: true };
         req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
