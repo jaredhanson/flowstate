@@ -23,9 +23,6 @@ describe('integration: sso/oauth2', function() {
   
       before(function(done) {
         function handler(req, res, next) {
-          console.log('**** STATE');
-          console.log(req.state)
-          
           req.state.complete();
           
           res.pushState({
