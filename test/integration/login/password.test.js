@@ -15,6 +15,7 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({});
       res.render('login/password');
     }
     
@@ -53,6 +54,9 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        returnTo: 'https://server.example.com/login'
+      });
       res.render('login/password');
     }
     
@@ -94,6 +98,9 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        returnTo: 'https://client.example.com/'
+      });
       res.render('login/password');
     }
     
@@ -135,6 +142,9 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        returnTo: 'https://client.example.com/'
+      });
       res.render('login/password');
     }
     
@@ -177,6 +187,9 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        state: '00000000'
+      });
       res.render('login/password');
     }
     
@@ -284,6 +297,9 @@ describe('POST /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        returnTo: 'https://client.example.com/'
+      });
       res.resumeState(next);
     }
     
@@ -329,6 +345,9 @@ describe('POST /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        state: '00000000'
+      });
       res.resumeState(next);
     }
     
@@ -390,6 +409,7 @@ describe('POST /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({});
       res.resumeState(next);
     }
     
