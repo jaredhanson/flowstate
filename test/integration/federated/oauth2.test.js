@@ -304,98 +304,78 @@ describe('integration: sso/oauth2', function() {
         .listen();
     }); // and resuming state
     
-    describe('and resuming state yeilding parameters', function() {
-      var store = new SessionStore()
-        , request, response, err;
-    
-      before(function() {
-        sinon.spy(store, 'load');
-        sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
-        sinon.spy(store, 'destroy');
-      });
-    
-      before(function(done) {
-        // TODO: test case with multiple handlers
-        function handler(req, res, next) {
-          req.federatedUser = { id: '248289761001', provider: 'http://server.example.net' };
-          res.resumeState({ beep: 'boop' }, next);
-        }
-        
-        function redirect(req, res, next) {
-          res.redirect('/home')
-        }
+    // FIXME: Review this test
+    it('and resuming state yeilding parameters', function(done) {
+      var store = new SessionStore();
+      sinon.spy(store, 'load');
+      sinon.spy(store, 'save');
+      sinon.spy(store, 'update');
+      sinon.spy(store, 'destroy');
+  
+      // TODO: test case with multiple handlers
+      function handler(req, res, next) {
+        req.federatedUser = { id: '248289761001', provider: 'http://server.example.net' };
+        res.resumeState({ beep: 'boop' }, next);
+      }
       
-        chai.express.use([ state({ store: store }), handler, redirect ])
-          .request(function(req) {
-            request = req;
-            request.connection = { encrypted: true };
-            request.method = 'GET';
-            request.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
-            request.headers = {
-              'host': 'server.example.com'
-            }
-            request.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
-            request.session = {};
-            request.session.state = {};
-            request.session.state['af0ifjsldkj'] = {
-              location: 'https://server.example.com/cb',
-              provider: 'http://server.example.net',
-              state: 'Dxh5N7w_wMQ'
-            };
-            request.session.state['Dxh5N7w_wMQ'] = {
-              location: 'https://server.example.com/oauth2/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
-            };
-          })
-          .finish(function() {
-            response = this;
-            done();
-          })
-          .listen();
-      });
-  
-  
-      it('should correctly invoke state store', function() {
-        expect(store.load).to.have.callCount(2);
-        expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(1);
-        expect(store.destroy).to.have.callCount(1);
-      });
+      function redirect(req, res, next) {
+        res.redirect('/home')
+      }
     
-      it('should set state', function() {
-        expect(request.state).to.be.an('object');
-        expect(request.state).to.deep.equal({
-          location: 'https://server.example.com/cb',
-          provider: 'http://server.example.net',
-          state: 'Dxh5N7w_wMQ'
-        });
-      });
-    
-      it('should remove state from session and update resuming state', function() {
-        expect(request.session).to.deep.equal({
-          state: {
-            'Dxh5N7w_wMQ': {
-              location: 'https://server.example.com/oauth2/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz',
-              beep: 'boop'
-            }
+      chai.express.use([ state({ store: store }), handler, redirect ])
+        .request(function(req, res) {
+          req.connection = { encrypted: true };
+          req.method = 'GET';
+          req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+          req.headers = {
+            'host': 'server.example.com'
           }
-        });
-      });
-    
-      it('should not set locals', function() {
-        expect(request.locals).to.be.undefined;
-      });
-  
-      it('should redirect', function() {
-        expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('https://server.example.com/oauth2/authorize/continue?state=Dxh5N7w_wMQ');
-      });
+          req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
+          req.session = {};
+          req.session.state = {};
+          req.session.state['af0ifjsldkj'] = {
+            location: 'https://server.example.com/cb',
+            provider: 'http://server.example.net',
+            state: 'Dxh5N7w_wMQ'
+          };
+          req.session.state['Dxh5N7w_wMQ'] = {
+            location: 'https://server.example.com/oauth2/authorize/continue',
+            clientID: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
+          };
+        })
+        .finish(function() {
+          expect(store.load).to.have.callCount(2);
+          expect(store.save).to.have.callCount(0);
+          expect(store.update).to.have.callCount(1);
+          expect(store.destroy).to.have.callCount(1);
+          
+          expect(this.req.state).to.be.an('object');
+          expect(this.req.state).to.deep.equal({
+            location: 'https://server.example.com/cb',
+            provider: 'http://server.example.net',
+            state: 'Dxh5N7w_wMQ'
+          });
+          
+          expect(this.req.session).to.deep.equal({
+            state: {
+              'Dxh5N7w_wMQ': {
+                location: 'https://server.example.com/oauth2/authorize/continue',
+                clientID: 's6BhdRkqt3',
+                redirectURI: 'https://client.example.com/cb',
+                state: 'xyz',
+                beep: 'boop'
+              }
+            }
+          });
+          
+          expect(this.statusCode).to.equal(302);
+          expect(this.getHeader('Location')).to.equal('https://server.example.com/oauth2/authorize/continue?state=Dxh5N7w_wMQ');
+          
+          done();
+        })
+        .listen();
     }); // and resuming state yeilding parameters
     
     // TODO: Test case without returnTo
