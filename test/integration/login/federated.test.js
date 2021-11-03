@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login/federated', function() {
   
-  it('should store state with referrer header and redirect with state', function(done) {
+  it('should push state with referrer header and redirect with state', function(done) {
     var store = new SessionStore({ genh: function() { return 'xyz' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -61,7 +61,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should store state with referrer header and redirect with state
   
-  it('should store state with return to query parameter in preference to referrer header and redirect with state', function(done) {
+  it('should push state with return to query parameter in preference to referrer header and redirect with state', function(done) {
     var store = new SessionStore({ genh: function() { return 'xyz' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -115,7 +115,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should store state with return to query parameter in preference to referrer header and redirect with state
   
-  it('should store state with state query parameter and redirect with state', function(done) {
+  it('should push state with state query parameter and redirect with state', function(done) {
     var store = new SessionStore({ genh: function() { return 'xyz' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -185,7 +185,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should store state with state query parameter and redirect with state
   
-  it('should store state with state query parameter in preference to return to query parameter and redirect with state', function(done) {
+  it('should push state with state query parameter in preference to return to query parameter and redirect with state', function(done) {
     var store = new SessionStore({ genh: function() { return 'xyz' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');

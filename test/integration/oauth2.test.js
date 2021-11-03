@@ -23,7 +23,6 @@ describe('[OAuth 2.0] GET /authorize', function() {
   
     chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
       .request(function(req, res) {
-        req = req;
         req.connection = { encrypted: true };
         req.method = 'POST';
         req.headers = {
