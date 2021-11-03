@@ -8,9 +8,7 @@ var chai = require('chai')
 describe('[OAuth 2.0] GET /authorize', function() {
   
   it('redirecting for login after modifying state', function(done) {
-    var store = new SessionStore({ genh: function() { return '00000000' } })
-      , request, response, err;
-  
+    var store = new SessionStore({ genh: function() { return '00000000' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
     sinon.spy(store, 'update');
@@ -25,17 +23,15 @@ describe('[OAuth 2.0] GET /authorize', function() {
   
     chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
       .request(function(req, res) {
-        response = res;
-        
-        request = req;
-        request.connection = { encrypted: true };
-        request.method = 'POST';
-        request.headers = {
+        req = req;
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.headers = {
           'host': 'server.example.com'
         }
-        request.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
-        request.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
-        request.session = {};
+        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+        req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
+        req.session = {};
       })
       .finish(function() {
         expect(store.load).to.have.callCount(0);
@@ -43,7 +39,7 @@ describe('[OAuth 2.0] GET /authorize', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(request.session).to.deep.equal({
+        expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
               location: 'https://server.example.com/authorize/continue',
@@ -54,9 +50,8 @@ describe('[OAuth 2.0] GET /authorize', function() {
           }
         });
         
-        expect(response.statusCode).to.equal(302);
-        expect(response.getHeader('Location')).to.equal('/login?state=00000000');
-        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login?state=00000000');
         done();
       })
       .listen();
