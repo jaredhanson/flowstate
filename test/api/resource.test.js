@@ -61,4 +61,66 @@ describe('POST /token', function() {
       .listen();
   }); // should load state with state query parameter and render with state
   
+  it('should load state with state query parameter and render with current state after modifying', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/token',
+        beep: 'boop'
+      });
+      req.state.foo = 'bar';
+      res.status(400).render('response/token.xml');
+    }
+    
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.method = 'POST';
+        req.url = '/token';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/token'
+        }
+        req.connection = { encrypted: true };
+        req.body = { state: '11111111' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['11111111'] = {
+          location: 'https://server.example.com/token',
+          beep: 'boop'
+        };
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/token',
+          beep: 'boop',
+          foo: 'bar'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '11111111': {
+              location: 'https://server.example.com/token',
+              beep: 'boop',
+              foo: 'bar'
+            }
+          }
+        });
+        
+        expect(this.statusCode).to.equal(400);
+        expect(this).to.render('response/token.xml')
+                    .with.deep.locals({ state: '11111111' });
+        done();
+      })
+      .listen();
+  }); // should load state with state query parameter and render with state after modifiying
+  
 });
