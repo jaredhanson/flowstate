@@ -490,6 +490,8 @@ describe('POST /login/password', function() {
       expect(req.state).to.deep.equal({
         state: '00000000'
       });
+      // TODO: Should this use pushState?
+      // TODO: What if it redirects to `/login?
       req.state.messages = req.session.messages || [];
       req.state.messages.push('Invalid username or password.');
       res.redirect('/login/password');
