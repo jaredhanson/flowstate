@@ -356,6 +356,70 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with state body parameter and resume state
   
+  it('should load state with state body parameter and redirect to location', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        state: '00000000'
+      });
+      res.redirect('/login/password');
+    }
+    
+    function redirect(req, res, next) {
+      res.redirect('/home')
+    }
+    
+    chai.express.use([ state({ store: store }), handler, redirect ])
+      .request(function(req, res) {
+        req.method = 'POST';
+        req.url = '/login/password';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login/password'
+        }
+        req.connection = { encrypted: true };
+        req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['00000000'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          state: '00000000'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login/password?state=00000000');
+        done();
+      })
+      .listen();
+  }); // should load state with state body parameter and redirect to location
+  
   it('should initialize state by ignoring invalid state body parameter and not resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
