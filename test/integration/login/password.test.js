@@ -240,6 +240,65 @@ describe('GET /login/password', function() {
       .listen();
   }); // should load state with state query parameter and render with state
   
+  it('should load state with state query parameter and render with current state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
+        messages: [ 'Invalid username or password.' ]
+      });
+      res.render('login/password');
+    }
+    
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.method = 'GET';
+        req.url = '/login/password?state=11111111';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login'
+        }
+        req.connection = { encrypted: true };
+        req.query = { state: '11111111' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['11111111'] = {
+          location: 'https://server.example.com/login/password',
+          messages: [ 'Invalid username or password.' ]
+        };
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
+          messages: [ 'Invalid username or password.' ]
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '11111111': {
+              location: 'https://server.example.com/login/password',
+              messages: [ 'Invalid username or password.' ]
+            }
+          }
+        });
+        
+        expect(this.statusCode).to.equal(200);
+        expect(this).to.render('login/password')
+                    .with.deep.locals({ state: '11111111' });
+        done();
+      })
+      .listen();
+  }); // should load state with state query parameter and render with state
+  
 }); // GET /login/password
   
 describe('POST /login/password', function() {
