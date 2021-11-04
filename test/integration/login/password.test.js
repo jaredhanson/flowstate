@@ -465,6 +465,7 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
+        // FIXME: This should have a location?
         expect(this.req.state).to.deep.equal({
           messages: [ 'Invalid username or password.' ],
           state: '00000000'
