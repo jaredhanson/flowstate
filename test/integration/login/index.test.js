@@ -183,4 +183,60 @@ describe('GET /login', function() {
       .listen();
   }); // should initialize state with state query parameter and redirect with state
   
+  it('should initialize state with state query parameter and redirect with current state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      res.redirect('/login/password');
+    }
+    
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.method = 'GET';
+        req.url = '/login?state=11111111';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://client.example.com/'
+        }
+        req.connection = { encrypted: true };
+        req.query = { state: '11111111' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['11111111'] = {
+          location: 'https://server.example.com/login',
+          messages: [ 'Invalid username or password.' ]
+        };
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(1);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          //state: '11111111'
+        });
+        // FIXME: This should update the location to /login/password
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '11111111': {
+              location: 'https://server.example.com/login',
+              messages: [ 'Invalid username or password.' ]
+            }
+          }
+        });
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login/password?state=11111111');
+        done();
+      })
+      .listen();
+  }); // should initialize state with state query parameter and redirect with current state
+  
 });
