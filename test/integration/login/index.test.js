@@ -219,8 +219,7 @@ describe('GET /login', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/login',
-          messages: [ 'Invalid username or password.' ],
-          //state: '11111111'
+          messages: [ 'Invalid username or password.' ]
         });
         // FIXME: This should update the location to /login/password
         expect(this.req.session).to.deep.equal({
