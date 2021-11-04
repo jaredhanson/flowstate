@@ -464,6 +464,6 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state body parameter and resume state
+  }); // should initialize state by ignoring invalid state body parameter and not resume state
   
 }); // POST /login/password
