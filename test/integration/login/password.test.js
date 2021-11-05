@@ -243,7 +243,8 @@ describe('GET /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
-        messages: [ 'Invalid username or password.' ]
+        messages: [ 'Invalid username or password.' ],
+        resumeState: '00000000'
       });
       res.render('login/password');
     }
@@ -260,9 +261,16 @@ describe('GET /login/password', function() {
         req.query = { state: '11111111' };
         req.session = {};
         req.session.state = {};
+        req.session.state['00000000'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
         req.session.state['11111111'] = {
           location: 'https://server.example.com/login/password',
-          messages: [ 'Invalid username or password.' ]
+          messages: [ 'Invalid username or password.' ],
+          resumeState: '00000000'
         };
       })
       .finish(function() {
@@ -273,9 +281,16 @@ describe('GET /login/password', function() {
         
         expect(this.req.session).to.deep.equal({
           state: {
+            '00000000': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            },
             '11111111': {
               location: 'https://server.example.com/login/password',
-              messages: [ 'Invalid username or password.' ]
+              messages: [ 'Invalid username or password.' ],
+              resumeState: '00000000'
             }
           }
         });
@@ -301,8 +316,8 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://client.example.com/'
+        location: 'https://www.example.com/login/password',
+        returnTo: 'https://www.example.com/app'
       });
       res.resumeState(next);
     }
@@ -316,11 +331,11 @@ describe('POST /login/password', function() {
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login/password'
         }
         req.connection = { encrypted: true };
-        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://client.example.com/' };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/app' };
         req.session = {};
       })
       .finish(function() {
@@ -329,20 +344,20 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          returnTo: 'https://client.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://client.example.com/');
+        expect(this.getHeader('Location')).to.equal('https://www.example.com/app');
         done();
       })
       .listen();
   }); // should initialize state with return to body parameter and return to location
   
-  it('should load state with state body parameter and resume state', function(done) {
+  
+  // TODO: Add a test case that falls into next after resumeState
+  
+  
+  it('should initialize state with state body parameter and resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
