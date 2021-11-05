@@ -63,7 +63,7 @@ describe('GET /login', function() {
         req.url = '/login';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://client.example.com/'
+          'referer': 'https://server.example.com/'
         }
         req.connection = { encrypted: true };
         req.session = {};
@@ -76,7 +76,7 @@ describe('GET /login', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/login',
-          returnTo: 'https://client.example.com/'
+          returnTo: 'https://server.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
         
@@ -107,7 +107,7 @@ describe('GET /login', function() {
           'host': 'server.example.com'
         }
         req.connection = { encrypted: true };
-        req.query = { return_to: 'https://client.example.com/' };
+        req.query = { return_to: 'https://server.example.com/' };
         req.session = {};
       })
       .finish(function() {
@@ -118,7 +118,7 @@ describe('GET /login', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/login',
-          returnTo: 'https://client.example.com/'
+          returnTo: 'https://server.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
         
