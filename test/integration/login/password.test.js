@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login/password', function() {
     
-  it('should initialize state without properties and render without state', function(done) {
+  it('should initialize state without properties and render without any state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -37,9 +37,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(200);
@@ -48,9 +45,9 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state without properties and render without state parameter
+  }); // should initialize state without properties and render without any state
   
-  it('should initialize state with referrer header and render with state', function(done) {
+  it('should initialize state with referrer header and render with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -82,10 +79,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          returnTo: 'https://server.example.com/login'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(200);
@@ -94,9 +87,9 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with referrer header and render with state
+  }); // should initialize state with referrer header and render with return location
   
-  it('should initialize state with return to query parameter and render with state', function(done) {
+  it('should initialize state with return to query parameter and render with return location', function(done) {
     var store = new SessionStore()
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -128,10 +121,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          returnTo: 'https://client.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(200);
@@ -140,9 +129,9 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return to query parameter and render with state
+  }); // should initialize state with return to query parameter and render with return location
   
-  it('should initialize state with return to query parameter in preference to referrer header and render with state', function(done) {
+  it('should initialize state with return to query parameter in preference to referrer header and render with return location', function(done) {
     var store = new SessionStore()
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -175,10 +164,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          returnTo: 'https://client.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(200);
@@ -187,9 +172,9 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return to query parameter in preference to referrer header and render with state
+  }); // should initialize state with return to query parameter in preference to referrer header and render with return location
   
-  it('should load state with state query parameter and render with state', function(done) {
+  it('should initialize state with state query parameter and render with resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -229,10 +214,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -250,9 +231,9 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should load state with state query parameter and render with state
+  }); // should initialize state with state query parameter and render with resume state
   
-  it('should load state with state query parameter and render with current state', function(done) {
+  it('should load state from state query parameter and render with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -290,10 +271,6 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          messages: [ 'Invalid username or password.' ]
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '11111111': {
@@ -309,7 +286,7 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should load state with state query parameter and render with state
+  }); // should load state from state query parameter and render with state
   
 }); // GET /login/password
   
