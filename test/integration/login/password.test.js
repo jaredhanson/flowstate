@@ -307,6 +307,50 @@ describe('GET /login/password', function() {
   
 describe('POST /login/password', function() {
   
+  it('should initialize state without properties and not resume state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'load');
+    sinon.spy(store, 'save');
+    sinon.spy(store, 'update');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://www.example.com/login/password'
+      });
+      res.resumeState(next);
+    }
+    
+    function redirect(req, res, next) {
+      res.redirect('/home')
+    }
+
+    chai.express.use([ state({ store: store }), handler, redirect ])
+      .request(function(req, res) {
+        req.method = 'POST';
+        req.url = '/login/password';
+        req.headers = {
+          'host': 'www.example.com'
+        }
+        req.connection = { encrypted: true };
+        req.body = { username: 'Aladdin', password: 'open sesame' };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(store.load).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.update).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/home');
+        done();
+      })
+      .listen();
+  }); // should initialize state without properties and not resume state
+  
   it('should initialize state with return to body parameter and return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
