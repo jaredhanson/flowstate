@@ -17,12 +17,15 @@ describe('GET /oauth2/authorize', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/authorize'
+      });
+      
       req.pushState({
         clientID: req.query.client_id,
         redirectURI: req.query.redirect_uri,
         state: req.query.state
       }, '/authorize/continue');
-      
       res.redirect('/login');
     }
   
@@ -31,7 +34,8 @@ describe('GET /oauth2/authorize', function() {
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'server.example.com',
+          'referer': 'https://client.example.com/'
         }
         req.connection = { encrypted: true };
         req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
