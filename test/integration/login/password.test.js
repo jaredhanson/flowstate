@@ -195,7 +195,7 @@ describe('GET /login/password', function() {
         req.url = '/login/password?state=00000000';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
+          'referer': 'https://client.example.com/'
         }
         req.connection = { encrypted: true };
         req.query = { state: '00000000' };
@@ -254,7 +254,7 @@ describe('GET /login/password', function() {
         req.url = '/login/password?state=11111111';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
+          'referer': 'https://server.example.com/login/password?state=00000000'
         }
         req.connection = { encrypted: true };
         req.query = { state: '11111111' };
