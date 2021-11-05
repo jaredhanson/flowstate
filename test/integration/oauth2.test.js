@@ -17,13 +17,16 @@ describe('GET /oauth2/authorize', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
-      req.state.clientID = req.query.client_id;
-      req.state.redirectURI = req.query.redirect_uri;
-      req.state.state = req.query.state;
+      req.pushState({
+        clientID: req.query.client_id,
+        redirectURI: req.query.redirect_uri,
+        state: req.query.state
+      }, '/authorize/continue');
+      
       res.redirect('/login');
     }
   
-    chai.express.use([ state({ external: true, continue: '/authorize/continue', store: store }), handler ])
+    chai.express.use([ state({ external: true, store: store }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
