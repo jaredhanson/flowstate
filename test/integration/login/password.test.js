@@ -438,10 +438,6 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with return to body parameter and return to location
   
-  
-  // TODO: Add a test case that falls into next after resumeState
-  
-  
   it('should initialize state with state body parameter and resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
@@ -504,7 +500,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with state body parameter and resume state
   
-  // TODO: Test case like below, but that loads current state and redirects
+  // TODO: Test case like below, but that loads current state (ie message) and redirects
   
   it('should initialize state with state body parameter and redirect to location', function(done) {
     var store = new SessionStore();
@@ -663,8 +659,8 @@ describe('POST /login/password', function() {
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com'
-          // TODO: Put a referer here from external domain
+          'host': 'server.example.com',
+          'referer': 'https://client.example.com/'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
