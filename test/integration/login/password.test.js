@@ -382,7 +382,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
+          'referer': 'https://server.example.com/login/password?state=00000000'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
@@ -401,10 +401,6 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -423,7 +419,9 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with state body parameter and resume state
   
-  it('should load state with state body parameter and redirect to location', function(done) {
+  // TODO: Test case like below, but that loads current state and redirects
+  
+  it('should initialize state with state body parameter and redirect to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -435,7 +433,7 @@ describe('POST /login/password', function() {
         location: 'https://server.example.com/login/password',
         resumeState: '00000000'
       });
-      res.redirect('/login/password');
+      res.redirect('/account/change-password');
     }
     
     function redirect(req, res, next) {
@@ -448,7 +446,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
+          'referer': 'https://server.example.com/login/password?state=00000000'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
@@ -467,10 +465,6 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -483,11 +477,11 @@ describe('POST /login/password', function() {
         });
         
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login/password?state=00000000');
+        expect(this.getHeader('Location')).to.equal('/account/change-password?state=00000000');
         done();
       })
       .listen();
-  }); // should load state with state body parameter and redirect to location
+  }); // should initialize state with state body parameter and redirect to location
   
   it('should load state with state body parameter and redirect to location after modifying state', function(done) {
     var store = new SessionStore({ genh: function() { return '11111111' } });
