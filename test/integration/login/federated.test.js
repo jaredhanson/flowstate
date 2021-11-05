@@ -160,7 +160,7 @@ describe('GET /login/federated', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'https://server.example.net',
-          state: '00000000'
+          resumeState: '00000000'
         });
         expect(this.req.session).to.deep.equal({
           state: {
@@ -173,7 +173,7 @@ describe('GET /login/federated', function() {
             'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
-              state: '00000000'
+              resumeState: '00000000'
             }
           }
         });
@@ -227,7 +227,7 @@ describe('GET /login/federated', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'https://server.example.net',
-          state: '00000000'
+          resumeState: '00000000'
         });
         expect(this.req.session).to.deep.equal({
           state: {
@@ -240,7 +240,7 @@ describe('GET /login/federated', function() {
             'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
-              state: '00000000'
+              resumeState: '00000000'
             }
           }
         });
