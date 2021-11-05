@@ -121,15 +121,14 @@ describe('GET /login', function() {
         
         expect(this.req.session).to.deep.equal({});
         
-        // TODO: Should this set a return_to parameter?
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp');
         done();
       })
       .listen();
-  }); // should initialize state with return to query parameter and redirect without state
+  }); // should initialize state with return to query parameter and redirect with return location
   
-  it('should initialize state with state query parameter and redirect with state', function(done) {
+  it('should initialize state with state query parameter and redirect with resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -137,6 +136,10 @@ describe('GET /login', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login',
+        resumeState: '00000000'
+      });
       res.redirect('/login/password');
     }
     
@@ -165,10 +168,6 @@ describe('GET /login', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login',
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -185,8 +184,9 @@ describe('GET /login', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter and redirect with state
+  }); // should initialize state with state query parameter and redirect with resume state
   
+  // TODO: review this test
   it('should initialize state with state query parameter and redirect with current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
