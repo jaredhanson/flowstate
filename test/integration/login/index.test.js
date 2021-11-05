@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login', function() {
     
-  it('should initialize state without properties and redirect without state', function(done) {
+  it('should initialize state without properties and redirect without any state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -15,6 +15,9 @@ describe('GET /login', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://www.example.com/login'
+      });
       res.redirect('/login/password');
     }
     
@@ -23,7 +26,7 @@ describe('GET /login', function() {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         }
         req.connection = { encrypted: true };
         req.session = {};
@@ -34,9 +37,6 @@ describe('GET /login', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
@@ -44,7 +44,7 @@ describe('GET /login', function() {
         done();
       })
       .listen();
-  }); // should initialize state without properties and redirect without state
+  }); // should initialize state without properties and redirect without any state
   
   it('should initialize state with referrer header and redirect without state', function(done) {
     var store = new SessionStore();
@@ -54,6 +54,10 @@ describe('GET /login', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login',
+        returnTo: 'https://server.example.com/'
+      });
       res.redirect('/login/password');
     }
     
@@ -74,10 +78,6 @@ describe('GET /login', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login',
-          returnTo: 'https://server.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         // TODO: Should this set a return_to parameter?
