@@ -483,6 +483,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with state body parameter and redirect to location
   
+  // TODO: Review this test
   it('should load state with state body parameter and redirect to location after modifying state', function(done) {
     var store = new SessionStore({ genh: function() { return '11111111' } });
     sinon.spy(store, 'load');
@@ -584,6 +585,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com'
+          // TODO: Put a referer here from external domain
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
@@ -591,14 +593,11 @@ describe('POST /login/password', function() {
         req.session.state = {};
       })
       .finish(function() {
-        expect(store.load).to.have.callCount(1); // FIXME: should onl be called once
+        expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password'
-        });
         expect(this.req.session).to.deep.equal({
           state: {}
         });
