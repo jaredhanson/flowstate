@@ -163,6 +163,7 @@ describe('GET /login', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login',
           state: '00000000'
         });
         expect(this.req.session).to.deep.equal({

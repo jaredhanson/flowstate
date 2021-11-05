@@ -188,6 +188,7 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         state: '00000000'
       });
       res.render('login/password');
@@ -219,6 +220,7 @@ describe('GET /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           state: '00000000'
         });
         expect(this.req.session).to.deep.equal({
@@ -360,6 +362,7 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         state: '00000000'
       });
       res.resumeState(next);
@@ -395,6 +398,7 @@ describe('POST /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           state: '00000000'
         });
         expect(this.req.session).to.deep.equal({
@@ -424,6 +428,7 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         state: '00000000'
       });
       res.redirect('/login/password');
@@ -459,6 +464,7 @@ describe('POST /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           state: '00000000'
         });
         expect(this.req.session).to.deep.equal({
@@ -488,6 +494,7 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         state: '00000000'
       });
       // TODO: Should this use pushState?
@@ -528,6 +535,7 @@ describe('POST /login/password', function() {
         
         // FIXME: This should have a location?
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           messages: [ 'Invalid username or password.' ],
           state: '00000000'
         });
@@ -540,6 +548,7 @@ describe('POST /login/password', function() {
               state: 'xyz'
             },
             '11111111': {
+              location: 'https://server.example.com/login/password',
               messages: [ 'Invalid username or password.' ],
               state: '00000000'
             }
