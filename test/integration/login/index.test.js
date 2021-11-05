@@ -46,7 +46,7 @@ describe('GET /login', function() {
       .listen();
   }); // should initialize state without properties and redirect without any state
   
-  it('should initialize state with referrer header and redirect without state', function(done) {
+  it('should initialize state with referrer header and redirect with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -55,8 +55,8 @@ describe('GET /login', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login',
-        returnTo: 'https://server.example.com/'
+        location: 'https://www.example.com/login',
+        returnTo: 'https://www.example.com/'
       });
       res.redirect('/login/password');
     }
@@ -66,8 +66,8 @@ describe('GET /login', function() {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/'
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
         }
         req.connection = { encrypted: true };
         req.session = {};
@@ -80,15 +80,14 @@ describe('GET /login', function() {
         
         expect(this.req.session).to.deep.equal({});
         
-        // TODO: Should this set a return_to parameter?
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login/password');
+        expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fwww.example.com%2F');
         done();
       })
       .listen();
-  }); // should initialize state with referrer header and redirect without state
+  }); // sshould initialize state with referrer header and redirect with return location
   
-  it('should initialize state with return to query parameter and redirect without state', function(done) {
+  it('should initialize state with return to query parameter and redirect with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -96,6 +95,10 @@ describe('GET /login', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://www.example.com/login',
+        returnTo: 'https://www.example.com/app'
+      });
       res.redirect('/login/password');
     }
     
@@ -104,10 +107,10 @@ describe('GET /login', function() {
         req.method = 'GET';
         req.url = '/login';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         }
         req.connection = { encrypted: true };
-        req.query = { return_to: 'https://server.example.com/' };
+        req.query = { return_to: 'https://www.example.com/app' };
         req.session = {};
       })
       .finish(function() {
@@ -116,15 +119,11 @@ describe('GET /login', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login',
-          returnTo: 'https://server.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         // TODO: Should this set a return_to parameter?
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login/password');
+        expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp');
         done();
       })
       .listen();
