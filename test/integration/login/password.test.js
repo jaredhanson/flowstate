@@ -16,7 +16,7 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password'
+        location: 'https://www.example.com/login/password'
       });
       res.render('login/password');
     }
@@ -26,7 +26,7 @@ describe('GET /login/password', function() {
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         }
         req.connection = { encrypted: true };
         req.session = {};
@@ -56,8 +56,8 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://server.example.com/login'
+        location: 'https://www.example.com/login/password',
+        returnTo: 'https://www.example.com/'
       });
       res.render('login/password');
     }
@@ -67,8 +67,8 @@ describe('GET /login/password', function() {
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
         }
         req.connection = { encrypted: true };
         req.session = {};
@@ -83,7 +83,7 @@ describe('GET /login/password', function() {
         
         expect(this.statusCode).to.equal(200);
         expect(this).to.render('login/password')
-                    .with.deep.locals({ returnTo: 'https://server.example.com/login' });
+                    .with.deep.locals({ returnTo: 'https://www.example.com/' });
         done();
       })
       .listen();
@@ -98,8 +98,8 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://client.example.com/'
+        location: 'https://www.example.com/login/password',
+        returnTo: 'https://www.example.com/app'
       });
       res.render('login/password');
     }
@@ -109,10 +109,10 @@ describe('GET /login/password', function() {
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         }
         req.connection = { encrypted: true };
-        req.query = { return_to: 'https://client.example.com/' };
+        req.query = { return_to: 'https://www.example.com/app' };
         req.session = {};
       })
       .finish(function() {
@@ -125,7 +125,7 @@ describe('GET /login/password', function() {
         
         expect(this.statusCode).to.equal(200);
         expect(this).to.render('login/password')
-                    .with.deep.locals({ returnTo: 'https://client.example.com/' });
+                    .with.deep.locals({ returnTo: 'https://www.example.com/app' });
         done();
       })
       .listen();
@@ -140,8 +140,8 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://client.example.com/'
+        location: 'https://www.example.com/login/password',
+        returnTo: 'https://www.example.com/app'
       });
       res.render('login/password');
     }
@@ -151,11 +151,11 @@ describe('GET /login/password', function() {
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
         }
         req.connection = { encrypted: true };
-        req.query = { return_to: 'https://client.example.com/' };
+        req.query = { return_to: 'https://www.example.com/app' };
         req.session = {};
       })
       .finish(function() {
@@ -168,7 +168,7 @@ describe('GET /login/password', function() {
         
         expect(this.statusCode).to.equal(200);
         expect(this).to.render('login/password')
-                    .with.deep.locals({ returnTo: 'https://client.example.com/' });
+                    .with.deep.locals({ returnTo: 'https://www.example.com/app' });
         done();
       })
       .listen();
