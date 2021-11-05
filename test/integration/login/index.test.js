@@ -34,7 +34,9 @@ describe('GET /login', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({});
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login'
+        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
@@ -73,6 +75,7 @@ describe('GET /login', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login',
           returnTo: 'https://client.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
@@ -114,6 +117,7 @@ describe('GET /login', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login',
           returnTo: 'https://client.example.com/'
         });
         expect(this.req.session).to.deep.equal({});

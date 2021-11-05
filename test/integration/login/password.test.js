@@ -15,7 +15,9 @@ describe('GET /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
-      expect(req.state).to.deep.equal({});
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password'
+      });
       res.render('login/password');
     }
     
@@ -35,7 +37,9 @@ describe('GET /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({});
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password'
+        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(200);
@@ -55,6 +59,7 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         returnTo: 'https://server.example.com/login'
       });
       res.render('login/password');
@@ -78,6 +83,7 @@ describe('GET /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           returnTo: 'https://server.example.com/login'
         });
         expect(this.req.session).to.deep.equal({});
@@ -99,6 +105,7 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         returnTo: 'https://client.example.com/'
       });
       res.render('login/password');
@@ -122,6 +129,7 @@ describe('GET /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           returnTo: 'https://client.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
@@ -143,6 +151,7 @@ describe('GET /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         returnTo: 'https://client.example.com/'
       });
       res.render('login/password');
@@ -167,6 +176,7 @@ describe('GET /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           returnTo: 'https://client.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
@@ -314,6 +324,7 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
         returnTo: 'https://client.example.com/'
       });
       res.resumeState(next);
@@ -342,6 +353,7 @@ describe('POST /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password',
           returnTo: 'https://client.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
@@ -570,7 +582,9 @@ describe('POST /login/password', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
-      expect(req.state).to.deep.equal({});
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password'
+      });
       res.resumeState(next);
     }
     
@@ -596,7 +610,9 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({});
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/password'
+        });
         expect(this.req.session).to.deep.equal({
           state: {}
         });

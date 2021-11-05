@@ -17,7 +17,9 @@ describe('Response', function() {
       sinon.spy(store, 'destroy');
 
       function handler(req, res, next) {
-        expect(req.state).to.deep.equal({});
+        expect(req.state).to.deep.equal({
+          location: 'https://client.example.com/',
+        });
         
         res.pushState({
           name: 'Jane Doe'
