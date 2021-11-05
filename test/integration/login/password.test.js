@@ -484,7 +484,7 @@ describe('POST /login/password', function() {
   }); // should initialize state with state body parameter and redirect to location
   
   // TODO: Review this test
-  it('should load state with state body parameter and redirect to location after modifying state', function(done) {
+  it('should initialize state with state body parameter and redirect to location after modifying state', function(done) {
     var store = new SessionStore({ genh: function() { return '11111111' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -513,7 +513,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password'
+          'referer': 'https://server.example.com/login/password?state=00000000'
         }
         req.connection = { encrypted: true };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
@@ -532,12 +532,6 @@ describe('POST /login/password', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        // FIXME: This should have a location?
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/login/password',
-          messages: [ 'Invalid username or password.' ],
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -559,7 +553,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should load state with state body parameter and redirect to location after modifying state
+  }); // should initialize state with state body parameter and redirect to location after modifying state
   
   it('should initialize state by ignoring invalid state body parameter and not resume state', function(done) {
     var store = new SessionStore();
