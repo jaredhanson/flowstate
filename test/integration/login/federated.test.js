@@ -206,7 +206,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should initialize state with state query parameter and redirect with pushed state
   
-  it('should push state with state query parameter in preference to return to query parameter and redirect with state', function(done) {
+  it('should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state', function(done) {
     var store = new SessionStore({ genh: function() { return 'xyz' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -214,6 +214,11 @@ describe('GET /login/federated', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/federated',
+        resumeState: '00000000'
+      });
+      
       res.pushState({
         provider: 'https://server.example.net'
       }, 'https://server.example.com/cb', false);
@@ -271,6 +276,6 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should store state with state query parameter in preference to return to query parameter and redirect with state
+  }); // should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state
   
 });
