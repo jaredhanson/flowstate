@@ -152,9 +152,6 @@ describe('GET /login/federated', function() {
 
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
-        // TODO: this shouldn't load the state, since it is not intended for the
-        //        /login/federated resource, but rather /continue.   Need to handle
-        //       this on push state, to set the resume state to the parent state.
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
         req.headers = {
