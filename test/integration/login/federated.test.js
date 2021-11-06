@@ -82,9 +82,9 @@ describe('GET /login/federated', function() {
         returnTo: 'https://client.example.com/app'
       });
       
-      res.pushState({
+      req.pushState({
         provider: 'https://server.example.com'
-      }, 'https://client.example.com/cb', false);
+      }, 'https://client.example.com/cb');
       
       // TODO: Assert that the state hasn't changed after pushing
       
@@ -144,9 +144,9 @@ describe('GET /login/federated', function() {
         resumeState: '00000000'
       });
       
-      res.pushState({
+      req.pushState({
         provider: 'https://server.example.net'
-      }, 'https://server.example.com/cb', false);
+      }, 'https://server.example.com/cb');
       res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
     }
 
@@ -216,9 +216,9 @@ describe('GET /login/federated', function() {
         resumeState: '00000000'
       });
       
-      res.pushState({
+      req.pushState({
         provider: 'https://server.example.net'
-      }, 'https://server.example.com/cb', false);
+      }, 'https://server.example.com/cb');
       res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
     }
 

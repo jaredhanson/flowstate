@@ -15,6 +15,11 @@ describe('POST /account/select', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/account/select',
+        resumeState: '00000000'
+      });
+      
       res.resumeState({
         selectedSession: req.body.selected_session
       }, next);
@@ -43,15 +48,11 @@ describe('POST /account/select', function() {
         };
       })
       .finish(function() {
-        expect(store.load).to.have.callCount(2);
+        expect(store.load).to.have.callCount(2); // FIXME: this should only load once?
         expect(store.save).to.have.callCount(0);
         expect(store.update).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/account/select',
-          resumeState: '00000000'
-        });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -66,7 +67,6 @@ describe('POST /account/select', function() {
         
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
-        
         done();
       })
       .listen();
