@@ -9,7 +9,7 @@ describe('integration: sso/oauth2', function() {
   
   describe('GET /login/federated', function() {
     
-    // FIXME: This test needs reviewing
+    // TODO: This test needs reviewing
     describe('with state intended for this resource', function() {
       var store = new SessionStore({ genh: function() { return 'XXXXXXXX' } })
         , request, response, err;

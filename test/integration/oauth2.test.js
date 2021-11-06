@@ -7,6 +7,10 @@ var chai = require('chai')
 
 describe('GET /oauth2/authorize', function() {
   
+  // TODO: Test case that preserves state by using return_to URL
+  
+  // TODO: Test cases for account select yeilding back with query param and then setting it in state
+  
   it('should initialize state by ignoring external state and redirect with pushed state to resume', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } });
     sinon.spy(store, 'load');
