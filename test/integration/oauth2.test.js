@@ -7,9 +7,7 @@ var chai = require('chai')
 
 describe('GET /oauth2/authorize', function() {
   
-  // TODO: Test case for something like this, but without `state` saved in session (ie SAML)
-  
-  it('should save state for continue endpoint and redirect with state', function(done) {
+  it('should initialize state by ignoring external state and redirect with pushed state to resume', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -63,6 +61,6 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should save state for continue endpoint and redirect with state
+  }); // should initialize state by ignoring external state and redirect with pushed state to resume
   
 }); // GET /oauth2/authorize
