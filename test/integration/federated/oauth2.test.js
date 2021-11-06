@@ -115,7 +115,7 @@ describe('integration: sso/oauth2', function() {
 
 describe('GET /oauth2/redirect', function() {
 
-  it('should consume state with state query parameter and return to location', function(done) {
+  it('should consume state from state query parameter and return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
@@ -123,6 +123,11 @@ describe('GET /oauth2/redirect', function() {
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://client.example.com/cb',
+        provider: 'http://server.example.com',
+        returnTo: 'https://client.example.com/'
+      });
       res.resumeState(next);
     }
     
@@ -153,11 +158,6 @@ describe('GET /oauth2/redirect', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
-        expect(this.req.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
-          provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
-        });
         expect(this.req.session).to.deep.equal({});
         
         expect(this.statusCode).to.equal(302);
@@ -165,17 +165,21 @@ describe('GET /oauth2/redirect', function() {
         done();
       })
       .listen();
-  }); // should consume state with state query parameter and return to location
+  }); // should consume state from state query parameter and return to location
   
-  it('should consume state with state query parameter and resume state', function(done) {
+  it('should consume state from state query parameter and resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
     sinon.spy(store, 'update');
     sinon.spy(store, 'destroy');
-
-    // TODO: test case with multiple handlers
+    
     function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/cb',
+        provider: 'https://server.example.net',
+        resumeState: '00000000'
+      });
       res.resumeState(next);
     }
     
@@ -212,13 +216,6 @@ describe('GET /oauth2/redirect', function() {
         expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
-        expect(this.req.state).to.be.an('object');
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/cb',
-          provider: 'https://server.example.net',
-          resumeState: '00000000'
-        });
-        
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -235,9 +232,9 @@ describe('GET /oauth2/redirect', function() {
         done();
       })
       .listen();
-  }); // and resuming state
+  }); // should consume state from state query parameter and resume state
   
-  // FIXME: Review this test
+  // TODO: Review this test
   it('and resuming state yeilding parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'load');
