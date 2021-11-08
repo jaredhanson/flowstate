@@ -318,7 +318,7 @@ describe('GET /login/federated', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(1); // FIXME: this should be 0
+        expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
@@ -392,7 +392,7 @@ describe('GET /login/federated', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(1); // FIXME: this should be 0
+        expect(store.update).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({

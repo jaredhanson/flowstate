@@ -564,7 +564,6 @@ describe('POST /login/password', function() {
       .listen();
   }); // should initialize state with state body parameter and resume state
   
-  // TODO: Review this test
   it('should initialize state with state body parameter and redirect to location after modifying state', function(done) {
     var store = new SessionStore({ genh: function() { return '11111111' } });
     sinon.spy(store, 'load');
