@@ -9,7 +9,7 @@ describe('Response', function() {
   
   describe('#pushState', function() {
     
-    it('should push state with referrer header and redirect with state', function(done) {
+    it.skip('should push state with referrer header and redirect with state', function(done) {
       var store = new SessionStore({ genh: function() { return '00000000' } });
       sinon.spy(store, 'load');
       sinon.spy(store, 'save');
