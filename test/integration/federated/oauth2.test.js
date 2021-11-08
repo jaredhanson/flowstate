@@ -25,9 +25,9 @@ describe('integration: sso/oauth2', function() {
         function handler(req, res, next) {
           req.state.complete();
           
-          res.pushState({
+          req.pushState({
             provider: 'https://server.example.net'
-          }, 'https://server.example.com/cb', false);
+          }, 'https://server.example.com/cb');
           res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
