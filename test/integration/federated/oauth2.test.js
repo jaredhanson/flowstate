@@ -71,7 +71,7 @@ describe('integration: sso/oauth2', function() {
         expect(store.get).to.have.callCount(1);
         expect(store.save).to.have.callCount(1);
         expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
       });
   
       it('should set state', function() {
@@ -86,13 +86,6 @@ describe('integration: sso/oauth2', function() {
       it('should persist state in session', function() {
         expect(request.session).to.deep.equal({
           state: {
-            // FIXME: This is the complted state, and should be removed from session
-            '00000000': {
-              location: 'https://server.example.com/login/federated',
-              provider: 'https://myshopify.com',
-              shop: 'example.myshopify.com',
-              returnTo: '/'
-            },
             'XXXXXXXX': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
