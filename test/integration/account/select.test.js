@@ -11,7 +11,7 @@ describe('POST /account/select', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -50,7 +50,7 @@ describe('POST /account/select', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(2); // FIXME: this should only load once?
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({

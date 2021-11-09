@@ -11,7 +11,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -34,7 +34,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -51,7 +51,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -76,7 +76,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -93,7 +93,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore()
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -118,7 +118,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -135,7 +135,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore()
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -161,7 +161,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -178,7 +178,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -211,7 +211,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -237,7 +237,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -276,7 +276,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -307,7 +307,7 @@ describe('GET /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -331,7 +331,7 @@ describe('GET /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -352,7 +352,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -380,7 +380,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -396,7 +396,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -426,7 +426,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({});
@@ -444,7 +444,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -481,7 +481,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -506,7 +506,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -543,7 +543,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(2); // FIXME: should onl be called once
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -568,7 +568,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore({ genh: function() { return '11111111' } });
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -609,7 +609,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -639,7 +639,7 @@ describe('POST /login/password', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -669,7 +669,7 @@ describe('POST /login/password', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({

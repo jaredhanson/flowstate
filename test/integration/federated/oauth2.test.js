@@ -17,7 +17,7 @@ describe('integration: sso/oauth2', function() {
       before(function() {
         sinon.spy(store, 'load');
         sinon.spy(store, 'save');
-        sinon.spy(store, 'update');
+        sinon.spy(store, 'set');
         sinon.spy(store, 'destroy');
       });
   
@@ -70,7 +70,7 @@ describe('integration: sso/oauth2', function() {
       it('should correctly invoke state store', function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(1);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
       });
   
@@ -119,7 +119,7 @@ describe('GET /oauth2/redirect', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
@@ -155,7 +155,7 @@ describe('GET /oauth2/redirect', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(1);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
         expect(this.req.session).to.deep.equal({});
@@ -171,7 +171,7 @@ describe('GET /oauth2/redirect', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
     
     function handler(req, res, next) {
@@ -213,7 +213,7 @@ describe('GET /oauth2/redirect', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(2);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
         expect(this.req.session).to.deep.equal({
@@ -239,7 +239,7 @@ describe('GET /oauth2/redirect', function() {
     var store = new SessionStore();
     sinon.spy(store, 'load');
     sinon.spy(store, 'save');
-    sinon.spy(store, 'update');
+    sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     // TODO: test case with multiple handlers
@@ -278,7 +278,7 @@ describe('GET /oauth2/redirect', function() {
       .finish(function() {
         expect(store.load).to.have.callCount(2);
         expect(store.save).to.have.callCount(0);
-        expect(store.update).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(1);
         
         expect(this.req.state).to.be.an('object');
