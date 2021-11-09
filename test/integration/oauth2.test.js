@@ -11,7 +11,7 @@ describe('GET /oauth2/authorize', function() {
   
   it('should initialize state by ignoring external state and redirect with return location', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } });
-    sinon.spy(store, 'load');
+    sinon.spy(store, 'get');
     sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
@@ -38,7 +38,7 @@ describe('GET /oauth2/authorize', function() {
         req.session = {};
       })
       .finish(function() {
-        expect(store.load).to.have.callCount(0);
+        expect(store.get).to.have.callCount(0);
         expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
@@ -54,7 +54,7 @@ describe('GET /oauth2/authorize', function() {
   
   it('should initialize state by ignoring external state and redirect with pushed state', function(done) {
     var store = new SessionStore({ genh: function() { return '00000000' } });
-    sinon.spy(store, 'load');
+    sinon.spy(store, 'get');
     sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
@@ -90,7 +90,7 @@ describe('GET /oauth2/authorize', function() {
         req.session = {};
       })
       .finish(function() {
-        expect(store.load).to.have.callCount(0);
+        expect(store.get).to.have.callCount(0);
         expect(store.save).to.have.callCount(1);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);

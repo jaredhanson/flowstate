@@ -9,7 +9,7 @@ describe('POST /account/select', function() {
   
   it('should initialize state with state body parameter and resume state with yielded parameters', function(done) {
     var store = new SessionStore();
-    sinon.spy(store, 'load');
+    sinon.spy(store, 'get');
     sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
@@ -48,7 +48,7 @@ describe('POST /account/select', function() {
         };
       })
       .finish(function() {
-        expect(store.load).to.have.callCount(2); // FIXME: this should only load once?
+        expect(store.get).to.have.callCount(2); // FIXME: this should only load once?
         expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
