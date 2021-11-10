@@ -10,7 +10,6 @@ describe('GET /login', function() {
   it('should initialize state without properties and redirect without any state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -33,7 +32,6 @@ describe('GET /login', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -49,7 +47,6 @@ describe('GET /login', function() {
   it('should initialize state with referrer header and redirect with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -74,7 +71,6 @@ describe('GET /login', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -90,7 +86,6 @@ describe('GET /login', function() {
   it('should initialize state with return to query parameter and redirect with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -115,7 +110,6 @@ describe('GET /login', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -131,7 +125,6 @@ describe('GET /login', function() {
   it('should initialize state with state query parameter and redirect with resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -164,7 +157,6 @@ describe('GET /login', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -190,7 +182,6 @@ describe('GET /login', function() {
   it('should initialize state with state query parameter and redirect with current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -217,7 +208,6 @@ describe('GET /login', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         

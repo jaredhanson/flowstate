@@ -10,7 +10,6 @@ describe('GET /login/federated', function() {
   it('should initialize state with referrer header and redirect with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -46,7 +45,6 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
@@ -70,7 +68,6 @@ describe('GET /login/federated', function() {
   it('should initialize state with return to query parameter in preference to referrer header and redirect with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -106,7 +103,6 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
@@ -130,7 +126,6 @@ describe('GET /login/federated', function() {
   it('should initialize state with state query parameter and redirect with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -172,7 +167,6 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
@@ -202,7 +196,6 @@ describe('GET /login/federated', function() {
   it('should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -244,7 +237,6 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
@@ -272,9 +264,8 @@ describe('GET /login/federated', function() {
   }); // should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state
   
   it('should initialize state with state query parameter and redirect with saved pushed state', function(done) {
-    var store = new SessionStore({ genh: function() { return 'xyz' } });
+    var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -297,7 +288,7 @@ describe('GET /login/federated', function() {
       });
     }
 
-    chai.express.use([ state({ store: store }), handler ])
+    chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
@@ -318,8 +309,7 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
@@ -346,9 +336,8 @@ describe('GET /login/federated', function() {
   }); // should initialize state with state query parameter and redirect with saved pushed state
   
   it('should initialize state with state query parameter and redirect with saved pushed state using handle option', function(done) {
-    var store = new SessionStore({ genh: function() { return 'xyz' } });
+    var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -371,7 +360,7 @@ describe('GET /login/federated', function() {
       });
     }
 
-    chai.express.use([ state({ store: store }), handler ])
+    chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
@@ -392,8 +381,7 @@ describe('GET /login/federated', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({

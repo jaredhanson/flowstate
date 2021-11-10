@@ -12,7 +12,6 @@ describe('POST /token', function() {
   it('should load state with state query parameter and render with current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -43,7 +42,6 @@ describe('POST /token', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
@@ -64,7 +62,6 @@ describe('POST /token', function() {
   it('should load state with state query parameter and render with current state after modifying', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
-    sinon.spy(store, 'save');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
@@ -96,7 +93,6 @@ describe('POST /token', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
