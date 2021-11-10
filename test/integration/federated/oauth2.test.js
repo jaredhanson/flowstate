@@ -77,8 +77,9 @@ describe('integration: sso/oauth2', function() {
       it('should set state', function() {
         expect(request.state).to.be.an('object');
         expect(request.state).to.deep.equal({
-          location: 'https://server.example.com/cb',
-          provider: 'https://server.example.net',
+          location: 'https://server.example.com/login/federated',
+          provider: 'https://myshopify.com',
+          shop: 'example.myshopify.com',
           returnTo: '/'
         });
       });
