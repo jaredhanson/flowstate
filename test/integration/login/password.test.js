@@ -631,7 +631,7 @@ describe('POST /login/password', function() {
   }); // should initialize state with state body parameter and resume state
   
   it('should initialize state with state body parameter and redirect to location after modifying state', function(done) {
-    var store = new SessionStore({ genh: function() { return '11111111' } });
+    var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'save');
     sinon.spy(store, 'set');
@@ -653,7 +653,7 @@ describe('POST /login/password', function() {
       res.redirect('/home')
     }
     
-    chai.express.use([ state({ store: store }), handler, redirect ])
+    chai.express.use([ state({ store: store, genh: function() { return '11111111' } }), handler, redirect ])
       .request(function(req, res) {
         req.method = 'POST';
         req.url = '/login/password';
@@ -674,8 +674,8 @@ describe('POST /login/password', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(1);
-        expect(store.save).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({

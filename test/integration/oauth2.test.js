@@ -53,7 +53,7 @@ describe('GET /oauth2/authorize', function() {
   }); // should initialize state by ignoring external state and redirect with return location
   
   it('should initialize state by ignoring external state and redirect with pushed state', function(done) {
-    var store = new SessionStore({ genh: function() { return '00000000' } });
+    var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'save');
     sinon.spy(store, 'set');
@@ -77,7 +77,7 @@ describe('GET /oauth2/authorize', function() {
       res.redirect('/login');
     }
   
-    chai.express.use([ state({ external: true, store: store }), handler ])
+    chai.express.use([ state({ external: true, store: store, genh: function() { return '00000000' } }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
@@ -91,8 +91,8 @@ describe('GET /oauth2/authorize', function() {
       })
       .finish(function() {
         expect(store.get).to.have.callCount(0);
-        expect(store.save).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
+        expect(store.save).to.have.callCount(0);
+        expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.session).to.deep.equal({
