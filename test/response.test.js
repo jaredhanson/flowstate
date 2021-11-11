@@ -7,6 +7,64 @@ var chai = require('chai')
 
 describe('Response', function() {
   
+  describe('#pushState', function() {
+    
+    it('should call callback with error when state fails to be set', function(done) {
+      var store = new SessionStore();
+      sinon.spy(store, 'get');
+      sinon.stub(store, 'set').yieldsAsync(new Error('something went wrong'));
+      sinon.spy(store, 'destroy');
+
+      function handler(req, res, next) {
+        req.pushState({
+          provider: 'https://server.example.net'
+        }, 'https://server.example.com/cb', function(err, h) {
+          if (err) { return next(err); }
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=' + h);
+        });
+      }
+
+      chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
+        .request(function(req, res) {
+          req.method = 'GET';
+          req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
+          req.headers = {
+            'host': 'server.example.com',
+            'referer': 'https://server.example.com/login?state=00000000'
+          }
+          req.connection = { encrypted: true };
+          req.query = { provider: 'https://server.example.net', state: '00000000' };
+          req.session = {};
+          req.session.state = {};
+          req.session.state['00000000'] = {
+            location: 'https://server.example.com/authorize/continue',
+            clientID: 's6BhdRkqt3',
+            redirectURI: 'https://client.example.com/cb',
+            state: 'xyz'
+          };
+        })
+        .next(function(err, req, res) {
+          expect(err).to.be.an.instanceof(Error);
+          expect(err.message).to.equal('something went wrong');
+        
+          expect(req.session).to.deep.equal({
+            state: {
+              '00000000': {
+                location: 'https://server.example.com/authorize/continue',
+                clientID: 's6BhdRkqt3',
+                redirectURI: 'https://client.example.com/cb',
+                state: 'xyz'
+              }
+            }
+          });
+        
+          done();
+        })
+        .listen();
+    }); // should call callback with error when state fails to be set
+    
+  });
+  
   describe('#redirect', function() {
     
     it('should call next with error when state fails to be destroyed', function(done) {
