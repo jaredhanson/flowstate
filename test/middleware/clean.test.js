@@ -129,4 +129,47 @@ describe('middleware/clean', function() {
       .listen();
   }); // should destroy exactly expired state
   
+  it('should not destroy non-expired state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    clock.tick(1095292800000);
+    
+    chai.express.use(clean({ store: store }))
+      .request(function(req, res) {
+        req.session = {};
+        req.session.state = {};
+        req.session.state['00000000'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz',
+          expires: new Date(Date.now() + 3600000).toJSON()
+        };
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(req.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz',
+              expires: '2004-09-16T01:00:00.000Z'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should not destroy non-expired state
+  
 });
