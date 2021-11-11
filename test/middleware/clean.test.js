@@ -236,4 +236,66 @@ describe('middleware/clean', function() {
       .listen();
   }); // should destroy non-expired states up to limit
   
+  it('should destroy non-expired states up to limit keeping non-expiring state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    clock.tick(1095292800000);
+    
+    chai.express.use(clean({ limit: 2, store: store }))
+      .request(function(req, res) {
+        req.session = {};
+        req.session.state = {};
+        req.session.state['k1lwl0f8'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz',
+          expires: new Date(Date.now() + 180000).toJSON()
+        };
+        req.session.state['ng9cfc3b'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+        req.session.state['rciqqp1p'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz',
+          expires: new Date(Date.now() + 120000).toJSON()
+        };
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
+        expect(req.session).to.deep.equal({
+          state: {
+            'k1lwl0f8': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz',
+              expires: '2004-09-16T00:03:00.000Z'
+            },
+            'ng9cfc3b': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should destroy non-expired states up to limit keeping non-expiring state
+  
 });
