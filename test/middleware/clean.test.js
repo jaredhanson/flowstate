@@ -7,6 +7,26 @@ var SessionStore = require('../../lib/store/session');
 
 describe('middleware/clean', function() {
   
+  it('should not clean when session is not available', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    chai.express.use(clean({ store: store }))
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(req.session).to.be.undefined;
+        done();
+      })
+      .listen();
+  }); // should not clean when session is not available
+  
   it('should not clean empty session', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
