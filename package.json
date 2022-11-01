@@ -42,7 +42,7 @@
     "chai": "^3.0.0",
     "chai-express-handler": "^0.1.1",
     "make-node": "^0.3.0",
-    "mocha": "^2.5.3",
+    "mocha": "^10.1.0",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0"
   },
