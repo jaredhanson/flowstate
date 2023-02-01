@@ -95,7 +95,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should redirect without location after completing current state
   
-  it('should redirect with state when entering a new state', function(done) {
+  it('should redirect with state to resume when adding a state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -153,7 +153,7 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should redirect with state when entering a new state
+  }); // should redirect with state to resume when adding a state
   
   it('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
     var store = new SessionStore();
