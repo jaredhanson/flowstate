@@ -23,23 +23,20 @@ describe('GET /login/federated', function() {
         provider: 'https://server.example.com'
       }, 'https://client.example.com/cb');
       
-      expect(req.state).to.deep.equal({
-        location: 'https://client.example.com/login/federated',
-        returnTo: 'https://client.example.com/login'
-      });
+      
       
       res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
     }
     
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.com';
         req.headers = {
           'host': 'client.example.com',
           'referer': 'https://client.example.com/login'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { provider: 'https://server.example.com' };
         req.session = {};
       })
@@ -48,6 +45,13 @@ describe('GET /login/federated', function() {
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
+        expect(this.req.state).to.deep.equal({
+          location: 'https://client.example.com/login/federated',
+          returnTo: 'https://client.example.com/login'
+        });
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
         expect(this.req.session).to.deep.equal({
           state: {
             'xyz': {
@@ -57,9 +61,6 @@ describe('GET /login/federated', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&state=xyz');
         done();
       })
       .listen();

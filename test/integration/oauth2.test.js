@@ -65,7 +65,7 @@ describe('GET /oauth2/authorize', function() {
       res.redirect('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
     }
   
-    chai.express.use([ state({ external: true, store: store, genh: function() { return '00000000' } }), handler ])
+    chai.express.use([ state({ external: true, store: store }), handler ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
