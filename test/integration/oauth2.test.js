@@ -9,8 +9,8 @@ describe('GET /oauth2/authorize', function() {
   
   // TODO: Test cases for account select yeilding back with query param and then setting it in state
   
-  it('should initialize state by ignoring external state and redirect with return location', function(done) {
-    var store = new SessionStore({ genh: function() { return '00000000' } });
+  it('should ignore external state when initializing state and redirect with return location', function(done) {
+    var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
@@ -26,13 +26,13 @@ describe('GET /oauth2/authorize', function() {
   
     chai.express.use([ state({ external: true, store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
@@ -48,9 +48,9 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should initialize state by ignoring external state and redirect with return location
+  }); // should ignore external state when initializing state and redirect with return location
   
-  it('should initialize state by ignoring external state and redirect with pushed state', function(done) {
+  it('should ignore external state when initializing state and redirect with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -69,20 +69,24 @@ describe('GET /oauth2/authorize', function() {
       }, '/authorize/continue');
       
       
-      // TODO: Assert that the state hasn't changed after pushing
+      // assert that state is unchanged after calling pushState
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/authorize',
+        returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+      });
       
       res.redirect('/login');
     }
   
     chai.express.use([ state({ external: true, store: store, genh: function() { return '00000000' } }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
@@ -107,7 +111,7 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should initialize state by ignoring external state and redirect with pushed state
+  }); // should ignore external state when initializing state and redirect with pushed state
   
   it('should initialize state by ignoring external state and respond after completing state', function(done) {
     var store = new SessionStore();
