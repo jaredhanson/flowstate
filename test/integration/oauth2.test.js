@@ -68,13 +68,6 @@ describe('GET /oauth2/authorize', function() {
         state: req.query.state
       }, '/authorize/continue');
       
-      
-      // assert that state is unchanged after calling pushState
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/authorize',
-        returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
-      });
-      
       res.redirect('/login');
     }
   
@@ -94,6 +87,12 @@ describe('GET /oauth2/authorize', function() {
         expect(store.get).to.have.callCount(0);
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
+        
+        // assert that state is unchanged after calling pushState
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/authorize',
+          returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+        });
         
         expect(this.req.session).to.deep.equal({
           state: {
