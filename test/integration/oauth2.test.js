@@ -155,6 +155,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should redirect with state to resume when adding a state
   
+  // TODO: review this
   it('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -202,6 +203,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should initialize state by ignoring external state and respond after popping and completing state
   
+  // TODO: review this
   it('should initialize state by ignoring external state and respond after pushing, popping, and completing state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
