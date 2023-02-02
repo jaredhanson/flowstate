@@ -105,7 +105,7 @@ describe('integration: sso/oauth2', function() {
 
 describe('GET /oauth2/redirect', function() {
 
-  it('should consume state from state query parameter and return to location', function(done) {
+  it('should complete state and then return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -126,12 +126,12 @@ describe('GET /oauth2/redirect', function() {
   
     chai.express.use([ state({ store: store }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
         req.headers = {
           'host': 'client.example.com'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
         req.session = {};
         req.session.state = {};
@@ -146,14 +146,13 @@ describe('GET /oauth2/redirect', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
-        expect(this.req.session).to.deep.equal({});
-        
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://client.example.com/');
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
-  }); // should consume state from state query parameter and return to location
+  }); // should complete state and then return to location
   
   it('should consume state from state query parameter and resume state', function(done) {
     var store = new SessionStore();
