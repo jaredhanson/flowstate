@@ -482,7 +482,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should redirect with location and state
   
-  it('should load state from state body parameter and redirect with resume state', function(done) {
+  it('should complete state and redirect with location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -494,6 +494,7 @@ describe('POST /login/password', function() {
         messages: [ 'Invalid username or password.' ],
         resumeState: '00000000'
       });
+      
       res.redirect('/account/change-password');
     }
     
@@ -503,13 +504,13 @@ describe('POST /login/password', function() {
     
     chai.express.use([ state({ store: store }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login/password?state=11111111'
-        }
-        req.connection = { encrypted: true };
+        };
         req.body = { username: 'Aladdin', password: 'open sesame', state: '11111111' };
         req.session = {};
         req.session.state = {};
@@ -530,6 +531,8 @@ describe('POST /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/account/change-password?state=00000000');
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -540,13 +543,10 @@ describe('POST /login/password', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/account/change-password?state=00000000');
         done();
       })
       .listen();
-  }); // should load state from state body parameter and redirect with resume state
+  }); // should complete state and redirect with location and state
   
   it('should initialize state with state body parameter and resume state', function(done) {
     var store = new SessionStore();
