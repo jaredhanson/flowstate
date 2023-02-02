@@ -56,6 +56,7 @@ describe('GET /login/password', function() {
         location: 'https://www.example.com/login/password',
         returnTo: 'https://www.example.com/'
       });
+      
       res.render('login/password');
     }
     
@@ -84,7 +85,7 @@ describe('GET /login/password', function() {
       .listen();
   }); // should render with return location set to referrer
   
-  it('should initialize state with return to query parameter and render with return location', function(done) {
+  it('should render with return location set to query parameter', function(done) {
     var store = new SessionStore()
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -95,17 +96,18 @@ describe('GET /login/password', function() {
         location: 'https://www.example.com/login/password',
         returnTo: 'https://www.example.com/app'
       });
+      
       res.render('login/password');
     }
     
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
           'host': 'www.example.com'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { return_to: 'https://www.example.com/app' };
         req.session = {};
       })
@@ -114,15 +116,14 @@ describe('GET /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.session).to.deep.equal({});
-        
         expect(this.statusCode).to.equal(200);
         expect(this).to.render('login/password')
                     .with.deep.locals({ returnTo: 'https://www.example.com/app' });
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
-  }); // should initialize state with return to query parameter and render with return location
+  }); // should render with return location set to query parameter
   
   it('should initialize state with return to query parameter in preference to referrer header and render with return location', function(done) {
     var store = new SessionStore()
