@@ -117,6 +117,7 @@ describe('GET /oauth2/redirect', function() {
         provider: 'http://server.example.com',
         returnTo: 'https://client.example.com/'
       });
+      
       res.resumeState(next);
     }
     
@@ -166,6 +167,7 @@ describe('GET /oauth2/redirect', function() {
         provider: 'https://server.example.net',
         resumeState: '00000000'
       });
+      
       res.resumeState(next);
     }
     
@@ -175,12 +177,12 @@ describe('GET /oauth2/redirect', function() {
   
     chai.express.use([ state({ store: store }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz';
         req.headers = {
           'host': 'server.example.com'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'xyz' };
         req.session = {};
         req.session.state = {};
@@ -201,6 +203,8 @@ describe('GET /oauth2/redirect', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(1);
         
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -211,9 +215,6 @@ describe('GET /oauth2/redirect', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
         done();
       })
       .listen();
