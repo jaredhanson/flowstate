@@ -188,6 +188,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should redirect with state which then returns to location with state
   
+  // TODO: review this
   it('should ignore "return_to" parameter and redirect with state to resume which then resumes "state" parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
