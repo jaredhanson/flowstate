@@ -257,6 +257,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should ignore "return_to" parameter and redirect with state to resume which then resumes "state" parameter
   
+  // TODO: review this
   it('should initialize state with state query parameter and redirect with saved pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -329,6 +330,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should initialize state with state query parameter and redirect with saved pushed state
   
+  // TODO: review this
   it('should initialize state with state query parameter and redirect with saved pushed state using handle option', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
