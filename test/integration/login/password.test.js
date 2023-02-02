@@ -336,7 +336,7 @@ describe('GET /login/password', function() {
   
 describe('POST /login/password', function() {
   
-  it('should initialize state without properties and not resume state', function(done) {
+  it('should not resume when there is no state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -346,6 +346,7 @@ describe('POST /login/password', function() {
       expect(req.state).to.deep.equal({
         location: 'https://www.example.com/login/password'
       });
+      
       res.resumeState(next);
     }
     
@@ -355,12 +356,12 @@ describe('POST /login/password', function() {
 
     chai.express.use([ state({ store: store }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
           'host': 'www.example.com'
-        }
-        req.connection = { encrypted: true };
+        };
         req.body = { username: 'Aladdin', password: 'open sesame' };
         req.session = {};
       })
@@ -369,16 +370,15 @@ describe('POST /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.session).to.deep.equal({});
-        
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('/home');
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
-  }); // should initialize state without properties and not resume state
+  }); // should not resume when there is no state
   
-  it('should initialize state with return to body parameter and return to location', function(done) {
+  it('should return to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -389,6 +389,7 @@ describe('POST /login/password', function() {
         location: 'https://www.example.com/login/password',
         returnTo: 'https://www.example.com/app'
       });
+      
       res.resumeState(next);
     }
     
@@ -398,13 +399,13 @@ describe('POST /login/password', function() {
 
     chai.express.use([ state({ store: store }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/login/password'
-        }
-        req.connection = { encrypted: true };
+        };
         req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/app' };
         req.session = {};
       })
@@ -413,14 +414,13 @@ describe('POST /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
-        expect(this.req.session).to.deep.equal({});
-        
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://www.example.com/app');
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
-  }); // should initialize state with return to body parameter and return to location
+  }); // should return to location
   
   it('should initialize state with state body parameter and redirect with resume state', function(done) {
     var store = new SessionStore();
