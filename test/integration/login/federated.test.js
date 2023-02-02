@@ -204,22 +204,17 @@ describe('GET /login/federated', function() {
         provider: 'https://server.example.net'
       }, 'https://server.example.com/cb');
       res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
-    
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/federated',
-        resumeState: '00000000'
-      });
     }
 
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&return_to=https%3A%2F%2Fserver.example.com/welcome&state=00000000';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login?state=00000000'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { provider: 'https://server.example.net', return_to: 'https://server.example.com/welcome', state: '00000000' };
         req.session = {};
         req.session.state = {};
@@ -235,6 +230,13 @@ describe('GET /login/federated', function() {
         expect(store.set).to.have.callCount(1);
         expect(store.destroy).to.have.callCount(0);
         
+        expect(this.req.state).to.deep.equal({
+          location: 'https://server.example.com/login/federated',
+          resumeState: '00000000'
+        });
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=xyz');
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -250,9 +252,6 @@ describe('GET /login/federated', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb&state=xyz');
         done();
       })
       .listen();
