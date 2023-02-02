@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login/federated', function() {
   
-  it('should initialize state with referrer header and redirect with pushed state', function(done) {
+  it('should redirect with state to enter and then return to referrer', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -22,9 +22,6 @@ describe('GET /login/federated', function() {
       req.pushState({
         provider: 'https://server.example.com'
       }, 'https://client.example.com/cb');
-      
-      
-      
       res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
     }
     
@@ -64,7 +61,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should initialize state with referrer header and redirect with pushed state
+  }); // should redirect with state to enter and then return to referrer
   
   it('should initialize state with return to query parameter in preference to referrer header and redirect with pushed state', function(done) {
     var store = new SessionStore();

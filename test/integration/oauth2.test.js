@@ -9,6 +9,8 @@ describe('GET /oauth2/authorize', function() {
   
   // TODO: Test cases for account select yeilding back with query param and then setting it in state
   
+  // TODO: eliminate returnTo initialized external states?
+  
   it('should redirect with location to resume current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -95,7 +97,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should redirect without location after completing current state
   
-  it('should redirect with state to resume when adding a state', function(done) {
+  it('should redirect with state to resume after adding that state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -153,7 +155,7 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume when adding a state
+  }); // should redirect with state to resume after adding that state
   
   // TODO: review this
   it('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
