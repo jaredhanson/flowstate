@@ -155,7 +155,7 @@ describe('GET /oauth2/redirect', function() {
       .listen();
   }); // should complete state and then return to location
   
-  it('should consume state from state query parameter and resume state', function(done) {
+  it('should complete state and then return to location with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -218,7 +218,7 @@ describe('GET /oauth2/redirect', function() {
         done();
       })
       .listen();
-  }); // should consume state from state query parameter and resume state
+  }); // should complete state and then return to location with state
   
   // TODO: Review this test
   it('and resuming state yeilding parameters', function(done) {
