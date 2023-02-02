@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login/federated', function() {
   
-  it('should redirect with state to enter and then return to referrer', function(done) {
+  it('should redirect with state to resume which then returns to referrer', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -61,7 +61,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to enter and then return to referrer
+  }); // should redirect with state to resume which then returns to referrer
   
   it('should initialize state with return to query parameter in preference to referrer header and redirect with pushed state', function(done) {
     var store = new SessionStore();
