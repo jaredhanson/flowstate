@@ -63,7 +63,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should redirect with state to resume which then returns to referrer
   
-  it('should redirect with state to resume which then returns to query parameter', function(done) {
+  it('should redirect with state to resume which then returns to "return_to" parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -117,7 +117,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume which then returns to query parameter
+  }); // should redirect with state to resume which then returns to "return_to" parameter
   
   it('should redirect with state to resume which then resumes prior state', function(done) {
     var store = new SessionStore();
@@ -188,7 +188,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should redirect with state to resume which then resumes prior state
   
-  it('should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state', function(done) {
+  it('should ignore "return_to" parameter and redirect with state to resume which then resumes prior state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -256,7 +256,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state
+  }); // should ignore "return_to" parameter and redirect with state to resume which then resumes prior state
   
   it('should initialize state with state query parameter and redirect with saved pushed state', function(done) {
     var store = new SessionStore();
