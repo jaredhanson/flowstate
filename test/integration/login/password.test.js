@@ -224,8 +224,7 @@ describe('GET /login/password', function() {
       .listen();
   }); // should render with return location and state
   
-  // should render with state
-  it('should load state from state query parameter and render with that state', function(done) {
+  it('should render with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -237,18 +236,19 @@ describe('GET /login/password', function() {
         messages: [ 'Invalid username or password.' ],
         resumeState: '00000000'
       });
+      
       res.render('login/password');
     }
     
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/password?state=11111111';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login/password?state=00000000'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { state: '11111111' };
         req.session = {};
         req.session.state = {};
@@ -269,6 +269,9 @@ describe('GET /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
+        expect(this.statusCode).to.equal(200);
+        expect(this).to.render('login/password')
+                    .with.deep.locals({ state: '11111111' });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -284,10 +287,6 @@ describe('GET /login/password', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(200);
-        expect(this).to.render('login/password')
-                    .with.deep.locals({ state: '11111111' });
         done();
       })
       .listen();
