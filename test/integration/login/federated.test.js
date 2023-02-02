@@ -119,7 +119,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should redirect with state to resume which then returns to query parameter
   
-  it('should initialize state with state query parameter and redirect with pushed state', function(done) {
+  it('should redirect with state to resume which then resumes prior state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -186,7 +186,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter and redirect with pushed state
+  }); // should redirect with state to resume which then resumes prior state
   
   it('should initialize state with state query parameter in preference to return to query parameter and redirect with pushed state', function(done) {
     var store = new SessionStore();
