@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('GET /login/federated', function() {
   
-  it('should redirect with state to resume which then returns to referrer', function(done) {
+  it('should redirect with state which then returns to referrer', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -61,9 +61,9 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume which then returns to referrer
+  }); // should redirect with state which then returns to referrer
   
-  it('should redirect with state to resume which then returns to "return_to" parameter', function(done) {
+  it('should redirect with state which then returns to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -117,9 +117,9 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume which then returns to "return_to" parameter
+  }); // should redirect with state which then returns to location
   
-  it('should redirect with state to resume which then resumes "state" parameter', function(done) {
+  it('should redirect with state which then returns to location with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -186,7 +186,7 @@ describe('GET /login/federated', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume which then resumes "state" parameter
+  }); // should redirect with state which then returns to location with state
   
   it('should ignore "return_to" parameter and redirect with state to resume which then resumes "state" parameter', function(done) {
     var store = new SessionStore();
