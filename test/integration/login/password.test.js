@@ -292,7 +292,7 @@ describe('GET /login/password', function() {
       .listen();
   }); // should load state from state query parameter and render with that state
   
-  it('should initialize state without invalid referrer header and render without any state', function(done) {
+  it('should ignore invalid referrer', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -302,18 +302,19 @@ describe('GET /login/password', function() {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password'
       });
+      
       res.render('login/password');
     }
     
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
-        }
-        req.connection = { encrypted: true };
+        };
         req.session = {};
       })
       .finish(function() {
@@ -329,7 +330,7 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state without invalid referrer header and render without any state
+  }); // should ignore invalid referrer
   
 }); // GET /login/password
   
