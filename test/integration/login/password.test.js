@@ -164,9 +164,10 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return to query parameter in preference to referrer header and render with return location
+  }); // should render with return location set to query parameter overriding referrer header
   
-  it('should initialize state with state query parameter and render with resume state', function(done) {
+  // TODO: Review this
+  it('should render with return location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -177,18 +178,19 @@ describe('GET /login/password', function() {
         location: 'https://server.example.com/login/password',
         resumeState: '00000000'
       });
+      
       res.render('login/password');
     }
     
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/login/password?state=00000000';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { state: '00000000' };
         req.session = {};
         req.session.state = {};
@@ -204,6 +206,9 @@ describe('GET /login/password', function() {
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
+        expect(this.statusCode).to.equal(200);
+        expect(this).to.render('login/password')
+                    .with.deep.locals({ state: '00000000' });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
@@ -214,15 +219,12 @@ describe('GET /login/password', function() {
             }
           }
         });
-        
-        expect(this.statusCode).to.equal(200);
-        expect(this).to.render('login/password')
-                    .with.deep.locals({ state: '00000000' });
         done();
       })
       .listen();
-  }); // should initialize state with state query parameter and render with resume state
+  }); // should render with return location and state
   
+  // should render with state
   it('should load state from state query parameter and render with that state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
