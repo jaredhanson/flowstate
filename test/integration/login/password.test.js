@@ -176,7 +176,7 @@ describe('GET /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.render('login/password');
@@ -234,7 +234,7 @@ describe('GET /login/password', function() {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
         messages: [ 'Invalid username or password.' ],
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.render('login/password');
@@ -261,7 +261,7 @@ describe('GET /login/password', function() {
         req.session.state['11111111'] = {
           location: 'https://server.example.com/login/password',
           messages: [ 'Invalid username or password.' ],
-          resumeState: '00000000'
+          state: '00000000'
         };
       })
       .finish(function() {
@@ -283,7 +283,7 @@ describe('GET /login/password', function() {
             '11111111': {
               location: 'https://server.example.com/login/password',
               messages: [ 'Invalid username or password.' ],
-              resumeState: '00000000'
+              state: '00000000'
             }
           }
         });
@@ -431,7 +431,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.redirect('/account/change-password');
@@ -492,7 +492,7 @@ describe('POST /login/password', function() {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
         messages: [ 'Invalid username or password.' ],
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.redirect('/account/change-password');
@@ -523,7 +523,7 @@ describe('POST /login/password', function() {
         req.session.state['11111111'] = {
           location: 'https://server.example.com/login/password',
           messages: [ 'Invalid username or password.' ],
-          resumeState: '00000000'
+          state: '00000000'
         };
       })
       .finish(function() {
@@ -557,7 +557,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.resumeState(next);
@@ -619,7 +619,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
-        resumeState: '00000000'
+        state: '00000000'
       });
       // TODO: Should this use pushState?
       // TODO: What if it redirects to `/login?
@@ -667,7 +667,7 @@ describe('POST /login/password', function() {
             '11111111': {
               location: 'https://server.example.com/login/password',
               messages: [ 'Invalid username or password.' ],
-              resumeState: '00000000'
+              state: '00000000'
             }
           }
         });

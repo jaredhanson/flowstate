@@ -98,7 +98,7 @@ describe('Response', function() {
           req.session.state['11111111'] = {
             location: 'https://server.example.com/login/password',
             messages: [ 'Invalid username or password.' ],
-            resumeState: '00000000'
+            state: '00000000'
           };
         })
         .next(function(err, req, res) {
@@ -120,7 +120,7 @@ describe('Response', function() {
               '11111111': {
                 location: 'https://server.example.com/login/password',
                 messages: [ 'Invalid username or password.' ],
-                resumeState: '00000000'
+                state: '00000000'
               }
             }
           });
@@ -143,7 +143,7 @@ describe('Response', function() {
       function handler(req, res, next) {
         expect(req.state).to.deep.equal({
           location: 'https://server.example.com/login/password',
-          resumeState: '00000000'
+          state: '00000000'
         });
         req.state.messages = req.session.messages || [];
         req.state.messages.push('Invalid username or password.');

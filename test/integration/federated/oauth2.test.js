@@ -165,7 +165,7 @@ describe('GET /oauth2/redirect', function() {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/cb',
         provider: 'https://server.example.net',
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.resumeState(next);
@@ -189,7 +189,7 @@ describe('GET /oauth2/redirect', function() {
         req.session.state['xyz'] = {
           location: 'https://server.example.com/cb',
           provider: 'https://server.example.net',
-          resumeState: '00000000'
+          state: '00000000'
         };
         req.session.state['00000000'] = {
           location: 'https://server.example.com/authorize/continue',
@@ -251,7 +251,7 @@ describe('GET /oauth2/redirect', function() {
         req.session.state['af0ifjsldkj'] = {
           location: 'https://server.example.com/cb',
           provider: 'http://server.example.net',
-          resumeState: 'Dxh5N7w_wMQ'
+          state: 'Dxh5N7w_wMQ'
         };
         req.session.state['Dxh5N7w_wMQ'] = {
           location: 'https://server.example.com/oauth2/authorize/continue',
@@ -269,7 +269,7 @@ describe('GET /oauth2/redirect', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/cb',
           provider: 'http://server.example.net',
-          resumeState: 'Dxh5N7w_wMQ'
+          state: 'Dxh5N7w_wMQ'
         });
         
         expect(this.req.session).to.deep.equal({

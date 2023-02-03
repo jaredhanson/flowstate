@@ -16,7 +16,7 @@ describe('POST /account/select', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/account/select',
-        resumeState: '00000000'
+        state: '00000000'
       });
       
       res.resumeState({
