@@ -22,7 +22,7 @@ describe('GET /login/federated', function() {
       req.pushState({
         provider: 'https://server.example.com'
       }, 'https://client.example.com/cb');
-      res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
+      res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb', true);
     }
     
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
@@ -78,7 +78,7 @@ describe('GET /login/federated', function() {
       req.pushState({
         provider: 'https://server.example.com'
       }, 'https://client.example.com/cb');
-      res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb');
+      res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb', true);
     }
 
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
@@ -119,6 +119,7 @@ describe('GET /login/federated', function() {
       .listen();
   }); // should redirect with state which then returns to location
   
+  // WIP: location tracking
   it('should redirect with state which then returns to location with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -134,7 +135,7 @@ describe('GET /login/federated', function() {
       req.pushState({
         provider: 'https://server.example.net'
       }, 'https://server.example.com/cb');
-      res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
+      res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb', true);
     }
 
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
@@ -204,7 +205,7 @@ describe('GET /login/federated', function() {
       req.pushState({
         provider: 'https://server.example.net'
       }, 'https://server.example.com/cb');
-      res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
+      res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb', true);
     }
 
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])

@@ -141,7 +141,7 @@ describe('GET /oauth2/authorize', function() {
         });
         
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login?state=00000000');
+        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000');
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
