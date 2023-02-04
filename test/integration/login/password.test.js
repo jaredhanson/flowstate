@@ -431,6 +431,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -450,7 +451,7 @@ describe('POST /login/password', function() {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login/password?state=00000000'
         };
-        req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -466,6 +467,7 @@ describe('POST /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.statusCode).to.equal(302);
+        // FIXME: this should have return_to
         expect(this.getHeader('Location')).to.equal('/account/change-password?state=00000000');
         expect(this.req.session).to.deep.equal({
           state: {
@@ -557,6 +559,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -576,7 +579,7 @@ describe('POST /login/password', function() {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login/password?state=00000000'
         };
-        req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -587,7 +590,8 @@ describe('POST /login/password', function() {
         };
       })
       .finish(function() {
-        expect(store.get).to.have.callCount(2); // FIXME: should onl be called once
+        //expect(store.get).to.have.callCount(2); // FIXME: should onl be called once
+        expect(store.get).to.have.callCount(1); // FIXME: wtf, now it is one with return_to changes?
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -619,6 +623,7 @@ describe('POST /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       // TODO: Should this use pushState?
@@ -641,7 +646,7 @@ describe('POST /login/password', function() {
           'referer': 'https://server.example.com/login/password?state=00000000'
         }
         req.connection = { encrypted: true };
-        req.body = { username: 'Aladdin', password: 'open sesame', state: '00000000' };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -667,6 +672,7 @@ describe('POST /login/password', function() {
             '11111111': {
               location: 'https://server.example.com/login/password',
               messages: [ 'Invalid username or password.' ],
+              returnTo: 'https://server.example.com/authorize/continue',
               state: '00000000'
             }
           }

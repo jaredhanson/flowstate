@@ -143,6 +143,8 @@ describe('Response', function() {
       function handler(req, res, next) {
         expect(req.state).to.deep.equal({
           location: 'https://server.example.com/login/password',
+          // TODO: review why this is here.  should referrer be tracked at all??
+          returnTo: 'https://server.example.com/login/password?state=00000000',
           state: '00000000'
         });
         req.state.messages = req.session.messages || [];

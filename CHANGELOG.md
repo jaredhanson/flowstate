@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Renamed `resumeState` property of state objects to `state`.
+- Initializing `returnTo` property of current state in all cases.  This avoids
+  needing to reference the `location` property of the state to resume,
+  optimizing state store access and allowing state targetting different
+  locations to be stored in different stores.
+- Both `returnTo` and `state` parameters are added as query parameters when
+  redirecting.
+- Both `returnTo` and `state` variables are set as locals when rendering.
+- Both `returnTo` and `state` are set when pushing state.
 
 ## [0.5.1] - 2021-12-13
 ### Added

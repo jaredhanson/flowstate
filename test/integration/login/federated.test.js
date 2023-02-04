@@ -129,6 +129,7 @@ describe('GET /login/federated', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -147,7 +148,7 @@ describe('GET /login/federated', function() {
           'host': 'server.example.com',
           'referer': 'https://server.example.com/login?state=00000000'
         };
-        req.query = { provider: 'https://server.example.net', state: '00000000' };
+        req.query = { provider: 'https://server.example.net', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -164,6 +165,7 @@ describe('GET /login/federated', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/login/federated',
+          returnTo: 'https://server.example.com/authorize/continue',
           state: '00000000'
         });
         
@@ -180,6 +182,7 @@ describe('GET /login/federated', function() {
             'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
+              returnTo: 'https://server.example.com/authorize/continue',
               state: '00000000'
             }
           }
@@ -199,6 +202,7 @@ describe('GET /login/federated', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/welcome',
         state: '00000000'
       });
       
@@ -234,6 +238,7 @@ describe('GET /login/federated', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/login/federated',
+          returnTo: 'https://server.example.com/welcome',
           state: '00000000'
         });
         
@@ -250,6 +255,7 @@ describe('GET /login/federated', function() {
             'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
+              returnTo: 'https://server.example.com/welcome',
               state: '00000000'
             }
           }
@@ -269,6 +275,7 @@ describe('GET /login/federated', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -281,6 +288,7 @@ describe('GET /login/federated', function() {
       
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
     }
@@ -294,7 +302,7 @@ describe('GET /login/federated', function() {
           'referer': 'https://server.example.com/login?state=00000000'
         }
         req.connection = { encrypted: true };
-        req.query = { provider: 'https://server.example.net', state: '00000000' };
+        req.query = { provider: 'https://server.example.net', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -320,6 +328,7 @@ describe('GET /login/federated', function() {
             'xyz': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
+              returnTo: 'https://server.example.com/authorize/continue',
               state: '00000000'
             }
           }
@@ -342,6 +351,7 @@ describe('GET /login/federated', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -354,6 +364,7 @@ describe('GET /login/federated', function() {
       
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/federated',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
     }
@@ -361,13 +372,14 @@ describe('GET /login/federated', function() {
     chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
-        req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&state=00000000';
+        req.url = '/login/federated?provider=https%3A%2F%2Fserver.example.net&return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
         req.headers = {
           'host': 'server.example.com',
+          // TODO: add return_to here
           'referer': 'https://server.example.com/login?state=00000000'
         }
         req.connection = { encrypted: true };
-        req.query = { provider: 'https://server.example.net', state: '00000000' };
+        req.query = { provider: 'https://server.example.net', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -393,6 +405,7 @@ describe('GET /login/federated', function() {
             'oauth2:123': {
               location: 'https://server.example.com/cb',
               provider: 'https://server.example.net',
+              returnTo: 'https://server.example.com/authorize/continue',
               state: '00000000'
             }
           }

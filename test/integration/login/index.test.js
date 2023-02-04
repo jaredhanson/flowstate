@@ -122,6 +122,7 @@ describe('GET /login', function() {
       .listen();
   }); // should initialize state with return to query parameter and redirect with return location
   
+  // WIP
   it('should initialize state with state query parameter and redirect with resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -131,21 +132,23 @@ describe('GET /login', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
+      
       res.redirect('/login/password');
     }
     
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
         req.method = 'GET';
-        req.url = '/login?state=00000000';
+        req.url = '/login?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
         }
         req.connection = { encrypted: true };
-        req.query = { state: '00000000' };
+        req.query = { return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -172,7 +175,7 @@ describe('GET /login', function() {
         });
         
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login/password?state=00000000');
+        expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000');
         done();
       })
       .listen();

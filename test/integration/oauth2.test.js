@@ -97,6 +97,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should redirect without location after completing current state
   
+  // WIP: location tracking
   it('should redirect with state to resume', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
