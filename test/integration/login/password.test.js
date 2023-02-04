@@ -467,8 +467,7 @@ describe('POST /login/password', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.statusCode).to.equal(302);
-        // FIXME: this should have return_to
-        expect(this.getHeader('Location')).to.equal('/account/change-password?state=00000000');
+        expect(this.getHeader('Location')).to.equal('/account/change-password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000');
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
