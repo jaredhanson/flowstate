@@ -422,6 +422,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should return to location
   
+  // NOTE: returnTo and state are always propagated, until a resumeState
   it('should redirect with location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');

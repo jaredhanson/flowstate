@@ -51,8 +51,7 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should redirect with location to resume current state
   
-  // FIXME: put back skipped test
-  it.skip('should redirect without location after completing current state', function(done) {
+  it('should redirect without location after completing current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -87,7 +86,7 @@ describe('GET /oauth2/authorize', function() {
         
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/authorize',
-          returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         
         expect(this.statusCode).to.equal(302);
@@ -160,8 +159,7 @@ describe('GET /oauth2/authorize', function() {
   }); // should redirect with state to resume
   
   // TODO: review this
-  // FIXME: put back skipped test
-  it.skip('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
+  it('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -198,7 +196,7 @@ describe('GET /oauth2/authorize', function() {
         expect(this.req.session).to.deep.equal({});
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/authorize',
-          returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         
         expect(this.statusCode).to.equal(302);
@@ -209,8 +207,7 @@ describe('GET /oauth2/authorize', function() {
   }); // should initialize state by ignoring external state and respond after popping and completing state
   
   // TODO: review this
-  // FIXME: put back skipped test
-  it.skip('should initialize state by ignoring external state and respond after pushing, popping, and completing state', function(done) {
+  it('should initialize state by ignoring external state and respond after pushing, popping, and completing state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -254,7 +251,7 @@ describe('GET /oauth2/authorize', function() {
         expect(this.req.session).to.deep.equal({});
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/authorize',
-          returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         
         expect(this.statusCode).to.equal(302);
