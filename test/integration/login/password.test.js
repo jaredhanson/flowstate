@@ -404,7 +404,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/login/password'
+          'referer': 'https://www.example.com/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp'
         };
         req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://www.example.com/app' };
         req.session = {};
@@ -422,8 +422,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should resume by returning to location
   
-  // NOTE: returnTo and state are always propagated, until a resumeState
-  it('should redirect with location and state', function(done) {
+  it('should redirect with return location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -450,7 +449,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password?state=00000000'
+          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
         };
         req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
@@ -482,7 +481,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should redirect with location and state
+  }); // should redirect with return location and state
   
   it('should complete state and redirect with location and state', function(done) {
     var store = new SessionStore();
