@@ -292,7 +292,7 @@ describe('GET /login/password', function() {
       .listen();
   }); // should render with state
   
-  it('should ignore invalid referrer', function(done) {
+  it('should ignore referrer that is from different subdomain', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -330,7 +330,7 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should ignore invalid referrer
+  }); // should ignore referrer that is from different subdomain
   
 }); // GET /login/password
   
