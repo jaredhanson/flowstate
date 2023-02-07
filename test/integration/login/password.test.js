@@ -166,7 +166,6 @@ describe('GET /login/password', function() {
       .listen();
   }); // should render with return location set to query parameter overriding referrer header
   
-  // TODO: Review this
   it('should render with return location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -176,6 +175,7 @@ describe('GET /login/password', function() {
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/login/password',
+        returnTo: 'https://server.example.com/authorize/continue',
         state: '00000000'
       });
       
@@ -186,12 +186,12 @@ describe('GET /login/password', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login/password?state=00000000';
+        req.url = '/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
         };
-        req.query = { state: '00000000' };
+        req.query = { return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
         req.session.state['00000000'] = {
@@ -208,7 +208,7 @@ describe('GET /login/password', function() {
         
         expect(this.statusCode).to.equal(200);
         expect(this).to.render('login/password')
-                    .with.deep.locals({ state: '00000000' });
+                    .with.deep.locals({ returnTo: 'https://server.example.com/authorize/continue', state: '00000000' });
         expect(this.req.session).to.deep.equal({
           state: {
             '00000000': {
