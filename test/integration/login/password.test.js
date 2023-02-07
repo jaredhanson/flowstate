@@ -104,7 +104,7 @@ describe('GET /login/password', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login/password';
+        req.url = '/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp';
         req.headers = {
           'host': 'www.example.com'
         };
@@ -144,7 +144,7 @@ describe('GET /login/password', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login/password';
+        req.url = '/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp';
         req.headers = {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/'
@@ -336,7 +336,7 @@ describe('GET /login/password', function() {
   
 describe('POST /login/password', function() {
   
-  it('should not resume when there is no state', function(done) {
+  it('should not resume without state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -376,9 +376,9 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should not resume when there is no state
+  }); // should not resume without state
   
-  it('should return to location', function(done) {
+  it('should resume by returning to location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -420,7 +420,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should return to location
+  }); // should resume by returning to location
   
   // NOTE: returnTo and state are always propagated, until a resumeState
   it('should redirect with location and state', function(done) {
