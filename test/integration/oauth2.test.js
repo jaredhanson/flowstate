@@ -9,9 +9,7 @@ describe('GET /oauth2/authorize', function() {
   
   // TODO: Test cases for account select yeilding back with query param and then setting it in state
   
-  // TODO: eliminate returnTo initialized external states?
-  
-  it('should redirect with location to resume current state', function(done) {
+  it('should redirect with return location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -49,9 +47,9 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should redirect with location to resume current state
+  }); // should redirect with return location
   
-  it('should redirect without location after completing current state', function(done) {
+  it('should redirect without return location after completing current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -85,8 +83,7 @@ describe('GET /oauth2/authorize', function() {
         expect(store.destroy).to.have.callCount(0);
         
         expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/authorize',
-          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          location: 'https://server.example.com/authorize'
         });
         
         expect(this.statusCode).to.equal(302);
@@ -95,10 +92,9 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should redirect without location after completing current state
+  }); // should redirect without return location after completing current state
   
-  // WIP: location tracking
-  it('should redirect with state to resume', function(done) {
+  it('should redirect with return location to pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -156,7 +152,7 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume
+  }); // should redirect with return location to pushed state
   
   // TODO: review this
   it('should initialize state by ignoring external state and respond after popping and completing state', function(done) {
@@ -206,15 +202,13 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should initialize state by ignoring external state and respond after popping and completing state
   
-  // TODO: review this
-  it('should initialize state by ignoring external state and respond after pushing, popping, and completing state', function(done) {
+  it('should redirect without return location after pushing, popping, and completing current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
 
     function handler(req, res, next) {
-      // FIXME: probably shouldn't have returnTo on external states
       expect(req.state).to.deep.equal({
         location: 'https://server.example.com/authorize',
         returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
@@ -231,15 +225,15 @@ describe('GET /oauth2/authorize', function() {
       res.redirect('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
     }
   
-    chai.express.use([ state({ external: true, store: store, genh: function() { return '00000000' } }), handler ])
+    chai.express.use([ state({ external: true, store: store }), handler ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'GET';
         req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
           'host': 'server.example.com',
           'referer': 'https://client.example.com/'
-        }
-        req.connection = { encrypted: true };
+        };
         req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
@@ -250,8 +244,7 @@ describe('GET /oauth2/authorize', function() {
         
         expect(this.req.session).to.deep.equal({});
         expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/authorize',
-          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          location: 'https://server.example.com/authorize'
         });
         
         expect(this.statusCode).to.equal(302);
@@ -259,6 +252,6 @@ describe('GET /oauth2/authorize', function() {
         done();
       })
       .listen();
-  }); // should initialize state by ignoring external state and respond after pushing, popping, and completing state
+  }); // should redirect without return location after pushing, popping, and completing current state
   
 }); // GET /oauth2/authorize
