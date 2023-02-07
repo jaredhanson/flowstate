@@ -247,7 +247,7 @@ describe('GET /login/password', function() {
         req.url = '/login/password?state=11111111';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password?state=00000000'
+          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
         };
         req.query = { state: '11111111' };
         req.session = {};
@@ -290,7 +290,7 @@ describe('GET /login/password', function() {
         done();
       })
       .listen();
-  }); // should load state from state query parameter and render with that state
+  }); // should render with state
   
   it('should ignore invalid referrer', function(done) {
     var store = new SessionStore();
