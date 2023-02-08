@@ -486,7 +486,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should redirect with return location and state
   
-  it('should complete state and redirect with location and state', function(done) {
+  it('should redirect with location and state after completing current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -552,9 +552,9 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should complete state and redirect with location and state
+  }); // should redirect with location and state after completing current state
   
-  it('should complete state and resume state', function(done) {
+  it('should resume by returning to location with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -581,7 +581,7 @@ describe('POST /login/password', function() {
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password?state=00000000'
+          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
         };
         req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
@@ -594,8 +594,7 @@ describe('POST /login/password', function() {
         };
       })
       .finish(function() {
-        //expect(store.get).to.have.callCount(2); // FIXME: should onl be called once
-        expect(store.get).to.have.callCount(1); // FIXME: wtf, now it is one with return_to changes?
+        expect(store.get).to.have.callCount(1);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         
@@ -614,7 +613,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should complete state and resume state
+  }); // should resume by returning to location with state
   
   // TODO: Put a render test in like this one below
   
