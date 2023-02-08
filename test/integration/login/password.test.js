@@ -617,7 +617,7 @@ describe('POST /login/password', function() {
   
   // TODO: Put a render test in like this one below
   
-  it('should initialize state with state body parameter and redirect to location after modifying state', function(done) {
+  it('should redirect with state after modifying current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -642,13 +642,13 @@ describe('POST /login/password', function() {
     
     chai.express.use([ state({ store: store, genh: function() { return '11111111' } }), handler, redirect ])
       .request(function(req, res) {
+        req.connection = { encrypted: true };
         req.method = 'POST';
         req.url = '/login/password';
         req.headers = {
           'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password?state=00000000'
-        }
-        req.connection = { encrypted: true };
+          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
+        };
         req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
         req.session = {};
         req.session.state = {};
@@ -683,7 +683,6 @@ describe('POST /login/password', function() {
         
         expect(this.statusCode).to.equal(302);
         // FIXME: Drop the return_to here since it targets same endpoint
-        // WIP: work on a branch locloc
         expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fserver.example.com%2Flogin%2Fpassword&state=11111111');
         done();
       })
