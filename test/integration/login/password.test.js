@@ -687,7 +687,7 @@ describe('POST /login/password', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state body parameter and redirect to location after modifying state
+  }); // should redirect with state after modifying current state
   
   it('should initialize state by ignoring invalid state body parameter and not resume state', function(done) {
     var store = new SessionStore();
