@@ -425,6 +425,67 @@ describe('POST /login/password', function() {
       .listen();
   }); // should resume by returning to location
   
+  it('should resume by returning to location with state', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+
+    function handler(req, res, next) {
+      expect(req.state).to.deep.equal({
+        location: 'https://server.example.com/login/password',
+        returnTo: 'https://server.example.com/authorize/continue',
+        state: '00000000'
+      });
+      
+      res.resumeState(next);
+    }
+    
+    function redirect(req, res, next) {
+      res.redirect('/home')
+    }
+    
+    chai.express.use([ state({ store: store }), handler, redirect ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login/password';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
+        };
+        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['00000000'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '00000000': {
+              location: 'https://server.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should resume by returning to location with state
+  
   it('should redirect with return location and state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -486,7 +547,7 @@ describe('POST /login/password', function() {
       .listen();
   }); // should redirect with return location and state
   
-  it('should redirect with location and state after completing current state', function(done) {
+  it('should redirect with return location and state from current state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -553,67 +614,6 @@ describe('POST /login/password', function() {
       })
       .listen();
   }); // should redirect with location and state after completing current state
-  
-  it('should resume by returning to location with state', function(done) {
-    var store = new SessionStore();
-    sinon.spy(store, 'get');
-    sinon.spy(store, 'set');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://server.example.com/authorize/continue',
-        state: '00000000'
-      });
-      
-      res.resumeState(next);
-    }
-    
-    function redirect(req, res, next) {
-      res.redirect('/home')
-    }
-    
-    chai.express.use([ state({ store: store }), handler, redirect ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'POST';
-        req.url = '/login/password';
-        req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000'
-        };
-        req.body = { username: 'Aladdin', password: 'open sesame', return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
-        req.session = {};
-        req.session.state = {};
-        req.session.state['00000000'] = {
-          location: 'https://server.example.com/authorize/continue',
-          clientID: 's6BhdRkqt3',
-          redirectURI: 'https://client.example.com/cb',
-          state: 'xyz'
-        };
-      })
-      .finish(function() {
-        expect(store.get).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize/continue?state=00000000');
-        expect(this.req.session).to.deep.equal({
-          state: {
-            '00000000': {
-              location: 'https://server.example.com/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
-            }
-          }
-        });
-        done();
-      })
-      .listen();
-  }); // should resume by returning to location with state
   
   // TODO: Put a render test in like this one below
   
