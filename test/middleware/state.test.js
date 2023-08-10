@@ -16,7 +16,7 @@ describe('middleware/state', function() {
         req.method = 'GET';
         req.url = '/';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         };
         req.query = {};
         req.session = {};
@@ -26,13 +26,42 @@ describe('middleware/state', function() {
         
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/'
+          location: 'https://www.example.com/'
         });
         expect(req.stateStore).to.equal(store);
         done();
       })
       .listen();
   }); // should initialize state
+  
+  it('should initialize state with return URL from referrer header', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
+        };
+        req.query = {};
+        req.session = {};
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.true;
+        expect(req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should initialize state with return URL from referrer header
   
   it('should initialize external state', function(done) {
     var store = new SessionStore();
@@ -62,7 +91,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize external state
   
-  it('should initialize external state with return to URL containing state parameter', function(done) {
+  it('should initialize external state with URL containing state parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -88,6 +117,6 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // sshould initialize external state with return to URL containing state parameter
+  }); // should initialize external state with URL containing state parameter
   
 });
