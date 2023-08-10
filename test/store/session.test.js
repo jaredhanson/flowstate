@@ -41,9 +41,9 @@ describe('SessionStore', function() {
           expect(state).to.be.undefined;
           done();
         });
-      }); // should not get state if session does not exist
+      }); // should not get state if state does not exist
     
-      it('should not get state if no state exists', function(done) {
+      it('should not get state if no session state exists', function(done) {
         var req = new Object();
         req.session = {};
   
@@ -53,7 +53,7 @@ describe('SessionStore', function() {
           expect(state).to.be.undefined;
           done();
         });
-      }); // should not get state if no state exists
+      }); // should not get state if no session state exists
     
       it('should error if no session exists', function(done) {
         var req = new Object();
@@ -65,7 +65,7 @@ describe('SessionStore', function() {
           expect(state).to.be.undefined;
           done();
         });
-      }); // should not get state if no session exists
+      }); // should error if no session exists
     
     }); // #get
     
@@ -87,6 +87,22 @@ describe('SessionStore', function() {
           done();
         });
       }); // should set state
+      
+      it('should set state if session state does not exist', function(done) {
+        var req = new Object();
+        req.session = {};
+        
+        var state = new State(req, { cow: 'moo' });
+        var store = new SessionStore();
+        store.set(req, 'xyz', state, function(err) {
+          expect(err).to.be.null;
+          expect(req.session.state['xyz']).to.deep.equal({
+            cow: 'moo'
+          });
+          expect(req.session.state['xyz']).to.not.be.an.instanceOf(State);
+          done();
+        });
+      }); // should set state if session state does not exist
       
       it('should error if no session exists', function(done) {
         var req = new Object();
