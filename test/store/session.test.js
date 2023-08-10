@@ -38,6 +38,18 @@ describe('SessionStore', function() {
         });
       }); // should get all states
       
+      it('should not get all states if no session state exists', function(done) {
+        var req = new Object();
+        req.session = {};
+  
+        var store = new SessionStore();
+        store.all(req, function(err, states) {
+          expect(err).to.be.undefined;
+          expect(states).to.be.undefined;
+          done();
+        });
+      }); // should not get all states if no session state exists
+      
       it('should error if no session exists', function(done) {
         var req = new Object();
   
