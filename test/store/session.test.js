@@ -28,7 +28,7 @@ describe('SessionStore', function() {
           expect(state).to.not.equal(req.session.state['xyz']);
           done();
         });
-      }); // should get session
+      }); // should get state
     
       it('should not get state if state does not exist', function(done) {
         var req = new Object();
@@ -117,6 +117,49 @@ describe('SessionStore', function() {
       }); // should error if no session exists
       
     }); // #set
+    
+    describe('#destroy', function() {
+      
+      it('should destroy state', function(done) {
+        var req = new Object();
+        req.session = {};
+        req.session.state = {};
+        req.session.state['xyz'] = {
+          cow: 'moo'
+        };
+  
+        var store = new SessionStore();
+        store.destroy(req, 'xyz', function(err) {
+          expect(err).to.be.undefined;
+          expect(req.session).to.deep.equal({});
+          done();
+        });
+      }); // should destroy state
+      
+      it('should destroy state and preserve other state', function(done) {
+        var req = new Object();
+        req.session = {};
+        req.session.state = {};
+        req.session.state['xyz'] = {
+          cow: 'moo'
+        };
+        req.session.state['123'] = {
+          pig: 'oink'
+        };
+  
+        var store = new SessionStore();
+        store.destroy(req, 'xyz', function(err) {
+          expect(err).to.be.undefined;
+          expect(req.session.state).to.deep.equal({
+            '123': {
+              pig: 'oink'
+            }
+          });
+          done();
+        });
+      }); // should destroy state and preserve other state
+      
+    }); // #destroy
     
   }); // defaults
   
