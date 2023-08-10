@@ -159,6 +159,33 @@ describe('SessionStore', function() {
         });
       }); // should destroy state and preserve other state
       
+      it('should destroy state if state does not exist', function(done) {
+        var req = new Object();
+        req.session = {};
+        req.session.state = {};
+  
+        var store = new SessionStore();
+        store.destroy(req, 'xyz', function(err) {
+          expect(err).to.be.undefined;
+          expect(req.session).to.deep.equal({
+            state: {}
+          });
+          done();
+        });
+      }); // should destroy state if state does not exist
+      
+      it('should destroy state if no session state exists', function(done) {
+        var req = new Object();
+        req.session = {};
+  
+        var store = new SessionStore();
+        store.destroy(req, 'xyz', function(err) {
+          expect(err).to.be.undefined;
+          expect(req.session).to.deep.equal({});
+          done();
+        });
+      }); // should destroy state if no session state exists
+      
       it('should error if no session exists', function(done) {
         var req = new Object();
   
