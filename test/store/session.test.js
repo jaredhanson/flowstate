@@ -159,6 +159,17 @@ describe('SessionStore', function() {
         });
       }); // should destroy state and preserve other state
       
+      it('should error if no session exists', function(done) {
+        var req = new Object();
+  
+        var store = new SessionStore();
+        store.destroy(req, 'xyz', function(err) {
+          expect(err).to.be.an.instanceOf(Error);
+          expect(err.message).to.equal('State requires session support. Did you forget to use `express-session` middleware?');
+          done();
+        });
+      }); // should error if no session exists
+      
     }); // #destroy
     
   }); // defaults
