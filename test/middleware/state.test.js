@@ -7,10 +7,10 @@ var chai = require('chai')
 
 describe('middleware/state', function() {
   
-  it('should redirect with return location', function(done) {
+  it('should initialize state', function(done) {
     var store = new SessionStore();
   
-    chai.express.use([ state({ external: true, store: store }) ])
+    chai.express.use([ state({ store: store }) ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
@@ -24,10 +24,9 @@ describe('middleware/state', function() {
       .next(function(err, req, res) {
         if (err) { return done(err); }
         
-        // TODO: remove returnTo here?
+        expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/',
-          returnTo: 'https://server.example.com/'
+          location: 'https://server.example.com/'
         });
         expect(req.stateStore).to.equal(store);
         done();
