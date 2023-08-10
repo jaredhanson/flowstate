@@ -38,6 +38,18 @@ describe('SessionStore', function() {
         });
       }); // should get all states
       
+      it('should error if no session exists', function(done) {
+        var req = new Object();
+  
+        var store = new SessionStore();
+        store.all(req, function(err, states) {
+          expect(err).to.be.an.instanceOf(Error);
+          expect(err.message).to.equal('State requires session support. Did you forget to use `express-session` middleware?');
+          expect(states).to.be.undefined;
+          done();
+        });
+      }); // should error if no session exists
+      
     }); // #all
   
     describe('#get', function() {
