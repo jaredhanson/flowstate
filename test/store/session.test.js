@@ -30,17 +30,6 @@ describe('SessionStore', function() {
         });
       }); // should get session
     
-      it('should not get state if session does not exist', function(done) {
-        var req = new Object();
-  
-        var store = new SessionStore();
-        store.get(req, 'xyz', function(err, state) {
-          expect(err).to.be.undefined;
-          expect(state).to.be.undefined;
-          done();
-        });
-      }); // should not get state if session does not exist
-    
       it('should not get state if state does not exist', function(done) {
         var req = new Object();
         req.session = {};
@@ -66,12 +55,13 @@ describe('SessionStore', function() {
         });
       }); // should not get state if no state exists
     
-      it('should not get state if no session exists', function(done) {
+      it('should error if no session exists', function(done) {
         var req = new Object();
   
         var store = new SessionStore();
         store.get(req, 'xyz', function(err, state) {
-          expect(err).to.be.undefined;
+          expect(err).to.be.an.instanceOf(Error);
+          expect(err.message).to.equal('State requires session support. Did you forget to use `express-session` middleware?');
           expect(state).to.be.undefined;
           done();
         });
@@ -87,7 +77,6 @@ describe('SessionStore', function() {
         req.session.state = {};
         
         var state = new State(req, { cow: 'moo' });
-  
         var store = new SessionStore();
         store.set(req, 'xyz', state, function(err) {
           expect(err).to.be.null;
@@ -98,6 +87,18 @@ describe('SessionStore', function() {
           done();
         });
       }); // should set state
+      
+      it('should error if no session exists', function(done) {
+        var req = new Object();
+        
+        var state = new State(req, { cow: 'moo' });
+        var store = new SessionStore();
+        store.set(req, 'xyz', state, function(err) {
+          expect(err).to.be.an.instanceOf(Error);
+          expect(err.message).to.equal('State requires session support. Did you forget to use `express-session` middleware?');
+          done();
+        });
+      }); // should error if no session exists
       
     }); // #set
     
