@@ -8,6 +8,37 @@ var chai = require('chai')
 describe('SessionStore', function() {
   
   describe('defaults', function() {
+    
+    describe('#all', function() {
+      
+      it('should get all states', function(done) {
+        var req = new Object();
+        req.session = {};
+        req.session.state = {};
+        req.session.state['xyz'] = {
+          cow: 'moo'
+        };
+        req.session.state['123'] = {
+          pig: 'oink'
+        };
+  
+        var store = new SessionStore();
+        store.all(req, function(err, states) {
+          expect(err).to.be.null;
+          expect(states).to.deep.equal([ {
+            handle: '123',
+            pig: 'oink'
+          }, {
+            handle: 'xyz',
+            cow: 'moo'
+          } ]);
+          expect(states[0]).to.not.equal(req.session.state['123']);
+          expect(states[1]).to.not.equal(req.session.state['xyz']);
+          done();
+        });
+      }); // should get all states
+      
+    }); // #all
   
     describe('#get', function() {
     
