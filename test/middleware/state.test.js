@@ -121,6 +121,43 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize state with return URL from body parameter
   
+  it('should initialize state with state from query parameter', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
+        req.headers = {
+          'host': 'server.example.com',
+          'referer': 'https://client.example.com/'
+        };
+        req.query = { return_to: 'https://server.example.com/authorize/continue', state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://server.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.true;
+        expect(req.state).to.deep.equal({
+          location: 'https://server.example.com/login',
+          returnTo: 'https://server.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should initialize state with state from query parameter
+  
   it('should initialize external state', function(done) {
     var store = new SessionStore();
   
