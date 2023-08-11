@@ -334,6 +334,7 @@ describe('ServerResponse#redirect', function() {
   
   // TODO: should render with current state after saving modifications on non-mutating request???
   
+  // FIXME: review the behavior here, i think its ok but should be documented
   it('should redirect with state to resume on successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
@@ -389,5 +390,69 @@ describe('ServerResponse#redirect', function() {
       })
       .listen();
   }); // should redirect with state to resume on successfully processing a mutating request
+  
+  // FIXME: review this behavior, i think it should be preserving current state based on redirecting
+  // to same URL as endpoint
+  it('should redirect with current state on unsuccessfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.redirect('/login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            /*'456': {
+              location: 'https://www.example.com/login',
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },*/
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should redirect with current state on unsuccessfully processing a mutating request
   
 });
