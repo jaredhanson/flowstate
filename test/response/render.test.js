@@ -407,7 +407,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should save and render with current modified state on non-mutating request
+  }); // should render with current state after saving modifications on non-mutating request
   
   it('should render with state to resume on successfully processing a mutating request', function(done) {
     var store = new SessionStore();
@@ -527,5 +527,70 @@ describe('ServerResponse#render', function() {
       })
       .listen();
   }); // should render with current state on unsuccessfully processing a mutating request
+  
+  // FIXME: make this pass
+  it.skip('should render with current state after saving modifications on unsuccessfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      req.state.failureCount = req.state.failureCount + 1;
+      res.status(403);
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ state: '456' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 2,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              failureCount: 2,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should render with current state after saving modifications on unsuccessfully processing a mutating request
   
 });
