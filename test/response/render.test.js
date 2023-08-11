@@ -231,7 +231,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo URL and state as specified by body parameter
+  }); // should render with redirect URL and state as specified by body parameter
   
   it('should render with redirect URL and state when that state is not found in state store', function(done) {
     var store = new SessionStore();
