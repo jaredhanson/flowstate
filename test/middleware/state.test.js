@@ -137,7 +137,7 @@ describe('middleware/state', function() {
         req.session = {};
         req.session.state = {};
         req.session.state['123'] = {
-          location: 'https://wwww.example.com/authorize/continue',
+          location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
           redirectURI: 'https://www.example.com/dashboard/cb',
           state: 'xyz'
