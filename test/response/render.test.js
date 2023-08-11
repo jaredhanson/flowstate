@@ -335,6 +335,63 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      res.render('token')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('token')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should render with state to continue after successfully processing a mutating request
+  
+  it('should render with current state after unsuccessfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.status(403);
       res.render('login')
     }
   
@@ -365,7 +422,7 @@ describe('ServerResponse#render', function() {
       })
       .finish(function() {
         expect(this).to.render('login')
-                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
+                    .with.deep.locals({ state: '456' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           failureCount: 1,
@@ -374,6 +431,12 @@ describe('ServerResponse#render', function() {
         });
         expect(this.req.session).to.deep.equal({
           state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
@@ -385,6 +448,6 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with state to continue after successfully processing a mutating request
+  }); // should render with current state after unsuccessfully processing a mutating request
   
 });
