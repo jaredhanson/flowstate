@@ -145,7 +145,7 @@ describe('ServerResponse#render', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=00000000';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
         req.headers = {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/dashboard'

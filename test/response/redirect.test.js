@@ -133,4 +133,53 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL set to URL specified by body parameter
   
+  it('should redirect with redirect URL and state as specified by query parameter', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.redirect('/login/password')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/dashboard'
+        };
+        req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should redirect with redirect URL and state as specified by query parameter
+  
 });
