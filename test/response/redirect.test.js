@@ -264,4 +264,71 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL and state when that state is not found in state store
   
+  it('should redirect with current state on non-mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      // TODO: Should this be adding return_to and state so we can resume it later???
+      //.  whats the use case?  /logout targetting a user???
+      res.redirect('/login/password')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?state=456';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.query = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/login/password?state=456');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              messages: [ 'Invalid username or password.' ],
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should redirect with current state on non-mutating request
+  
 });
