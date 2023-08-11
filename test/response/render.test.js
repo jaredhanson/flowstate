@@ -264,4 +264,59 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with returnTo URL and state when that state is not found in state store
   
+  it('should render with state intended for this endpoint', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?state=456';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.query = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ state: '456' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              messages: [ 'Invalid username or password.' ],
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should render with state intended for this endpoint
+  
+  // TODO: test case for modifying this state above here by deleting messages
+  
 });
