@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('ServerResponse#render', function() {
   
-  it('should render', function(done) {
+  it('should render without state', function(done) {
     var store = new SessionStore();
     
     function handler(req, res, next) {
@@ -35,7 +35,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render
+  }); // should render without state
   
   it('should render with returnTo set to referrer', function(done) {
     var store = new SessionStore();
@@ -105,6 +105,7 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      res.status(403);
       res.render('login')
     }
   
@@ -186,6 +187,7 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      res.status(403);
       res.render('login')
     }
   
@@ -235,6 +237,7 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      res.status(403);
       res.render('login')
     }
   
@@ -268,6 +271,8 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      res.locals.message = req.state.messages[0];
+      res.locals.attemptsRemaining = 3 - req.state.failureCount;
       res.render('login')
     }
   
@@ -299,7 +304,11 @@ describe('ServerResponse#render', function() {
       })
       .finish(function() {
         expect(this).to.render('login')
-                    .with.deep.locals({ state: '456' });
+                    .with.deep.locals({
+                      message: 'Invalid username or password.',
+                      attemptsRemaining: 2,
+                      state: '456'
+                    });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
