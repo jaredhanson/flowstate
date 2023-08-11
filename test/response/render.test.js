@@ -409,9 +409,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should save and render with current modified state on non-mutating request
   
-  // TODO: test case for modifying this state above here by deleting messages
-  
-  it('should render with state to continue after successfully processing a mutating request', function(done) {
+  it('should render with state to resume on successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -465,9 +463,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with state to continue after successfully processing a mutating request
+  }); // should render with state to resume on successfully processing a mutating request
   
-  it('should render with current state after unsuccessfully processing a mutating request', function(done) {
+  it('should render with current state on unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -528,6 +526,6 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state after unsuccessfully processing a mutating request
+  }); // should render with current state on unsuccessfully processing a mutating request
   
 });
