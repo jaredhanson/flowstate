@@ -131,7 +131,7 @@ describe('middleware/state', function() {
         req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=00000000';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://client.example.com/'
+          'referer': 'https://www.example.com/dashboard'
         };
         req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
@@ -139,7 +139,7 @@ describe('middleware/state', function() {
         req.session.state['123'] = {
           location: 'https://wwww.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://client.example.com/cb',
+          redirectURI: 'https://www.example.com/dashboard/cb',
           state: 'xyz'
         };
       })
@@ -176,7 +176,7 @@ describe('middleware/state', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://client.example.com/cb',
+          redirectURI: 'https://www.example.com/dashboard/cb',
           state: 'xyz'
         };
       })
