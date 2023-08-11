@@ -413,7 +413,7 @@ describe('ServerResponse#render', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
-      res.render('token')
+      res.render('stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -442,7 +442,7 @@ describe('ServerResponse#render', function() {
         };
       })
       .finish(function() {
-        expect(this).to.render('token')
+        expect(this).to.render('stepup')
                     .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
