@@ -243,6 +243,7 @@ describe('middleware/state', function() {
         req.session.state['456'] = {
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         };
@@ -254,6 +255,7 @@ describe('middleware/state', function() {
         expect(req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
@@ -262,6 +264,44 @@ describe('middleware/state', function() {
       })
       .listen();
   }); // should load state specified by query parameter when it is intended for endpoint
+  
+  it('should load state specified by body parameter when it is intended for endpoint', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.false;
+        expect(req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should load state specified by body parameter when it is intended for endpoint
   
   it('should initialize external state to eventually redirect to the request URL', function(done) {
     var store = new SessionStore();
