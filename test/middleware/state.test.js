@@ -128,16 +128,16 @@ describe('middleware/state', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=00000000';
         req.headers = {
-          'host': 'server.example.com',
+          'host': 'www.example.com',
           'referer': 'https://client.example.com/'
         };
-        req.query = { return_to: 'https://server.example.com/authorize/continue', state: '123' };
+        req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
         req.session.state = {};
         req.session.state['123'] = {
-          location: 'https://server.example.com/authorize/continue',
+          location: 'https://wwww.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
           redirectURI: 'https://client.example.com/cb',
           state: 'xyz'
@@ -148,8 +148,8 @@ describe('middleware/state', function() {
         
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/login',
-          returnTo: 'https://server.example.com/authorize/continue',
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
         expect(req.stateStore).to.equal(store);
@@ -167,14 +167,14 @@ describe('middleware/state', function() {
         req.method = 'POST';
         req.url = '/login';
         req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
         };
-        req.body = { return_to: 'https://server.example.com/authorize/continue', state: '123' };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
         req.session.state = {};
         req.session.state['123'] = {
-          location: 'https://server.example.com/authorize/continue',
+          location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
           redirectURI: 'https://client.example.com/cb',
           state: 'xyz'
@@ -185,8 +185,8 @@ describe('middleware/state', function() {
         
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/login',
-          returnTo: 'https://server.example.com/authorize/continue',
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
         expect(req.stateStore).to.equal(store);
@@ -204,7 +204,7 @@ describe('middleware/state', function() {
         req.method = 'GET';
         req.url = '/authorize?client_id=s6BhdRkqt3';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         };
         req.query = { client_id: 's6BhdRkqt3' };
         req.session = {};
@@ -214,8 +214,8 @@ describe('middleware/state', function() {
         
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/authorize',
-          returnTo: 'https://server.example.com/authorize?client_id=s6BhdRkqt3'
+          location: 'https://www.example.com/authorize',
+          returnTo: 'https://www.example.com/authorize?client_id=s6BhdRkqt3'
         });
         expect(req.stateStore).to.equal(store);
         done();
@@ -232,7 +232,7 @@ describe('middleware/state', function() {
         req.method = 'GET';
         req.url = '/authorize?client_id=s6BhdRkqt3&state=xyz';
         req.headers = {
-          'host': 'server.example.com'
+          'host': 'www.example.com'
         };
         req.query = { client_id: 's6BhdRkqt3', state: 'xyz' };
         req.session = {};
@@ -242,8 +242,8 @@ describe('middleware/state', function() {
         
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
-          location: 'https://server.example.com/authorize',
-          returnTo: 'https://server.example.com/authorize?client_id=s6BhdRkqt3&state=xyz'
+          location: 'https://www.example.com/authorize',
+          returnTo: 'https://www.example.com/authorize?client_id=s6BhdRkqt3&state=xyz'
         });
         expect(req.stateStore).to.equal(store);
         done();
