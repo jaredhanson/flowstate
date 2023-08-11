@@ -111,10 +111,9 @@ describe('POST /token', function() {
           }
         });
         
-        // FIXME: fixme, this shouldn't have returnTo for same endpoint
         expect(this.statusCode).to.equal(400);
         expect(this).to.render('response/token.xml')
-                    .with.deep.locals({ state: '11111111', returnTo: 'https://server.example.com/token'  });
+                    .with.deep.locals({ state: '11111111'  });
         done();
       })
       .listen();
