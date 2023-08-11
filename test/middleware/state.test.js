@@ -303,7 +303,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should load state specified by body parameter when it is intended for endpoint
   
-  it('should initialize external state to eventually redirect to the request URL', function(done) {
+  it('should initialize external state to eventually redirect to request URL', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -331,7 +331,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize external state to eventually redirect to the request URL
   
-  it('should initialize external state to eventually redirect to the request URL with state parameter preserved', function(done) {
+  it('should initialize external state to eventually redirect to request URL with state parameter preserved', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])

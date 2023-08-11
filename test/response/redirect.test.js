@@ -37,7 +37,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect without state
   
-  it('should redirect with return_to set to referrer', function(done) {
+  it('should redirect with redirect URL set to referrer', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -67,9 +67,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with return_to set to referrer
+  }); // should redirect with redirect URL set to referrer
   
-  it('should redirect with return_to set to URL specified by query parameter', function(done) {
+  it('should redirect with redirect URL set to URL specified by query parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -99,9 +99,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with return_to set to URL specified by query parameter
+  }); // should redirect with redirect URL set to URL specified by query parameter
   
-  it('should redirect with return_to set to URL specified by body parameter', function(done) {
+  it('should redirect with redirect URL set to URL specified by body parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -131,6 +131,6 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with return_to set to URL specified by body parameter
+  }); // should redirect with redirect URL set to URL specified by body parameter
   
 });

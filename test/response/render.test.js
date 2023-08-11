@@ -37,7 +37,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render without state
   
-  it('should render with returnTo set to referrer', function(done) {
+  it('should render with redirect URL set to referrer', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -67,9 +67,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo set to referrer
+  }); // should render with redirect URL set to referrer
   
-  it('should render with returnTo set to URL specified by query parameter', function(done) {
+  it('should render with redirect URL set to URL specified by query parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -99,9 +99,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo set to URL specified by query parameter
+  }); // should render with redirect URL set to URL specified by query parameter
   
-  it('should render with returnTo set to URL specified by body parameter', function(done) {
+  it('should render with redirect URL set to URL specified by body parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -132,9 +132,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo set to URL specified by query parameter
+  }); // should render with redirect URL set to URL specified by query parameter
   
-  it('should render with returnTo URL and state as specified by query parameter', function(done) {
+  it('should render with redirect URL and state as specified by query parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -181,9 +181,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo URL and state as specified by query parameter
+  }); // should render with redirect URL and state as specified by query parameter
   
-  it('should render with returnTo URL and state as specified by body parameter', function(done) {
+  it('should render with redirect URL and state as specified by body parameter', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -233,7 +233,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with returnTo URL and state as specified by body parameter
   
-  it('should render with returnTo URL and state when that state is not found in state store', function(done) {
+  it('should render with redirect URL and state when that state is not found in state store', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -265,7 +265,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with returnTo URL and state when that state is not found in state store
+  }); // should render with redirect URL and state when that state is not found in state store
   
   it('should render with current state on non-mutating request', function(done) {
     var store = new SessionStore();
