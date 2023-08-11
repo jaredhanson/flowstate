@@ -34,7 +34,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize state
   
-  it('should initialize state with return URL from referrer header', function(done) {
+  it('should initialize state that will eventually redirect to referrer', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -61,9 +61,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return URL from referrer header
+  }); // should initialize state that will eventually redirect to referrer
   
-  it('should initialize state with return URL from query parameter', function(done) {
+  it('should initialize state that will eventually redirect to URL specified by query parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -90,9 +90,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return URL from query parameter
+  }); // should initialize state that will eventually redirect to URL specified by query parameter
   
-  it('should initialize state with return URL from body parameter', function(done) {
+  it('should initialize state that will eventually redirect to URL specified by body parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -119,9 +119,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state with return URL from body parameter
+  }); // should initialize state that will eventually redirect to URL specified by body parameter
   
-  it('should initialize state with state from query parameter', function(done) {
+  it('should initialize state that will eventually redirect to URL with state specified by query parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -156,9 +156,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state from query parameter
+  }); // should initialize state that will eventually redirect to URL with state specified by query parameter
   
-  it('should initialize state with state from body parameter', function(done) {
+  it('should initialize state that will eventually redirect to URL with state specified by body parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -193,7 +193,37 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state with state from body parameter
+  }); // should initialize state that will eventually redirect to URL with state specified by body parameter
+  
+  it('should initialize state that will eventually redirect to URL with state when that state is not found in state store', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xxx' };
+        req.session = {};
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.true;
+        expect(req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: 'xxx'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should initialize state that will eventually redirect to URL with state when that state is not found in state store
   
   it('should initialize external state', function(done) {
     var store = new SessionStore();
