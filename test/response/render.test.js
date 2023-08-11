@@ -69,4 +69,68 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with returnTo set to referrer
   
+  it('should render with returnTo set to URL specified by query parameter', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fwelcome';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
+        };
+        req.query = { return_to: 'https://www.example.com/welcome' };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/welcome' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/welcome'
+        });
+        expect(this.req.session).to.deep.equal({})
+        done();
+      })
+      .listen();
+  }); // should render with returnTo set to URL specified by query parameter
+  
+  it('should render with returnTo set to URL specified by body parameter', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
+        };
+        req.body = { return_to: 'https://www.example.com/bienvenido' };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/bienvenido' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/bienvenido'
+        });
+        expect(this.req.session).to.deep.equal({})
+        done();
+      })
+      .listen();
+  }); // should render with returnTo set to URL specified by query parameter
+  
 });
