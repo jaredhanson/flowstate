@@ -225,7 +225,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize state that will eventually redirect to URL with state when that state is not found in state store
   
-  it('should initialize external state', function(done) {
+  it('should initialize external state to eventually redirect to the request URL', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -251,9 +251,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize external state
+  }); // should initialize external state to eventually redirect to the request URL
   
-  it('should initialize external state with URL containing state parameter', function(done) {
+  it('should initialize external state to eventually redirect to the request URL with state parameter preserved', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -279,6 +279,6 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize external state with URL containing state parameter
+  }); // should initialize external state to eventually redirect to the request URL with state parameter preserved
   
 });
