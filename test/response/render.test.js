@@ -31,7 +31,7 @@ describe('ServerResponse#render', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/'
         });
-        expect(this.req.session).to.deep.equal({})
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
@@ -63,7 +63,7 @@ describe('ServerResponse#render', function() {
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/'
         });
-        expect(this.req.session).to.deep.equal({})
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
@@ -95,7 +95,7 @@ describe('ServerResponse#render', function() {
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/welcome'
         });
-        expect(this.req.session).to.deep.equal({})
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
@@ -127,10 +127,59 @@ describe('ServerResponse#render', function() {
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/bienvenido'
         });
-        expect(this.req.session).to.deep.equal({})
+        expect(this.req.session).to.deep.equal({});
         done();
       })
       .listen();
   }); // should render with returnTo set to URL specified by query parameter
+  
+  it('should render with returnTo and state set to URL specified by query parameter', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=00000000';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/dashboard'
+        };
+        req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://wwww.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/dashboard/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '123': {
+              location: 'https://wwww.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/dashboard/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        done();
+      })
+      .listen();
+  }); // should render with returnTo and state set to URL specified by query parameter
   
 });
