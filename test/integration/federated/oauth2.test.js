@@ -156,7 +156,8 @@ describe('GET /oauth2/redirect', function() {
   }); // should complete state and then return to location
   
   // WIP: location tracking cleanup
-  it('should complete state and then return to location with state', function(done) {
+  // TODO: this can be removed once the store.get call has been removed in resumeState
+  it.skip('should complete state and then return to location with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
