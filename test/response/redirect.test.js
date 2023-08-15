@@ -457,7 +457,7 @@ describe('ServerResponse#redirect', function() {
   
   // FIXME: review this behavior, i think it should be preserving current state based on redirecting
   // to same URL as endpoint
-  it('should redirect with current state on unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with current state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -517,11 +517,11 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state on unsuccessfully processing a mutating request
+  }); // should redirect with current state when unsuccessfully processing a mutating request
   
   // TODO: This is good, but i think the test above should have the same behavior even though
   // it doesn't modify state
-  it('should redirect with current state after saving modifications on unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -584,6 +584,6 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state after saving modifications on unsuccessfully processing a mutating request
+  }); // should redirect with current state after saving modifications when unsuccessfully processing a mutating request
   
 });
