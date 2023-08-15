@@ -487,7 +487,6 @@ describe('ServerResponse#render', function() {
         req.session.state = {};
         req.session.state['456'] = {
           location: 'https://www.example.com/login',
-          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         };
@@ -503,7 +502,6 @@ describe('ServerResponse#render', function() {
                     .with.deep.locals({ state: '456' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
-          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
@@ -511,7 +509,6 @@ describe('ServerResponse#render', function() {
           state: {
             '456': {
               location: 'https://www.example.com/login',
-              failureCount: 1,
               returnTo: 'https://www.example.com/authorize/continue',
               state: '123'
             },
