@@ -461,7 +461,7 @@ describe('ServerResponse#redirect', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
-      //req.state.complete(false);
+      req.state.complete(false);
       res.redirect('/login')
     }
   
@@ -479,7 +479,6 @@ describe('ServerResponse#redirect', function() {
         req.session.state = {};
         req.session.state['456'] = {
           location: 'https://www.example.com/login',
-          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         };
@@ -492,21 +491,19 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
+        expect(this.getHeader('Location')).to.equal('/login?state=456');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
-          failureCount: 1,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
         expect(this.req.session).to.deep.equal({
           state: {
-            /*'456': {
+            '456': {
               location: 'https://www.example.com/login',
-              failureCount: 1,
               returnTo: 'https://www.example.com/authorize/continue',
               state: '123'
-            },*/
+            },
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
@@ -520,8 +517,6 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current state when unsuccessfully processing a mutating request
   
-  // TODO: This is good, but i think the test above should have the same behavior even though
-  // it doesn't modify state
   it('should redirect with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
