@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('middleware/state', function() {
   
-  it('should initialize state', function(done) {
+  it('should initialize empty state', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -32,7 +32,7 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state
+  }); // should initialize empty state
   
   it('should initialize state that will eventually redirect to referrer', function(done) {
     var store = new SessionStore();

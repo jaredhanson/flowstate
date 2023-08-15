@@ -134,7 +134,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with redirect URL set to URL specified by query parameter
   
-  it('should render with redirect URL and state as specified by query parameter', function(done) {
+  it('should render with redirect URL and state set to values specified by query parameters', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -181,9 +181,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL and state as specified by query parameter
+  }); // should render with redirect URL and state set to values specified by query parameters
   
-  it('should render with redirect URL and state as specified by body parameter', function(done) {
+  it('should render with redirect URL and state set to values specified by body parameters', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -231,9 +231,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL and state as specified by body parameter
+  }); // should render with redirect URL and state set to values specified by body parameters
   
-  it('should render with redirect URL and state when that state is not found in state store', function(done) {
+  it('should render with redirect URL and state set to values specified by body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -265,9 +265,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL and state when that state is not found in state store
+  }); // should render with redirect URL and state set to values specified by body parameters when that state is not found in state store
   
-  it('should render with current state on non-mutating request', function(done) {
+  it('should render with current state of non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -336,9 +336,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state on non-mutating request
+  }); // should render with current state of non-mutating request
   
-  it('should render with current state after saving modifications on non-mutating request', function(done) {
+  it('should render with current state after saving modifications of non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -406,9 +406,10 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state after saving modifications on non-mutating request
+  }); // should render with current state after saving modifications of non-mutating request
   
-  it('should render with state to resume on successfully processing a mutating request', function(done) {
+  // WIP: reviewing this and commenting (resume terminology)
+  it('should render with redirectURL and state to resume after successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -462,9 +463,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with state to resume on successfully processing a mutating request
+  }); // should render with redirectURL and state to resume after successfully processing a mutating request
   
-  it('should render with current state on unsuccessfully processing a mutating request', function(done) {
+  it('should render with current state after unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -522,7 +523,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state on unsuccessfully processing a mutating request
+  }); // should render with current state after unsuccessfully processing a mutating request
   
   // FIXME: make this pass
   it.skip('should render with current state after saving modifications on unsuccessfully processing a mutating request', function(done) {
