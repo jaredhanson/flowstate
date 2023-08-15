@@ -556,9 +556,7 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        // TODO: this doesn't have a return_to url
-        // FIXME: this shouldn't have a return URL (cause by the i > 1 check in commit2)
-        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Flogin&state=456');
+        expect(this.getHeader('Location')).to.equal('/login?state=456');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           failureCount: 2,

@@ -682,8 +682,7 @@ describe('POST /login/password', function() {
         });
         
         expect(this.statusCode).to.equal(302);
-        // FIXME: Drop the return_to here since it targets same endpoint
-        expect(this.getHeader('Location')).to.equal('/login/password?return_to=https%3A%2F%2Fserver.example.com%2Flogin%2Fpassword&state=11111111');
+        expect(this.getHeader('Location')).to.equal('/login/password?state=11111111');
         done();
       })
       .listen();
