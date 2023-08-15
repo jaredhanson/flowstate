@@ -264,7 +264,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store
   
-  it('should redirect with redirect URL and current state when processing a non-mutating request', function(done) {
+  it('should redirect with current URL and state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -327,9 +327,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and current state when processing a non-mutating request
+  }); // should redirect with current URL and state when processing a non-mutating request
   
-  it('should redirect with redirect URL and current state after saving modifications when processing a non-mutating request', function(done) {
+  it('should redirect with current URL and state after saving modifications when processing a non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -395,7 +395,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and current state after saving modifications when processing a non-mutating request
+  }); // should redirect with current URL and state after saving modifications when processing a non-mutating request
   
   // TODO: same test case as above, but saving initial state
   
