@@ -265,13 +265,13 @@ describe('ServerResponse#redirect', function() {
   }); // should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store
   
   // FIXME: review this
-  it('should redirect with current state on non-mutating request', function(done) {
+  it('should redirect with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
       // TODO: Should this be adding return_to and state so we can resume it later???
       //.  whats the use case?  /logout targetting a user???
-      res.redirect('/login/password')
+      res.redirect('/captcha')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -302,7 +302,7 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login/password?state=456');
+        expect(this.getHeader('Location')).to.equal('/captcha?state=456');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
@@ -330,7 +330,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state on non-mutating request
+  }); // should redirect with current state when processing a non-mutating request
   
   // TODO: should render with current state after saving modifications on non-mutating request???
   
