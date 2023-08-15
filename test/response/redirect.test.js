@@ -461,6 +461,7 @@ describe('ServerResponse#redirect', function() {
     var store = new SessionStore();
   
     function handler(req, res, next) {
+      //req.state.complete(false);
       res.redirect('/login')
     }
   
@@ -526,6 +527,7 @@ describe('ServerResponse#redirect', function() {
   
     function handler(req, res, next) {
       req.state.failureCount = req.state.failureCount + 1;
+      req.state.complete(false);
       res.redirect('/login')
     }
   

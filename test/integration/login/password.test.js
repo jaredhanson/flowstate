@@ -633,6 +633,7 @@ describe('POST /login/password', function() {
       // TODO: What if it redirects to `/login?
       req.state.messages = req.session.messages || [];
       req.state.messages.push('Invalid username or password.');
+      req.state.complete(false);
       res.redirect('/login/password');
     }
     
