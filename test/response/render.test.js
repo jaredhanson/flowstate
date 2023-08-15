@@ -338,14 +338,13 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with current state on non-mutating request
   
-  // FIXME: make this pass
-  it.skip('should render with current state after saving modifications on non-mutating request', function(done) {
+  it('should render with current state after saving modifications on non-mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
       res.locals.message = req.state.messages[0];
-      res.locals.attemptsRemaining = 3 - req.state.failureCount;
       delete req.state.messages;
+      res.locals.attemptsRemaining = 3 - req.state.failureCount;
       res.render('login')
     }
   
