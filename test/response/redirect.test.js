@@ -399,8 +399,7 @@ describe('ServerResponse#redirect', function() {
   
   // TODO: same test case as above, but saving initial state
   
-  // FIXME: review the behavior here, i think its ok but should be documented
-  it('should redirect with state to resume on successfully processing a mutating request', function(done) {
+  it('should redirect with redirectURL and state to resume when successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -454,7 +453,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with state to resume on successfully processing a mutating request
+  }); // should redirect with redirectURL and state to resume when successfully processing a mutating request
   
   // FIXME: review this behavior, i think it should be preserving current state based on redirecting
   // to same URL as endpoint
