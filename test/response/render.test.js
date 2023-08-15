@@ -524,8 +524,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with current state when unsuccessfully processing a mutating request
   
-  // FIXME: make this pass
-  it.skip('should render with current state after saving modifications on unsuccessfully processing a mutating request', function(done) {
+  it('should render with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -587,6 +586,6 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state after saving modifications on unsuccessfully processing a mutating request
+  }); // should render with current state after saving modifications when unsuccessfully processing a mutating request
   
 });
