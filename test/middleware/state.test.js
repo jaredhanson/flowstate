@@ -193,9 +193,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL with state by body parameter
+  }); // should initialize state that will eventually redirect to URL with state specified by body parameter
   
-  it('should initialize state that will eventually redirect to URL with state when that state is not found in state store', function(done) {
+  it('should initialize state that will eventually redirect to URL with state specified by body parameter when that state is not found in state store', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -223,9 +223,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL with state when that state is not found in state store
+  }); // should initialize state that will eventually redirect to URL with state specified by body parameter when that state is not found in state store
   
-  it('should load state specified by query parameter when it is intended for endpoint', function(done) {
+  it('should load state specified by query parameter when that state is intended for endpoint', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -263,9 +263,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should load state specified by query parameter when it is intended for endpoint
+  }); // should load state specified by query parameter when that state is intended for endpoint
   
-  it('should load state specified by body parameter when it is intended for endpoint', function(done) {
+  it('should load state specified by body parameter when that state is intended for endpoint', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -301,7 +301,7 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should load state specified by body parameter when it is intended for endpoint
+  }); // should load state specified by body parameter when that state is intended for endpoint
   
   it('should initialize external state to eventually redirect to request URL', function(done) {
     var store = new SessionStore();
