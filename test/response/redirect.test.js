@@ -133,7 +133,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL set to URL specified by body parameter
   
-  it('should redirect with redirect URL and state as specified by query parameter', function(done) {
+  it('should redirect with redirect URL and state set to values specified by query parameters', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -180,9 +180,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state as specified by query parameter
+  }); // should redirect with redirect URL and state set to values specified by query parameters
   
-  it('should redirect with redirect URL and state as specified by body parameter', function(done) {
+  it('should redirect with redirect URL and state set to values specified by body parameters', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -229,9 +229,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state as specified by body parameter
+  }); // should redirect with redirect URL and state set to values specified by body parameters
   
-  it('should redirect with redirect URL and state when that state is not found in state store', function(done) {
+  it('should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -262,7 +262,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state when that state is not found in state store
+  }); // should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store
   
   // FIXME: review this
   it('should redirect with current state on non-mutating request', function(done) {
