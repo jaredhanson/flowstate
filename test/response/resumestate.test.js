@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('ServerResponse#resumeState', function() {
   
-  it('should redirect with redirect URL set to referrer', function(done) {
+  it('should redirect to URL to return to', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -47,6 +47,6 @@ describe('ServerResponse#resumeState', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL set to referrer
+  }); // should redirect to URL to return to
   
 });
