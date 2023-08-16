@@ -1,7 +1,7 @@
 {
   "name": "flowstate",
   "version": "0.5.1",
-  "description": "Stateful, transactional flows using page-based navigation.",
+  "description": "Per-request state management middleware.",
   "keywords": [
     "express",
     "connect",
