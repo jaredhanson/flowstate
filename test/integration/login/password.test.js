@@ -689,6 +689,8 @@ describe('POST /login/password', function() {
       .listen();
   }); // should redirect with state after modifying current state
   
+  // TODO: review this test
+  // NOTE: seems fixed now
   it('should initialize state by ignoring invalid state body parameter and not resume state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -721,9 +723,9 @@ describe('POST /login/password', function() {
         req.session.state = {};
       })
       .finish(function() {
-        //expect(store.get).to.have.callCount(1);
+        expect(store.get).to.have.callCount(1);
         // FIXME: should be 1, if no yields
-        expect(store.get).to.have.callCount(2);
+        //expect(store.get).to.have.callCount(2);
         expect(store.set).to.have.callCount(0);
         expect(store.destroy).to.have.callCount(0);
         

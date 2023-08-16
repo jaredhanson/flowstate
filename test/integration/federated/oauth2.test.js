@@ -223,7 +223,9 @@ describe('GET /oauth2/redirect', function() {
   }); // should complete state and then return to location with state
   
   // TODO: Review this test
-  it('and resuming state yeilding parameters', function(done) {
+  // TODO: This can be removed because no longer supporting yeilding back with params encoded
+  // into state.
+  it.skip('and resuming state yeilding parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');

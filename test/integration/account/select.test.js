@@ -7,7 +7,8 @@ var chai = require('chai')
 
 describe('POST /account/select', function() {
   
-  it('should initialize state with state body parameter and resume state with yielded parameters', function(done) {
+  // TODO: Removing this test because no longer yielding back encoded in state.
+  it.skip('should initialize state with state body parameter and resume state with yielded parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
