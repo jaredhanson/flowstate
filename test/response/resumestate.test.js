@@ -7,6 +7,40 @@ var chai = require('chai')
 
 describe('ServerResponse#resumeState', function() {
   
+  it('should not resume without state', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.resumeState(next);
+    }
+  
+    function home(req, res, next) {
+      res.redirect('/home')
+    }
+  
+    chai.express.use([ state({ store: store }), handler, home ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com'
+        };
+        req.body = {};
+        req.session = {};
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/home');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login'
+        });
+        expect(this.req.session).to.deep.equal({});
+        done();
+      })
+      .listen();
+  }); // should not resume without state
+  
   it('should redirect to URL to return to', function(done) {
     var store = new SessionStore();
   
