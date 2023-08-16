@@ -25,7 +25,7 @@ describe('integration: sso/oauth2', function() {
           req.pushState({
             provider: 'https://server.example.net'
           }, 'https://server.example.com/cb');
-          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb', true);
+          res.redirect('https://server.example.net/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fserver.example.com%2Fcb');
         }
     
         chai.express.use([state({ store: store, mutationMethods: [ 'GET', 'POST' ], genh: function() { return 'XXXXXXXX' } }), handler])
