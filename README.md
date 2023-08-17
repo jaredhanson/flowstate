@@ -93,7 +93,7 @@ the view.
 
 If the above `/login` endpoint were requested with:
 
-```
+```http
 GET /login?state=xyz  HTTP/1.1
 ```
 
@@ -101,8 +101,6 @@ Assuming the state was valid and intended for `/login`, `res.locals.state` would
 be set to `xyz` and made available to the view.
 
 #### Redirect to a Location
-
-This middleware extends `redirect()` to propagate state:
 
 ```js
 app.post('/login', flowstate(), ..., function(req, res, next) {
