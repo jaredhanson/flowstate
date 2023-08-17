@@ -699,8 +699,7 @@ describe('POST /login/password', function() {
 
     function handler(req, res, next) {
       expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        state: '00000000'
+        location: 'https://server.example.com/login/password'
       });
       res.resumeState(next);
     }
@@ -735,7 +734,7 @@ describe('POST /login/password', function() {
         
         expect(this.statusCode).to.equal(302);
         // FIXME: this shouldn't have state parameter???
-        expect(this.getHeader('Location')).to.equal('/home?state=00000000');
+        expect(this.getHeader('Location')).to.equal('/home');
         done();
       })
       .listen();
