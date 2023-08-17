@@ -66,6 +66,10 @@ requests.
 
 ```js
 app.get('/login', flowstate(), function(req, res, next) {
+  var msgs = req.state.messages || [];
+  res.locals.messages = msgs;
+  res.locals.hasMessages = !! msgs.length;
+  req.state.messages = [];
   res.render('login');
 });
 
@@ -78,11 +82,31 @@ if needed, as the location to eventually redirect the user.  The view is expecte
 to decorate links with these properties and add them to forms, in order to
 propagate state to subsequent requests.
 
+For example, if the above `/login` endpoint were requested with:
+
+```http
+GET /login?return_to=%2Fdashboard  HTTP/1.1
+```
+
+Then `res.locals.returnTo` would be set to `/dashboard` and made available to
+the view.
+
+If the above `/login` endpoint were requested with:
+
+```
+GET /login?state=xyz  HTTP/1.1
+```
+
+Assuming the state was valid and intended for `/login`, `res.locals.state` would
+be set to `xyz` and made available to the view.
+
 #### Redirect to a Location
 
+This middleware extends `redirect()` to propagate state:
+
 ```js
-app.get('/login', flowstate(), function(req, res, next) {
-  res.render('login');
+app.post('/login', flowstate(), ..., function(req, res, next) {
+  res.redirect('/mfa');
 });
 
 ```
