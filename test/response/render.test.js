@@ -9,6 +9,9 @@ describe('ServerResponse#render', function() {
   
   it('should render without state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
     
     function handler(req, res, next) {
       res.render('home')
@@ -32,6 +35,11 @@ describe('ServerResponse#render', function() {
           location: 'https://www.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
