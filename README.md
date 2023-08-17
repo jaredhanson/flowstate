@@ -55,12 +55,11 @@ a `return_to` and optional `state` parameter, those will be preserved in the
 uninitialized state as the location to redirect the user to when the current
 state has been completely processed.
 
-When a success response is sent, any modifications to the current state will be
-saved if the state is not complete.  If the state is complete, any persisted
-state will be removed.  Note that an uninitialized state will never be saved
-since it is not modified, and the location to redirect to can be preserved by
-propagating the `return_to` and optional `state` parameters on subsequent
-requests.
+When a response is sent, any modifications to the current state will be saved
+if the state is not complete.  If the state is complete, any persisted state
+will be removed.  Note that an uninitialized state will never be saved since it
+is not modified; the location to redirect to can be preserved by propagating the
+`return_to` and optional `state` parameters on subsequent requests.
 
 #### Render a View
 
