@@ -38,7 +38,7 @@ Add state middleware to your application or route:
 ```js
 var flowstate = require('flowstate');
 
-app.get('/step-one', flowstate(), function(req, res, next) {
+app.get('/login', flowstate(), function(req, res, next) {
   // ...
 });
 
@@ -46,12 +46,47 @@ app.get('/step-one', flowstate(), function(req, res, next) {
 
 The middleware will attempt to load any state intended for the endpoint, based
 the `state` parameter in the query or body of the request.  If state is loaded,
-it will be set at `req.state` so that the handler can process it.  If not, an
-"uninitialized" state will be set at `req.state`.  A state is uninitialized when
-it is new but not modified.  If the request contains a `return_to` and optional
-`state` parameter, those will be preserved in the uninitialized state as the
-location to redirect the user to when the current request and associated state,
-if any, has been completely processed.
+it will be set at `req.state` so that the handler can process it.  The value set
+at `req.state` is referred to as the "current state".
+
+If state is not loaded, an "uninitialized" state will be set at `req.state`.  A
+state is uninitialized when it is new but not modified.  If the request contains
+a `return_to` and optional `state` parameter, those will be preserved in the
+uninitialized state as the location to redirect the user to when the current
+state has been completely processed.
+
+When a success response is sent, any modifications to the current state will be
+saved if the state is not complete.  If the state is complete, any persisted
+state will be removed.  Note that an uninitialized state will never be saved
+since it is not modified, and the location to redirect to can be preserved by
+propagating the `return_to` and optional `state` parameters on subsequent
+requests.
+
+#### Render a View
+
+```js
+app.get('/login', flowstate(), function(req, res, next) {
+  res.render('login');
+});
+
+```
+
+When a response is sent by rendering a view, if the current state has not been
+completed, `res.locals.state` will be set to the current state's handle.  If it
+has been completed, `res.local.returnTo` will be set, along with `res.locals.state`
+if needed, as the location to eventually redirect the user.  The view is expected
+to decorate links with these properties and add them to forms, in order to
+propagate state to subsequent requests.
+
+#### Redirect to a Location
+
+```js
+app.get('/login', flowstate(), function(req, res, next) {
+  res.render('login');
+});
+
+```
+
 
 
 ## Authors
