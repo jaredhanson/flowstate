@@ -19,9 +19,24 @@ authentication-related packages, in particular [passport-oauth2](https://www.pas
 this package, that functionality is made generic so that it can be applied to
 any HTTP endpoint.
 
+<div align="right">
+  <sup>Developed by <a href="#authors">Jared Hanson</a>.</sub>
+</div>
+
 ## Install
 
-```
+```bash
 $ npm install flowstate
 ```
 
+## Usage
+
+## Authors
+
+- [Jared Hanson](https://www.jaredhanson.me/) { [![WWW](https://raw.githubusercontent.com/jaredhanson/jaredhanson/master/images/globe-12x12.svg)](https://www.jaredhanson.me/) [![Facebook](https://raw.githubusercontent.com/jaredhanson/jaredhanson/master/images/facebook-12x12.svg)](https://www.facebook.com/jaredhanson) [![LinkedIn](https://raw.githubusercontent.com/jaredhanson/jaredhanson/master/images/linkedin-12x12.svg)](https://www.linkedin.com/in/jaredhanson) [![Twitter](https://raw.githubusercontent.com/jaredhanson/jaredhanson/master/images/twitter-12x12.svg)](https://twitter.com/jaredhanson) [![GitHub](https://raw.githubusercontent.com/jaredhanson/jaredhanson/master/images/github-12x12.svg)](https://github.com/jaredhanson) }
+
+## License
+
+[The MIT License](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2016-2023 Jared Hanson
