@@ -116,7 +116,7 @@ be set.
 ```js
 app.post('/login', flowstate(), authenticate(), function(req, res, next) {
   if (mfaRequired(req.user)) {
-    return res.redirect('/mfa');
+    return res.redirect('/stepup');
   }
   // ...
 }, function(err, req, res, next) {
