@@ -534,8 +534,56 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and state after saving modifications when processing a non-mutating request
   
-  it('should redirect with redirect URL after completing current state when successfully processing a mutating request', function(done) {
+  it('should redirect without state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+  
+    function handler(req, res, next) {
+      res.redirect('/stepup')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/stepup');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1
+        });
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
+        done();
+      })
+      .listen();
+  }); // should redirect with out state after completing current state when processing a mutating request
+  
+  it('should redirect with redirect URL after completing current state when processing a mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/stepup')
@@ -568,13 +616,21 @@ describe('ServerResponse#redirect', function() {
           returnTo: 'https://www.example.com/dashboard'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL after completing current state when successfully processing a mutating request
+  }); // should redirect with redirect URL after completing current state when processing a mutating request
   
-  it('should redirect with redirect URL and state after completing current state when successfully processing a mutating request', function(done) {
+  it('should redirect with redirect URL and state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/stepup')
@@ -624,10 +680,15 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state after completing current state when successfully processing a mutating request
+  }); // should redirect with redirect URL and state after completing current state when processing a mutating request
   
   // FIXME: review this behavior, i think it should be preserving current state based on redirecting
   // to same URL as endpoint
