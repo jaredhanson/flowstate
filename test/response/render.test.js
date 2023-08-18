@@ -182,7 +182,7 @@ describe('ServerResponse#render', function() {
         req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/dashboard'
+          'referer': 'https://www.example.com/'
         };
         req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
@@ -190,7 +190,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -207,7 +207,7 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
@@ -247,7 +247,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -264,7 +264,7 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
@@ -298,16 +298,16 @@ describe('ServerResponse#render', function() {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/login'
         };
-        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xyz' };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
       })
       .finish(function() {
         expect(this).to.render('stepup')
-                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: 'xyz' });
+                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/authorize/continue',
-          state: 'xyz'
+          state: '123'
         });
         expect(this.req.session).to.deep.equal({});
         
@@ -351,7 +351,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -381,7 +381,7 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
