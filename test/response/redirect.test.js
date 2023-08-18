@@ -896,4 +896,78 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current state after saving modifications when unsuccessfully processing a mutating request
   
+  it('should redirect with current URL and state when unsuccessfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+  
+    function handler(req, res, next) {
+      req.state.complete(false);
+      res.redirect('/captcha')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        };
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/captcha?return_to=https%3A%2F%2Fwww.example.com%2Flogin&state=456');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          messages: [ 'Invalid username or password.' ],
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              messages: [ 'Invalid username or password.' ],
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should redirect with current URL and state when unsuccessfully processing a mutating request
+  
 });
