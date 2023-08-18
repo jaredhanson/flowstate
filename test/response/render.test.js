@@ -522,6 +522,53 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with redirect URL and state after completing current state when processing a mutating request
   
+  it('should render with redirect URL after completing current state when processing a mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+  
+    function handler(req, res, next) {
+      res.render('stepup')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/dashboard',
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('stepup')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/dashboard' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/dashboard',
+        });
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
+        done();
+      })
+      .listen();
+  }); // should render with redirect URL after completing current state when processing a mutating request
+  
   it('should render with redirect URL and state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
