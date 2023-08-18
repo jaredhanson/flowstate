@@ -142,7 +142,6 @@ For example, if the above `/login` endpoint is requested with a `return_to` and
 POST /login HTTP/1.1
 Host: www.example.com
 Content-Type: application/x-www-form-urlencoded
-Content-Length: 27
 
 username=alice&password=letmein&return_to=%2Fauthorize%2Fcontinue&state=xyz
 ```
