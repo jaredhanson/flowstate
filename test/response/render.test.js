@@ -477,8 +477,11 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with current state after saving modifications when processing a non-mutating request
   
-  it('should render with redirectURL and state to resume when successfully processing a mutating request', function(done) {
+  it('should render with redirect URL and state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.render('stepup')
@@ -505,7 +508,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -523,18 +526,26 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(1);
+        
         done();
       })
       .listen();
-  }); // should render with redirectURL and state to resume when successfully processing a mutating request
+  }); // should render with redirect URL and state after completing current state when processing a mutating request
   
   it('should render with current state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.status(403);
@@ -561,7 +572,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -583,11 +594,16 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -595,6 +611,9 @@ describe('ServerResponse#render', function() {
   
   it('should render with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       req.state.failureCount = req.state.failureCount + 1;
@@ -623,7 +642,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -647,11 +666,16 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
