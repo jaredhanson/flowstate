@@ -534,6 +534,45 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and state after saving modifications when processing a non-mutating request
   
+  it('should redirect with redirect URL after completing current state when successfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.redirect('/stepup')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { state: '456' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['456'] = {
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/dashboard'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/stepup?return_to=https%3A%2F%2Fwww.example.com%2Fdashboard');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/dashboard'
+        });
+        expect(this.req.session).to.deep.equal({});
+        done();
+      })
+      .listen();
+  }); // should redirect with redirect URL after completing current state when successfully processing a mutating request
+  
   it('should redirect with redirect URL and state after completing current state when successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   

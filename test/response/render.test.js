@@ -520,7 +520,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL and state after completing current state when processing a mutating request
+  }); // should render without state after completing current state when processing a mutating request
   
   it('should render with redirect URL after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
