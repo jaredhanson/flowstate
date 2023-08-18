@@ -534,7 +534,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and state after saving modifications when processing a non-mutating request
   
-  it('should redirect with redirectURL and state to resume when successfully processing a mutating request', function(done) {
+  it('should redirect with redirect URL and state after completing current state when successfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
     function handler(req, res, next) {
@@ -588,7 +588,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirectURL and state to resume when successfully processing a mutating request
+  }); // should redirect with redirect URL and state after completing current state when successfully processing a mutating request
   
   // FIXME: review this behavior, i think it should be preserving current state based on redirecting
   // to same URL as endpoint
