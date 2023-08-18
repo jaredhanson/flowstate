@@ -127,10 +127,12 @@ describe('ServerResponse#render', function() {
   
   it('should render with redirect URL set to URL specified by body parameter', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.status(403);
-      res.render('login')
+      res.render('stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -146,20 +148,28 @@ describe('ServerResponse#render', function() {
         req.session = {};
       })
       .finish(function() {
-        expect(this).to.render('login')
+        expect(this).to.render('stepup')
                     .with.deep.locals({ returnTo: 'https://www.example.com/bienvenido' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/bienvenido'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
   }); // should render with redirect URL set to URL specified by query parameter
   
-  it('should render with redirect URL and state set to values specified by query parameters', function(done) {
+  it('should render with redirect URL set to URL with state specified by query parameters', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.render('login')
@@ -202,10 +212,15 @@ describe('ServerResponse#render', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should render with redirect URL and state set to values specified by query parameters
+  }); // should render with redirect URL set to URL with state specified by query parameters
   
   it('should render with redirect URL and state set to values specified by body parameters', function(done) {
     var store = new SessionStore();

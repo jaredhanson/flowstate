@@ -7,64 +7,6 @@ var chai = require('chai')
 
 describe('GET /login/password', function() {
   
-  it('should render with return location and state', function(done) {
-    var store = new SessionStore();
-    sinon.spy(store, 'get');
-    sinon.spy(store, 'set');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/login/password',
-        returnTo: 'https://server.example.com/authorize/continue',
-        state: '00000000'
-      });
-      
-      res.render('login/password');
-    }
-    
-    chai.express.use([ state({ store: store }), handler ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/login/password?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000';
-        req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://client.example.com/'
-        };
-        req.query = { return_to: 'https://server.example.com/authorize/continue', state: '00000000' };
-        req.session = {};
-        req.session.state = {};
-        req.session.state['00000000'] = {
-          location: 'https://server.example.com/authorize/continue',
-          clientID: 's6BhdRkqt3',
-          redirectURI: 'https://client.example.com/cb',
-          state: 'xyz'
-        };
-      })
-      .finish(function() {
-        expect(store.get).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.statusCode).to.equal(200);
-        expect(this).to.render('login/password')
-                    .with.deep.locals({ returnTo: 'https://server.example.com/authorize/continue', state: '00000000' });
-        expect(this.req.session).to.deep.equal({
-          state: {
-            '00000000': {
-              location: 'https://server.example.com/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
-            }
-          }
-        });
-        done();
-      })
-      .listen();
-  }); // should render with return location and state
-  
   it('should render with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
