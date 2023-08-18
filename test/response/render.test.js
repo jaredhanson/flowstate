@@ -322,6 +322,9 @@ describe('ServerResponse#render', function() {
   
   it('should render with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.locals.message = req.state.messages[0];
@@ -386,6 +389,11 @@ describe('ServerResponse#render', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
