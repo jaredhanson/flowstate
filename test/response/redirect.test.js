@@ -657,7 +657,7 @@ describe('ServerResponse#redirect', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -675,7 +675,7 @@ describe('ServerResponse#redirect', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
@@ -690,9 +690,9 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL and state after completing current state when processing a mutating request
   
+  // TODO: should render with modified initial state when unsuccessfully processing a mutating request
+  
   // WIP: below here
-  // FIXME: review this behavior, i think it should be preserving current state based on redirecting
-  // to same URL as endpoint
   it('should redirect with current state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
   
@@ -721,7 +721,7 @@ describe('ServerResponse#redirect', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -743,7 +743,7 @@ describe('ServerResponse#redirect', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
