@@ -222,12 +222,14 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with redirect URL set to URL with state specified by query parameters
   
-  it('should render with redirect URL and state set to values specified by body parameters', function(done) {
+  it('should render with redirect URL set to URL with state specified by body parameters', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.status(403);
-      res.render('login')
+      res.render('stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -250,7 +252,7 @@ describe('ServerResponse#render', function() {
         };
       })
       .finish(function() {
-        expect(this).to.render('login')
+        expect(this).to.render('stepup')
                     .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: '123' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
@@ -267,17 +269,24 @@ describe('ServerResponse#render', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should render with redirect URL and state set to values specified by body parameters
+  }); // should render with redirect URL set to URL with state specified by body parameters
   
-  it('should render with redirect URL and state set to values specified by body parameters when that state is not found in state store', function(done) {
+  it('should render with redirect URL set to URL with state specified by body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.status(403);
-      res.render('login')
+      res.render('stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -289,22 +298,27 @@ describe('ServerResponse#render', function() {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/login'
         };
-        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xxx' };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xyz' };
         req.session = {};
       })
       .finish(function() {
-        expect(this).to.render('login')
-                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: 'xxx' });
+        expect(this).to.render('stepup')
+                    .with.deep.locals({ returnTo: 'https://www.example.com/authorize/continue', state: 'xyz' });
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/authorize/continue',
-          state: 'xxx'
+          state: 'xyz'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should render with redirect URL and state set to values specified by body parameters when that state is not found in state store
+  }); // should render with redirect URL set to URL with state specified by body parameters when that state is not found in state store
   
   it('should render with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
