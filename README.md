@@ -114,8 +114,18 @@ be set.
 #### Redirect to a Location
 
 ```js
-app.post('/login', flowstate(), ..., function(req, res, next) {
-  res.redirect('/mfa');
+app.post('/login', flowstate(), authenticate(), function(req, res, next) {
+  if (mfaRequired(req.user)) {
+    return res.redirect('/mfa');
+  }
+  // ...
+}, function(err, req, res, next) {
+  if (err.status !== 401) { return next(err); }
+  req.state.messages = req.state.messages || [];
+  req.state.messages.push('Invalid username or password.');
+  req.state.failureCount = req.state.failureCount ? req.state.failureCount + 1 : 1;
+  req.state.complete(false);
+  res.redirect('/login');
 });
 
 ```
