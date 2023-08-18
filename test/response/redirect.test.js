@@ -695,6 +695,9 @@ describe('ServerResponse#redirect', function() {
   // WIP: below here
   it('should redirect with current state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       req.state.complete(false);
@@ -748,6 +751,11 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -755,6 +763,9 @@ describe('ServerResponse#redirect', function() {
   
   it('should redirect with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       req.state.failureCount = req.state.failureCount + 1;
@@ -812,6 +823,11 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
