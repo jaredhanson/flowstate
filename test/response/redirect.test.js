@@ -222,11 +222,14 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with propagated query parameters as redirect URL with states
   
-  it('should redirect with redirect URL and state set to values specified by body parameters', function(done) {
+  it('should redirect with propagated body parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/login')
+      res.redirect('/stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -250,7 +253,7 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
+        expect(this.getHeader('Location')).to.equal('/stepup?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/authorize/continue',
@@ -266,16 +269,24 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state set to values specified by body parameters
+  }); // should redirect with propagated body parameters as redirect URL with state
   
-  it('should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store', function(done) {
+  it('should redirect with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/login')
+      res.redirect('/stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -287,22 +298,27 @@ describe('ServerResponse#redirect', function() {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/login'
         };
-        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xxx' };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=xxx');
+        expect(this.getHeader('Location')).to.equal('/stepup?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/authorize/continue',
-          state: 'xxx'
+          state: '123'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state set to values specified by body parameters when that state is not found in state store
+  }); // should redirect with propagated body parameters as redirect URL with state when that state is not found in state store
   
   it('should redirect with current URL and state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
