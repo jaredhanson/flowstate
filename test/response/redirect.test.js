@@ -165,8 +165,11 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with propagated body parameter as redirect URL
   
-  it('should redirect with redirect URL and state set to values specified by query parameters', function(done) {
+  it('should redirect with propagated query parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/login/password')
@@ -179,7 +182,7 @@ describe('ServerResponse#redirect', function() {
         req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/dashboard'
+          'referer': 'https://www.example.com/'
         };
         req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
@@ -187,7 +190,7 @@ describe('ServerResponse#redirect', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -204,15 +207,20 @@ describe('ServerResponse#redirect', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state set to values specified by query parameters
+  }); // should redirect with propagated query parameters as redirect URL with states
   
   it('should redirect with redirect URL and state set to values specified by body parameters', function(done) {
     var store = new SessionStore();
