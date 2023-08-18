@@ -633,6 +633,72 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with redirect URL and state after completing current state when processing a mutating request
   
+  it('should render with modified initial state when unsuccessfully processing a mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+  
+    function handler(req, res, next) {
+      req.state.failureCount = 1;
+      res.status(403);
+      res.render('login')
+    }
+  
+    chai.express.use([ state({ store: store, genh: function() { return '456' } }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'POST';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/login'
+        };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this).to.render('login')
+                    .with.deep.locals({ state: '456' });
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login',
+          failureCount: 1,
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/login',
+              failureCount: 1,
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should render with modified initial state when unsuccessfully processing a mutating request
+  
   it('should render with current state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
