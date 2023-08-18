@@ -9,6 +9,9 @@ describe('ServerResponse#redirect', function() {
   
   it('should redirect without state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
     
     function handler(req, res, next) {
       res.redirect('/home')
@@ -32,13 +35,21 @@ describe('ServerResponse#redirect', function() {
           location: 'https://www.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
   }); // should redirect without state
   
-  it('should redirect with redirect URL set to referrer', function(done) {
+  it('should redirect with propagated referrer header as redirect URL', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/login/password')
@@ -64,13 +75,21 @@ describe('ServerResponse#redirect', function() {
           returnTo: 'https://www.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL set to referrer
+  }); // should redirect with propagated referrer header as redirect URL
   
-  it('should redirect with redirect URL set to URL specified by query parameter', function(done) {
+  it('should redirect with propagated query parameter as redirect URL', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/login/password')
@@ -96,16 +115,24 @@ describe('ServerResponse#redirect', function() {
           returnTo: 'https://www.example.com/welcome'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL set to URL specified by query parameter
+  }); // should redirect with propagated query parameter as redirect URL
   
-  it('should redirect with redirect URL set to URL specified by body parameter', function(done) {
+  it('should redirect with propagated body parameter as redirect URL', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/login')
+      res.redirect('/stepup')
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -122,16 +149,21 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fbienvenido');
+        expect(this.getHeader('Location')).to.equal('/stepup?return_to=https%3A%2F%2Fwww.example.com%2Fbienvenido');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/bienvenido'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
-  }); // should redirect with redirect URL set to URL specified by body parameter
+  }); // should redirect with propagated body parameter as redirect URL
   
   it('should redirect with redirect URL and state set to values specified by query parameters', function(done) {
     var store = new SessionStore();
