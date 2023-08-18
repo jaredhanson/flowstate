@@ -81,23 +81,35 @@ setting `res.locals.returnTo` _and_ `res.locals.state`.  The view is expected
 to decorate links with these properties and add them as hidden input to forms,
 in order to propagate state to subsequent requests.
 
-For example, if the above `/login` endpoint were requested with:
+For example, if the above `/login` endpoint is requested with a `return_to`
+parameter:
 
 ```http
 GET /login?return_to=%2Fdashboard  HTTP/1.1
 ```
 
-Then `res.locals.returnTo` would be set to `/dashboard` and made available to
+Then `res.locals.returnTo` will be set to `/dashboard`, making it available to
 the view.
 
-If the above `/login` endpoint were requested with:
+If the `/login` endpoint is requested with _both_ a `return_to` and `state`
+parameter:
+
+```http
+GET /login?return_to=%2Fauthorize%2Fcontinue&state=123  HTTP/1.1
+```
+
+Then `res.locals.returnTo` will be set to `/authorize/contine` and `res.locals.state`
+will be set to `123`, making them available to the view.
+
+If the `/login` endpoint is requested with:
 
 ```http
 GET /login?state=xyz  HTTP/1.1
 ```
 
-Assuming the state was valid and intended for `/login`, `res.locals.state` would
-be set to `xyz` and made available to the view.
+Assuming the state was valid and intended for `/login`, `res.locals.state` will
+be set to `xyz` and made available to the view.  `res.locals.returnTo` will _not_
+be set.
 
 #### Redirect to a Location
 
