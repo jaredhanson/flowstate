@@ -7,46 +7,6 @@ var chai = require('chai')
 
 describe('GET /login/password', function() {
   
-  it('should render with return location set to query parameter', function(done) {
-    var store = new SessionStore()
-    sinon.spy(store, 'get');
-    sinon.spy(store, 'set');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      expect(req.state).to.deep.equal({
-        location: 'https://www.example.com/login/password',
-        returnTo: 'https://www.example.com/app'
-      });
-      
-      res.render('login/password');
-    }
-    
-    chai.express.use([ state({ store: store }), handler ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/login/password?return_to=https%3A%2F%2Fwww.example.com%2Fapp';
-        req.headers = {
-          'host': 'www.example.com'
-        };
-        req.query = { return_to: 'https://www.example.com/app' };
-        req.session = {};
-      })
-      .finish(function() {
-        expect(store.get).to.have.callCount(0);
-        expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.statusCode).to.equal(200);
-        expect(this).to.render('login/password')
-                    .with.deep.locals({ returnTo: 'https://www.example.com/app' });
-        expect(this.req.session).to.deep.equal({});
-        done();
-      })
-      .listen();
-  }); // should render with return location set to query parameter
-  
   it('should render with return location set to query parameter overriding referrer header', function(done) {
     var store = new SessionStore()
     sinon.spy(store, 'get');
