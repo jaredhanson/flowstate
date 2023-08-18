@@ -95,11 +95,11 @@ If the `/login` endpoint is requested with _both_ a `return_to` and `state`
 parameter:
 
 ```http
-GET /login?return_to=%2Fauthorize%2Fcontinue&state=123  HTTP/1.1
+GET /login?return_to=%2Fauthorize%2Fcontinue&state=xyz  HTTP/1.1
 ```
 
 Then `res.locals.returnTo` will be set to `/authorize/contine` and `res.locals.state`
-will be set to `123`, making them available to the view.
+will be set to `xyz`, making them available to the view.
 
 If the `/login` endpoint is requested with:
 
@@ -130,13 +130,13 @@ app.post('/login', flowstate(), authenticate(), function(req, res, next) {
 
 ```
 
-When a response redirects the browser, if the current state is complete, `return_to`
-and `state` parameters, if any, will be propagated decorating the target URL.
-If the current state is not complete, modifications will be saved and the
+When a response redirects the browser, if the current state is complete, any
+`return_to` and `state` parameters will be propagated by decorating the target
+URL.  If the current state is not complete, modifications will be saved and the
 redirect will be decorated with the current state's handle.
 
-For example, if the above `/login` endpoint is requested with a `return_to`
-parameter:
+For example, if the above `/login` endpoint is requested with a `return_to` and
+`state` parameter:
 
 ```http
 POST /login HTTP/1.1
@@ -144,16 +144,16 @@ Host: www.example.com
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 27
 
-username=alice&password=letmein&return_to=%2Fdashboard
+username=alice&password=letmein&return_to=%2Fauthorize%2Fcontinue&state=xyz
 ```
 
-Then the user will be redirected to `/stepup?return_to=%2Fdashboard`, assuming
-the password is valid and MFA is required.
+Then the user will be redirected to `/stepup?return_to=%2Fauthorize%2Fcontinue&state=xyz`,
+assuming the password is valid and MFA is required.
 
 If the password is not valid, an uninitialized state is set at `req.state` that
-preserves the `return_to` parameter.  It is then saved and the user is redirected
-to `/login?state=Zwu8y84x` (where `'Zwu8y84x'` is the handle of the newly saved
-state).  The state data stored in the session is as follows:
+preserves the `return_to` and `state` parameters.  It is then saved and the user
+is redirected to `/login?state=Zwu8y84x` (where `'Zwu8y84x'` is the handle of
+the newly saved state).  The state data stored in the session is as follows:
 
 ```json
 {
@@ -162,11 +162,13 @@ state).  The state data stored in the session is as follows:
       location: 'https://www.example.com/login',
       message: [ 'Invalid username or password.' ],
       failureCount: 1,
-      returnTo: '/dashboard'
+      returnTo: '/authorize/continue',
+      state: 'xyz'
     }
   }
 }
 ```
+
 
 
 
