@@ -45,7 +45,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render without state
   
-  it('should render with redirect URL set to referrer', function(done) {
+  it('should render with propagated referrer header as redirect URL', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -83,9 +83,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to referrer
+  }); // should render with propagated referrer header as redirect URL
   
-  it('should render with redirect URL set to URL specified by query parameter', function(done) {
+  it('should render with propagated query parameter as redirect URL', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -123,9 +123,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to URL specified by query parameter
+  }); // should render with propagated query parameter as redirect URL
   
-  it('should render with redirect URL set to URL specified by body parameter', function(done) {
+  it('should render with propagated body parameter as redirect URL', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -163,9 +163,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to URL specified by query parameter
+  }); // should render with propagated body parameter as redirect URL
   
-  it('should render with redirect URL set to URL with state specified by query parameters', function(done) {
+  it('should render with propagated query parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -220,9 +220,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to URL with state specified by query parameters
+  }); // should render with propagated query parameters as redirect URL with state
   
-  it('should render with redirect URL set to URL with state specified by body parameters', function(done) {
+  it('should render with with propagated body parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -277,9 +277,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to URL with state specified by body parameters
+  }); // should render with with propagated body parameters as redirect URL with state
   
-  it('should render with redirect URL set to URL with state specified by body parameters when that state is not found in state store', function(done) {
+  it('should render with with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -318,7 +318,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL set to URL with state specified by body parameters when that state is not found in state store
+  }); // should render with with propagated body parameters as redirect URL with state when that state is not found in state store
   
   it('should render with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
