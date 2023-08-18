@@ -222,7 +222,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with propagated query parameters as redirect URL with state
   
-  it('should render with with propagated body parameters as redirect URL with state', function(done) {
+  it('should render with propagated body parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -277,9 +277,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with with propagated body parameters as redirect URL with state
+  }); // should render with propagated body parameters as redirect URL with state
   
-  it('should render with with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
+  it('should render with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -318,7 +318,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with with propagated body parameters as redirect URL with state when that state is not found in state store
+  }); // should render with propagated body parameters as redirect URL with state when that state is not found in state store
   
   it('should render with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
@@ -401,6 +401,9 @@ describe('ServerResponse#render', function() {
   
   it('should render with current state after saving modifications when processing a non-mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.locals.message = req.state.messages[0];
@@ -431,7 +434,7 @@ describe('ServerResponse#render', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -459,11 +462,16 @@ describe('ServerResponse#render', function() {
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/dashboard/cb',
+              redirectURI: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
