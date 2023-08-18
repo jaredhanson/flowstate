@@ -52,14 +52,15 @@ at `req.state` is referred to as the "current state".
 If state is not loaded, an "uninitialized" state will be set at `req.state`.  A
 state is uninitialized when it is new but not modified.  If the request contains
 a `return_to` and optional `state` parameter, those will be preserved in the
-uninitialized state as the location to redirect the user to when the current
-state has been completely processed.
+uninitialized state as the location to return the user to when the current state
+has been completely processed.
 
 When a response is sent, any modifications to the current state will be saved
 if the state is not complete.  If the state is complete, any persisted state
 will be removed.  Note that an uninitialized state will never be saved since it
-is not modified; the location to redirect to can be preserved by propagating the
-`return_to` and optional `state` parameters on subsequent requests.
+is not modified.  However, the location to return the user to will be preserved
+by propagating the `return_to` and optional `state` parameters on subsequent
+requests.
 
 #### Render a View
 
@@ -68,18 +69,17 @@ app.get('/login', flowstate(), function(req, res, next) {
   var msgs = req.state.messages || [];
   res.locals.messages = msgs;
   res.locals.hasMessages = !! msgs.length;
-  req.state.messages = [];
   res.render('login');
 });
 
 ```
 
-When a response is sent by rendering a view, if the current state has not been
-completed, `res.locals.state` will be set to the current state's handle.  If it
-has been completed, `res.local.returnTo` will be set, along with `res.locals.state`
-if needed, as the location to eventually redirect the user.  The view is expected
-to decorate links with these properties and add them to forms, in order to
-propagate state to subsequent requests.
+When a response is sent by rendering a view, if there is state associated with
+the request, `res.locals.state` will be set to the current state's handle.
+Otherwise the `return_to` and `state` parameters, if any, will be propagated by
+setting `res.locals.returnTo` _and_ `res.locals.state`.  The view is expected
+to decorate links with these properties and add them as hidden input to forms,
+in order to propagate state to subsequent requests.
 
 For example, if the above `/login` endpoint were requested with:
 
