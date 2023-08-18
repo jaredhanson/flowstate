@@ -130,6 +130,46 @@ app.post('/login', flowstate(), authenticate(), function(req, res, next) {
 
 ```
 
+When a response redirects the browser, if the current state is complete, `return_to`
+and `state` parameters, if any, will be propagated decorating the target URL.
+If the current state is not complete, modifications will be saved and the
+redirect will be decorated with the current state's handle.
+
+For example, if the above `/login` endpoint is requested with a `return_to`
+parameter:
+
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 27
+
+username=alice&password=letmein&return_to=%2Fdashboard
+```
+
+Then the user will be redirected to `/stepup?return_to=%2Fdashboard`, assuming
+the password is valid and MFA is required.
+
+If the password is not valid, an uninitialized state is set at `req.state` that
+preserves the `return_to` parameter.  It is then saved and the user is redirected
+to `/login?state=Zwu8y84x` (where `'Zwu8y84x'` is the handle of the newly saved
+state).  The state data stored in the session is as follows:
+
+```json
+{
+  state: {
+    'Zwu8y84x': {
+      location: 'https://www.example.com/login',
+      message: [ 'Invalid username or password.' ],
+      failureCount: 1,
+      returnTo: '/dashboard'
+    }
+  }
+}
+```
+
+
+
 
 
 ## Authors
