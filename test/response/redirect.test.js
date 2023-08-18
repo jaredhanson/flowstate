@@ -322,6 +322,9 @@ describe('ServerResponse#redirect', function() {
   
   it('should redirect with current URL and state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.redirect('/captcha')
@@ -380,6 +383,11 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -387,9 +395,12 @@ describe('ServerResponse#redirect', function() {
   
   it('should redirect with current URL and state after saving modifications when processing a non-mutating request', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      req.state.botRisk = 0.82;
+      req.state.riskScore = 0.82;
       res.redirect('/captcha')
     }
   
@@ -426,7 +437,7 @@ describe('ServerResponse#redirect', function() {
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
           failureCount: 1,
-          botRisk: 0.82,
+          riskScore: 0.82,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
@@ -436,7 +447,7 @@ describe('ServerResponse#redirect', function() {
               location: 'https://www.example.com/login',
               messages: [ 'Invalid username or password.' ],
               failureCount: 1,
-              botRisk: 0.82,
+              riskScore: 0.82,
               returnTo: 'https://www.example.com/authorize/continue',
               state: '123'
             },
@@ -448,6 +459,11 @@ describe('ServerResponse#redirect', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
