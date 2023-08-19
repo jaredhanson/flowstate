@@ -183,9 +183,12 @@ Content-Type: application/x-www-form-urlencoded
 username=alice&password=letmeinnow&state=Zwu8y84x
 ```
 
-This requests the `POST /login` route again.  If another invalid password is
-submitted, the cycle of rendering the login view and prompting for the password
-will repeat, with the `failureCount` incremented and saved in state each time.
+This requests the `POST /login` route again, and this time the route will load
+the state.  If another invalid password is submitted, the cycle of rendering the
+login view and prompting the user for a password will repeat, with the
+`failureCount` incremented and saved each time.
+
+#### Resume State
 
 ## Authors
 
