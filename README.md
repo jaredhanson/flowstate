@@ -168,10 +168,20 @@ the newly saved state).  The state data stored in the session is as follows:
 }
 ```
 
+This redirect will cause the browser to request the `GET /login` route above.
+Since the request is made with a `state=Zwu8y84x` query parameter, the route will
+load the state and make the handle (as well as messages) available to the view.
+The view must add the handle to the login form as a hidden input field named
+`state`.  When submitted, the browser will then make a request with that `state`
+parameter:
 
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
 
-
-
+username=alice&password=letmeinnow&state=Zwu8y84x
+```
 
 ## Authors
 
