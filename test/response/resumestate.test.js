@@ -112,6 +112,48 @@ describe('ServerResponse#resumeState', function() {
       .listen();
   }); // should redirect to body parameters as redirect URL with state
   
+  it('should redirect with redirect URL after completing current state when processing a non-mutating request', function(done) {
+    var store = new SessionStore();
+  
+    function handler(req, res, next) {
+      res.resumeState(next);
+    }
+  
+    function home(req, res, next) {
+      res.redirect('/home')
+    }
+  
+    chai.express.use([ state({ store: store }), handler, home ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+        req.headers = {
+          'host': 'client.example.com'
+        };
+        req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['af0ifjsldkj'] = {
+          location: 'https://client.example.com/cb',
+          provider: 'http://server.example.com',
+          returnTo: 'https://client.example.com/'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://client.example.com/');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://client.example.com/cb',
+          provider: 'http://server.example.com',
+          returnTo: 'https://client.example.com/'
+        });
+        expect(this.req.session).to.deep.equal({});
+        done();
+      })
+      .listen();
+  }); // should redirect with redirect URL after completing current state when processing a non-mutating request
+  
   it('should yield arguments by encoding them as query parameters to redirect URL', function(done) {
     var store = new SessionStore();
   
@@ -163,47 +205,5 @@ describe('ServerResponse#resumeState', function() {
       })
       .listen();
   }); // should yield arguments by encoding them as query parameters to redirect URL
-  
-  it('should redirect to URL to return to', function(done) {
-    var store = new SessionStore();
-  
-    function handler(req, res, next) {
-      res.resumeState(next);
-    }
-  
-    function home(req, res, next) {
-      res.redirect('/home')
-    }
-  
-    chai.express.use([ state({ store: store }), handler, home ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
-        req.headers = {
-          'host': 'client.example.com'
-        };
-        req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
-        req.session = {};
-        req.session.state = {};
-        req.session.state['af0ifjsldkj'] = {
-          location: 'https://client.example.com/cb',
-          provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
-        };
-      })
-      .finish(function() {
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://client.example.com/');
-        expect(this.req.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
-          provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
-        });
-        expect(this.req.session).to.deep.equal({});
-        done();
-      })
-      .listen();
-  }); // should redirect to URL to return to
   
 });
