@@ -343,4 +343,73 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should redirect within callback after saving pushed state that redirects to URL with state specified as query parameters
   
+  it('should redirect within callback after saving pushed state with explicit handle that redirects to URL with state specified as query parameters', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    function handler(req, res, next) {
+      req.pushState({
+        provider: 'https://server.example.com'
+      }, 'https://www.example.com/cb', { handle: 'oauth_xyz' }, function(err, h) {
+        if (err) { return next(err); }
+        expect(h).to.equal('oauth_xyz');
+        res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcb&state=' + h);
+      });
+    }
+  
+    chai.express.use([ state({ store: store, genh: function() { return 'xyz' } }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login/federated?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
+        };
+        req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://client.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcb&state=oauth_xyz');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/login/federated',
+          returnTo: 'https://www.example.com/authorize/continue',
+          state: '123'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            'oauth_xyz': {
+              location: 'https://www.example.com/cb',
+              provider: 'https://server.example.com',
+              returnTo: 'https://www.example.com/authorize/continue',
+              state: '123'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://client.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should redirect within callback after saving pushed state with explicit handle that redirects to URL with state specified as query parameters
+  
 });
