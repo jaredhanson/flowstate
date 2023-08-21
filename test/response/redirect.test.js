@@ -970,4 +970,42 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and state when unsuccessfully processing a mutating request
   
+  it('should ignore invalid state parameter', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    function handler(req, res, next) {
+      res.redirect('/home')
+    }
+  
+    chai.express.use([ state({ store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/';
+        req.headers = {
+          'host': 'www.example.com'
+        };
+        req.query = { state: 'xxx' };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('/home');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/'
+        });
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should ignore invalid state parameter
+  
 });
