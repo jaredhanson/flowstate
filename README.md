@@ -98,7 +98,7 @@ parameter:
 GET /login?return_to=%2Fauthorize%2Fcontinue&state=xyz  HTTP/1.1
 ```
 
-Then `res.locals.returnTo` will be set to `/authorize/contine` and `res.locals.state`
+Then `res.locals.returnTo` will be set to `/authorize/continue` and `res.locals.state`
 will be set to `xyz`, making them available to the view.
 
 If the `/login` endpoint is requested with:
