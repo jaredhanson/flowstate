@@ -154,10 +154,5 @@ describe('GET /oauth2/redirect', function() {
       })
       .listen();
   }); // should complete state and then return to location
-  
-  // TODO: Test case without returnTo
-  
-  // TODO: Test case for popping return data into state and/or query params
-  //       (for example, when a session is not established, but the return to page needs info)
 
 }); // redirect back from OAuth 2.0 authorization server
