@@ -285,6 +285,7 @@ describe('IncomingMessage#pushState', function() {
         provider: 'https://server.example.com'
       }, 'https://www.example.com/cb', function(err, h) {
         if (err) { return next(err); }
+        expect(h).to.equal('xyz');
         res.redirect('https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcb&state=' + h);
       });
     }
