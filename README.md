@@ -77,9 +77,9 @@ app.get('/login', flowstate(), function(req, res, next) {
 When a response is sent by rendering a view, if there is state associated with
 the request, `res.locals.state` will be set to the current state's handle.
 Otherwise the `return_to` and `state` parameters, if any, will be propagated by
-setting `res.locals.returnTo` _and_ `res.locals.state`.  The view is expected
-to decorate links with these properties and add them as hidden input to forms,
-in order to propagate state to subsequent requests.
+setting `res.locals.returnTo` and `res.locals.state`.  The view is expected to
+decorate links with these properties and add them as hidden input to forms, in
+order to propagate state to subsequent requests.
 
 For example, if the above `/login` endpoint is requested with a `return_to`
 parameter:
@@ -91,7 +91,7 @@ GET /login?return_to=%2Fdashboard  HTTP/1.1
 Then `res.locals.returnTo` will be set to `/dashboard`, making it available to
 the view.
 
-If the `/login` endpoint is requested with _both_ a `return_to` and `state`
+If the `/login` endpoint is requested with both a `return_to` and `state`
 parameter:
 
 ```http
@@ -183,12 +183,32 @@ Content-Type: application/x-www-form-urlencoded
 username=alice&password=letmeinnow&state=Zwu8y84x
 ```
 
-This requests the `POST /login` route again, and this time the route will load
-the state.  If another invalid password is submitted, the cycle of rendering the
-login view and prompting the user for a password will repeat, with the
+This time, the `POST /login` route will load the state.  If the password is
+valid and MFA is required will be redirected to `/stepup?return_to=%2Fauthorize%2Fcontinue&state=xyz`,
+as before.  This is because the original `return_to` and `state` parameters were
+preserved in the loaded state object.
+
+If another invalid password is submitted, the cycle of redirecting, rendering
+the login view, and prompting the user for a password will repeat, with the
 `failureCount` incremented and saved each time.
 
 #### Resume State
+
+```
+app.post('/login', flowstate(), authenticate(), function(req, res, next) {
+  if (mfaRequired(req.user)) {
+    return res.redirect('/stepup');
+  }
+  res.resumeState(next);
+}, function(req, res, next) {
+  res.redirect('/');
+}, function(err, req, res, next) {
+  // ...
+});
+
+```
+
+At some point during a flow, processing of a state will be complete and ...
 
 ## Authors
 
