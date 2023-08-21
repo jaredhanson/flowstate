@@ -227,7 +227,7 @@ POST /login HTTP/1.1
 Host: www.example.com
 Content-Type: application/x-www-form-urlencoded
 
-username=alice&password=letmein&state=Zwu8y84x
+username=alice&password=letmeinnow&state=Zwu8y84x
 ```
 
 Then the user will be redirected to `/authorize/continue&state=xyz`,
