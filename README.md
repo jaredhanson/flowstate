@@ -184,9 +184,10 @@ username=alice&password=letmeinnow&state=Zwu8y84x
 ```
 
 This time, the `POST /login` route will load the state.  If the password is
-valid and MFA is required will be redirected to `/stepup?return_to=%2Fauthorize%2Fcontinue&state=xyz`,
-as before.  This is because the original `return_to` and `state` parameters were
-preserved in the loaded state object.
+valid and MFA is required, the user will be will be redirected to
+`/stepup?return_to=%2Fauthorize%2Fcontinue&state=xyz`, as before.  This is
+because the original `return_to` and `state` parameters were preserved in the
+loaded state object.
 
 If another invalid password is submitted, the cycle of redirecting, rendering
 the login view, and prompting the user for a password will repeat, with the
