@@ -9,6 +9,9 @@ describe('ServerResponse#resumeState', function() {
   
   it('should proceed to next middleware without state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.resumeState(next);
@@ -36,6 +39,11 @@ describe('ServerResponse#resumeState', function() {
           location: 'https://www.example.com/login'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -43,6 +51,9 @@ describe('ServerResponse#resumeState', function() {
   
   it('should redirect to body parameter as redirect URL', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.resumeState(next);
@@ -71,6 +82,11 @@ describe('ServerResponse#resumeState', function() {
           returnTo: 'https://www.example.com/bienvenido'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -78,6 +94,9 @@ describe('ServerResponse#resumeState', function() {
   
   it('should redirect to body parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.resumeState(next);
@@ -107,6 +126,11 @@ describe('ServerResponse#resumeState', function() {
           state: '123'
         });
         expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
@@ -266,6 +290,9 @@ describe('ServerResponse#resumeState', function() {
   
   it('should yield arguments by encoding them as query parameters to redirect URL', function(done) {
     var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
       res.resumeState({ authuser: '1' }, next);
@@ -311,6 +338,11 @@ describe('ServerResponse#resumeState', function() {
             }
           }
         });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
         done();
       })
       .listen();
