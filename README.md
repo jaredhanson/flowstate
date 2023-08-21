@@ -209,7 +209,53 @@ app.post('/login', flowstate(), authenticate(), function(req, res, next) {
 
 ```
 
-At some point during a flow, processing of a state will be complete and ...
+When a user has completed a given flow, they should be returned to the location
+they were navigating prior to entering the flow.  This is accomplished by
+calling `resumeState()`, a function added to the response by this middleware.
+
+If a current state was loaded, `resumeState()` will return the user to the
+preserved `return_to` and `state` parameters, if any.  Otherwise, it will return
+the user to the `return_to` and `state` parameters carried by the request.  If
+neither of these exist, `resumeState()` will call a callback, which will
+typically be `next` to invoke the next middleware.  This middleware can then
+redirect the user to a default location.
+
+For example, when `POST /login` is requested with a `state` parameter:
+
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+
+username=alice&password=letmein&state=Zwu8y84x
+```
+
+Then the user will be redirected to `/authorize/continue&state=xyz`,
+assuming the password is valid and MFA is not required.
+
+If the `/login` endpoint is requested with a `return_to` parameter:
+
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+
+username=alice&password=letmein&return_to=%2Fdashboard
+```
+
+Then the user will be redirected to `/dashboard`, after logging in.
+
+If the `/login` endpoint is requested without any state-related parameters:
+
+```http
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+
+username=alice&password=letmein
+```
+
+Then the user will be redirected to `/` by the next middleware in the stack.
 
 ## Authors
 
