@@ -157,6 +157,8 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should redirect after saving pushed state that redirects to URL specified as query parameter
   
+  // TODO: pull this out into state initiation tests?
+  // TODO: ensure relative and aboslute urls are being handled correctly elsewhere.
   it('should redirect after saving pushed state that redirects to relative URL specified as query parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
