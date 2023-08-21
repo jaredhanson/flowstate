@@ -143,7 +143,6 @@ describe('ServerResponse#resumeState', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        // FIXME: this shouldn't have return_to in it
         expect(this.getHeader('Location')).to.equal('https://www.example.com/authorize/continue?authuser=1&state=123');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/session/select',
