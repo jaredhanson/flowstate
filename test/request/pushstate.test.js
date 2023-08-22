@@ -474,7 +474,7 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should redirect within callback after saving pushed state with explicit handle that redirects to URL with state specified as query parameters
   
-  it('should external something', function(done) {
+  it('should push state linked to external location', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -527,6 +527,6 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should external something
+  }); // should push state linked to external location
   
 });
