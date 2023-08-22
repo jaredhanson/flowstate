@@ -286,7 +286,7 @@ describe('ServerResponse#redirect', function() {
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/stepup')
+      res.redirect('/stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -320,7 +320,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL and state that propagates body parameters when that state is not found in state store
   
-  it('should redirect with current URL and modified initial state when processing a non-mutating request', function(done) {
+  it('should redirect with current URL and saved initial state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -328,7 +328,7 @@ describe('ServerResponse#redirect', function() {
   
     function handler(req, res, next) {
       req.state.riskScore = 0.82;
-      res.redirect('/captcha')
+      res.redirect('/captcha');
     }
   
     chai.express.use([ state({ store: store, genh: function() { return '456' } }), handler ])
@@ -383,7 +383,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current URL and modified initial state when processing a non-mutating request
+  }); // should redirect with current URL and saved initial state when processing a non-mutating request
   
   it('should redirect with current URL and state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
