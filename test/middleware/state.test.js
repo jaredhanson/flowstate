@@ -34,7 +34,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize empty state
   
-  it('should initialize state that will eventually redirect to referrer', function(done) {
+  it('should initialize state that will eventually return to referrer', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -61,9 +61,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to referrer
+  }); // should initialize state that will eventually return to referrer
   
-  it('should initialize state that will eventually redirect to URL specified by query parameter', function(done) {
+  it('should initialize state that will eventually return to URL specified by query parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -90,9 +90,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL specified by query parameter
+  }); // should initialize state that will eventually return to URL specified by query parameter
   
-  it('should initialize state that will eventually redirect to URL specified by body parameter', function(done) {
+  it('should initialize state that will eventually return to URL specified by body parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -119,19 +119,19 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL specified by body parameter
+  }); // should initialize state that will eventually return to URL specified by body parameter
   
-  it('should initialize state that will eventually redirect to URL with state specified by query parameter', function(done) {
+  it('should initialize state that will eventually return to URL with state specified by query parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=00000000';
+        req.url = '/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=123';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/dashboard'
+          'referer': 'https://www.example.com/'
         };
         req.query = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
@@ -139,7 +139,7 @@ describe('middleware/state', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -156,9 +156,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL with state specified by query parameter
+  }); // should initialize state that will eventually return to URL with state specified by query parameter
   
-  it('should initialize state that will eventually redirect to URL with state specified by body parameter', function(done) {
+  it('should initialize state that will eventually return to URL with state specified by body parameter', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -176,7 +176,7 @@ describe('middleware/state', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/dashboard/cb',
+          redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -193,9 +193,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL with state specified by body parameter
+  }); // should initialize state that will eventually return to URL with state specified by body parameter
   
-  it('should initialize state that will eventually redirect to URL with state specified by body parameter when that state is not found in state store', function(done) {
+  it('should initialize state that will eventually return to URL with state specified by body parameter when that state is not found in state store', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ store: store }) ])
@@ -207,7 +207,7 @@ describe('middleware/state', function() {
           'host': 'www.example.com',
           'referer': 'https://www.example.com/login'
         };
-        req.body = { return_to: 'https://www.example.com/authorize/continue', state: 'xxx' };
+        req.body = { return_to: 'https://www.example.com/authorize/continue', state: '123' };
         req.session = {};
       })
       .next(function(err, req, res) {
@@ -217,7 +217,7 @@ describe('middleware/state', function() {
         expect(req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           returnTo: 'https://www.example.com/authorize/continue',
-          state: 'xxx'
+          state: '123'
         });
         expect(req.stateStore).to.equal(store);
         done();
