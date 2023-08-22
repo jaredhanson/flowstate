@@ -51,7 +51,7 @@ at `req.state` is referred to as the "current state".
 
 If state is not loaded, an "uninitialized" state will be set at `req.state`.  A
 state is uninitialized when it is new but not modified.  If the request contains
-a `return_to` and optional `state` parameter, those will be captured in the
+a `return_to` and optional `state` parameter, those will be captured by the
 uninitialized state as the location to return the user to when the current state
 has been completely processed.
 
@@ -186,8 +186,8 @@ username=alice&password=letmeinnow&state=Zwu8y84x
 This time, the `POST /login` route will load the state.  If the password is
 valid and MFA is required, the user will be will be redirected to
 `/stepup?return_to=%2Fauthorize%2Fcontinue&state=xyz`, as before.  This is
-because the original `return_to` and `state` parameters were preserved in the
-loaded state object.
+because the original `return_to` and `state` parameters were captured by the
+loaded state object, and are propagated by decorating the redirect location.
 
 If another invalid password is submitted, the cycle of redirecting, rendering
 the login view, and prompting the user for a password will repeat, with the
