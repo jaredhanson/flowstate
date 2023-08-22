@@ -503,7 +503,6 @@ describe('IncomingMessage#pushState', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        // FIXME: this shouldn't have a return_to
         expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=xyz');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
