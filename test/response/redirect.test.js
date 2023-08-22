@@ -690,7 +690,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with captured URL and state after completing current state when processing a mutating request
   
-  it('should redirect with modified initial state when unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with saved initial state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -754,9 +754,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state when unsuccessfully processing a mutating request
+  }); // should redirect with saved initial state when unsuccessfully processing a mutating request
   
-  it('should redirect with current state when unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with loaded state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -822,7 +822,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state when unsuccessfully processing a mutating request
+  }); // should redirect with loaded state when unsuccessfully processing a mutating request
   
   it('should redirect with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
