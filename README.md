@@ -5,7 +5,7 @@ a web application.  This allows for implementing flows which are sequences of
 requests and responses that, taken together, culminate in a desired outcome.
 
 By default, this state is kept in the session.  The session itself stores state
-by setting a cookie which applies to all requests to an application.  This
+by setting a cookie which applies to _all_ requests to an application.  This
 middleware isolates that state so it can be applied to an individual sequence of
 requests.  To do this, state is propagated in `return_to` and `state` parameters
 across requests.  This middleware does this automatically whenever possible,
@@ -104,12 +104,12 @@ will be set to `xyz`, making them available to the view.
 If the `/login` endpoint is requested with:
 
 ```http
-GET /login?state=xyz  HTTP/1.1
+GET /login?state=Zwu8y84x  HTTP/1.1
 ```
 
 Assuming the state was valid and intended for `/login`, `res.locals.state` will
-be set to `xyz` and made available to the view.  `res.locals.returnTo` will _not_
-be set.
+be set to `Zwu8y84x` and made available to the view.  `res.locals.returnTo` will
+_not_ be set.
 
 #### Redirect to a Location
 
@@ -214,7 +214,7 @@ they were navigating prior to entering the flow.  This is accomplished by
 calling `resumeState()`, a function added to the response by this middleware.
 
 If a current state was loaded, `resumeState()` will return the user to the
-preserved `return_to` and `state` parameters, if any.  Otherwise, it will return
+captured `return_to` and `state` parameters, if any.  Otherwise, it will return
 the user to the `return_to` and `state` parameters carried by the request.  If
 neither of these exist, `resumeState()` will call a callback, which will
 typically be `next` to invoke the next middleware.  This middleware can then
