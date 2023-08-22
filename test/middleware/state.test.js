@@ -34,6 +34,34 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize empty state
   
+  it('should initialize empty state due to ignoring invalid state', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.net/'
+        };
+        req.query = { state: 'xxx' };
+        req.session = {};
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.true;
+        expect(req.state).to.deep.equal({
+          location: 'https://www.example.com/login'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should initialize empty state due to ignoring invalid state
+  
   it('should initialize empty state due to ignoring cross-origin referrer', function(done) {
     var store = new SessionStore();
   
