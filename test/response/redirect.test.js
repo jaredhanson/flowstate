@@ -165,14 +165,14 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL that propagates body parameter
   
-  it('should redirect with propagated query parameters as redirect URL with state', function(done) {
+  it('should redirect with redirect URL and state that propagates query parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/login/password')
+      res.redirect('/login/password');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -220,7 +220,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with propagated query parameters as redirect URL with states
+  }); // should redirect with redirect URL and state that propagates query parameters
   
   it('should redirect with propagated body parameters as redirect URL with state', function(done) {
     var store = new SessionStore();
