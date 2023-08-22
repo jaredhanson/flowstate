@@ -824,7 +824,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with loaded state when unsuccessfully processing a mutating request
   
-  it('should redirect with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with loaded state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -894,9 +894,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current state after saving modifications when unsuccessfully processing a mutating request
+  }); // should redirect with loaded state after saving modifications when unsuccessfully processing a mutating request
   
-  it('should redirect with current URL and state when unsuccessfully processing a mutating request', function(done) {
+  it('should redirect with current URL and loaded state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -904,7 +904,7 @@ describe('ServerResponse#redirect', function() {
   
     function handler(req, res, next) {
       req.state.complete(false);
-      res.redirect('/captcha')
+      res.redirect('/captcha');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -922,7 +922,7 @@ describe('ServerResponse#redirect', function() {
         req.session.state['456'] = {
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
-          failureCount: 1,
+          failureCount: 3,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         };
@@ -939,7 +939,7 @@ describe('ServerResponse#redirect', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/login',
           messages: [ 'Invalid username or password.' ],
-          failureCount: 1,
+          failureCount: 3,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         });
@@ -948,7 +948,7 @@ describe('ServerResponse#redirect', function() {
             '456': {
               location: 'https://www.example.com/login',
               messages: [ 'Invalid username or password.' ],
-              failureCount: 1,
+              failureCount: 3,
               returnTo: 'https://www.example.com/authorize/continue',
               state: '123'
             },
@@ -968,7 +968,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current URL and state when unsuccessfully processing a mutating request
+  }); // should redirect with current URL and loaded state when unsuccessfully processing a mutating request
   
   it('should ignore invalid state parameter', function(done) {
     var store = new SessionStore();
