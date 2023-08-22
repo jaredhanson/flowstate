@@ -486,7 +486,7 @@ describe('IncomingMessage#pushState', function() {
         redirectURI: req.query.redirect_uri,
         state: req.query.state
       }, '/authorize/continue');
-      res.redirect('https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcb');
+      res.redirect('/login');
     }
   
     chai.express.use([ state({ external: true, store: store, genh: function() { return 'xyz' } }), handler ])
@@ -504,7 +504,7 @@ describe('IncomingMessage#pushState', function() {
       .finish(function() {
         expect(this.statusCode).to.equal(302);
         // FIXME: this shouldn't have a return_to
-        //expect(this.getHeader('Location')).to.equal('https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fwww.example.com%2Fcb&state=xyz');
+        expect(this.getHeader('Location')).to.equal('/login?return_to=https%3A%2F%2Fwww.example.com%2Fauthorize%2Fcontinue&state=xyz');
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
           returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fwww%2Eexample%2Ecom%2Fcb'
