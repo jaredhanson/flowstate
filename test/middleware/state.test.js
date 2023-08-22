@@ -34,6 +34,34 @@ describe('middleware/state', function() {
       .listen();
   }); // should initialize empty state
   
+  it('should initialize empty state due to ignoring cross-origin referrer', function(done) {
+    var store = new SessionStore();
+  
+    chai.express.use([ state({ store: store }) ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/login';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.net/'
+        };
+        req.query = {};
+        req.session = {};
+      })
+      .next(function(err, req, res) {
+        if (err) { return done(err); }
+        
+        expect(req.state.isNew()).to.be.true;
+        expect(req.state).to.deep.equal({
+          location: 'https://www.example.com/login'
+        });
+        expect(req.stateStore).to.equal(store);
+        done();
+      })
+      .listen();
+  }); // should initialize empty state due to ignoring cross-origin referrer
+  
   it('should initialize state that will eventually return to referrer', function(done) {
     var store = new SessionStore();
   
@@ -303,7 +331,7 @@ describe('middleware/state', function() {
       .listen();
   }); // should load state specified by body parameter when that state is intended for endpoint
   
-  it('should initialize external state that will eventually return to request URL', function(done) {
+  it('should initialize state that will eventually return to URL of external endpoint', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -330,9 +358,9 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize external state that will eventually return to request URL
+  }); // should initialize state that will eventually return to URL of external endpoint
   
-  it('should initialize external state that will eventually return to request URL with state parameter preserved', function(done) {
+  it('should initialize state that will eventually return to URL of external endpoint with state parameter preserved', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
@@ -359,34 +387,6 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize external state that will eventually return to request URL with state parameter preserved
-  
-  it('should initialize empty state due to ignoring cross-origin referrer', function(done) {
-    var store = new SessionStore();
-  
-    chai.express.use([ state({ store: store }) ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/login';
-        req.headers = {
-          'host': 'www.example.com',
-          'referer': 'https://www.example.net/'
-        };
-        req.query = {};
-        req.session = {};
-      })
-      .next(function(err, req, res) {
-        if (err) { return done(err); }
-        
-        expect(req.state.isNew()).to.be.true;
-        expect(req.state).to.deep.equal({
-          location: 'https://www.example.com/login'
-        });
-        expect(req.stateStore).to.equal(store);
-        done();
-      })
-      .listen();
-  }); // should initialize empty state due to ignoring cross-origin referrer
+  }); // should initialize state that will eventually return to URL of external endpoint with state parameter preserved
   
 });
