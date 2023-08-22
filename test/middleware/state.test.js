@@ -223,7 +223,7 @@ describe('middleware/state', function() {
         done();
       })
       .listen();
-  }); // should initialize state that will eventually redirect to URL with state specified by body parameter when that state is not found in state store
+  }); // should initialize state that will eventually return to URL with state specified by body parameter when that state is not found in state store
   
   it('should load state specified by query parameter when that state is intended for endpoint', function(done) {
     var store = new SessionStore();
@@ -303,18 +303,19 @@ describe('middleware/state', function() {
       .listen();
   }); // should load state specified by body parameter when that state is intended for endpoint
   
-  it('should initialize external state to eventually redirect to request URL', function(done) {
+  it('should initialize external state that will eventually return to request URL', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/authorize?client_id=s6BhdRkqt3';
+        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
-          'host': 'www.example.com'
+          'host': 'www.example.com',
+          'referer': 'https://client.example.com/'
         };
-        req.query = { client_id: 's6BhdRkqt3' };
+        req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
       .next(function(err, req, res) {
@@ -323,24 +324,25 @@ describe('middleware/state', function() {
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
-          returnTo: 'https://www.example.com/authorize?client_id=s6BhdRkqt3'
+          returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         expect(req.stateStore).to.equal(store);
         done();
       })
       .listen();
-  }); // should initialize external state to eventually redirect to the request URL
+  }); // should initialize external state that will eventually return to request URL
   
-  it('should initialize external state to eventually redirect to request URL with state parameter preserved', function(done) {
+  it('should initialize external state that will eventually return to request URL with state parameter preserved', function(done) {
     var store = new SessionStore();
   
     chai.express.use([ state({ external: true, store: store }) ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/authorize?client_id=s6BhdRkqt3&state=xyz';
+        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
         req.headers = {
-          'host': 'www.example.com'
+          'host': 'www.example.com',
+          'referer': 'https://client.example.com/'
         };
         req.query = { client_id: 's6BhdRkqt3', state: 'xyz' };
         req.session = {};
@@ -351,13 +353,13 @@ describe('middleware/state', function() {
         expect(req.state.isNew()).to.be.true;
         expect(req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
-          returnTo: 'https://www.example.com/authorize?client_id=s6BhdRkqt3&state=xyz'
+          returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         expect(req.stateStore).to.equal(store);
         done();
       })
       .listen();
-  }); // should initialize external state to eventually redirect to the request URL with state parameter preserved
+  }); // should initialize external state that will eventually return to request URL with state parameter preserved
   
   it('should initialize empty state due to ignoring cross-origin referrer', function(done) {
     var store = new SessionStore();
