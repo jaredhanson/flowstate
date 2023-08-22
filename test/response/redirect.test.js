@@ -45,7 +45,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect without state
   
-  it('should redirect with redirect URL that propagates referrer header', function(done) {
+  it('should redirect with URL that propagates referrer header', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -83,9 +83,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL that propagates referrer header
+  }); // should redirect with URL that propagates referrer header
   
-  it('should redirect with redirect URL that propagates query parameter', function(done) {
+  it('should redirect with URL that propagates query parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -123,9 +123,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL that propagates query parameter
+  }); // should redirect with URL that propagates query parameter
   
-  it('should redirect with redirect URL that propagates body parameter', function(done) {
+  it('should redirect with URL that propagates body parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -163,9 +163,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL that propagates body parameter
+  }); // should redirect with URL that propagates body parameter
   
-  it('should redirect with redirect URL and state that propagates query parameters', function(done) {
+  it('should redirect with URL and state that propagates query parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -220,9 +220,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state that propagates query parameters
+  }); // should redirect with URL and state that propagates query parameters
   
-  it('should redirect with redirect URL and state that propagates body parameters', function(done) {
+  it('should redirect with URL and state that propagates body parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -277,9 +277,9 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state that propagates body parameters
+  }); // should redirect with URL and state that propagates body parameters
   
-  it('should redirect with redirect URL and state that propagates body parameters when that state is not found in state store', function(done) {
+  it('should redirect with URL and state that propagates body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -318,7 +318,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state that propagates body parameters when that state is not found in state store
+  }); // should redirect with URL and state that propagates body parameters when that state is not found in state store
   
   it('should redirect with current URL and saved initial state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
@@ -534,14 +534,14 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and loaded state after saving modifications when processing a non-mutating request
   
-  it('should redirect without state after completing current state when processing a mutating request', function(done) {
+  it('should redirect without state after completing state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/stepup')
+      res.redirect('/stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -577,7 +577,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with out state after completing current state when processing a mutating request
+  }); // should redirect without state after completing state when processing a mutating request
   
   it('should redirect with redirect URL after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
