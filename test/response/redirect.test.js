@@ -579,14 +579,14 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect without state after completing state when processing a mutating request
   
-  it('should redirect with redirect URL after completing current state when processing a mutating request', function(done) {
+  it('should redirect with captured URL after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/stepup')
+      res.redirect('/stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -624,16 +624,16 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL after completing current state when processing a mutating request
+  }); // should redirect with captured URL after completing current state when processing a mutating request
   
-  it('should redirect with redirect URL and state after completing current state when processing a mutating request', function(done) {
+  it('should redirect with captured URL and state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.redirect('/stepup')
+      res.redirect('/stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -688,7 +688,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL and state after completing current state when processing a mutating request
+  }); // should redirect with captured URL and state after completing current state when processing a mutating request
   
   it('should redirect with modified initial state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
