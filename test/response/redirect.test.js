@@ -279,7 +279,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with redirect URL and state that propagates body parameters
   
-  it('should redirect with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
+  it('should redirect with redirect URL and state that propagates body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -318,7 +318,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with propagated body parameters as redirect URL with state when that state is not found in state store
+  }); // should redirect with redirect URL and state that propagates body parameters when that state is not found in state store
   
   it('should redirect with current URL and modified initial state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
