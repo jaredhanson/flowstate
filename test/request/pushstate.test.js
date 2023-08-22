@@ -334,6 +334,8 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should redirect after saving pushed state that redirects to URL propagated from current state when processing a non-mutating request that is optioned as mutating
   
+  // TODO: test case same as above, but propagating state
+  
   it('should redirect within callback after saving pushed state that redirects to URL with state specified as query parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');

@@ -16,7 +16,7 @@ locals and helpers are made available to the view so that `return_to` and
 This middleware emerged from the state management functionality implemented by
 authentication-related packages, in particular [passport-oauth2](https://www.passportjs.org/packages/passport-oauth2/) and
 [oauth2orize](https://www.oauth2orize.org/) which implement OAuth 2.0.  With
-this package, that functionality is made generic so that it can be applied to
+this package, the functionality is made generic so that it can be applied to
 any HTTP endpoint.
 
 <div align="right">
@@ -51,7 +51,7 @@ at `req.state` is referred to as the "current state".
 
 If state is not loaded, an "uninitialized" state will be set at `req.state`.  A
 state is uninitialized when it is new but not modified.  If the request contains
-a `return_to` and optional `state` parameter, those will be preserved in the
+a `return_to` and optional `state` parameter, those will be captured in the
 uninitialized state as the location to return the user to when the current state
 has been completely processed.
 
@@ -150,19 +150,19 @@ Then the user will be redirected to `/stepup?return_to=%2Fauthorize%2Fcontinue&s
 assuming the password is valid and MFA is required.
 
 If the password is not valid, an uninitialized state is set at `req.state` that
-preserves the `return_to` and `state` parameters.  It is then saved and the user
+captures the `return_to` and `state` parameters.  It is then saved and the user
 is redirected to `/login?state=Zwu8y84x` (where `'Zwu8y84x'` is the handle of
 the newly saved state).  The state data stored in the session is as follows:
 
 ```json
 {
-  state: {
-    'Zwu8y84x': {
-      location: 'https://www.example.com/login',
-      message: [ 'Invalid username or password.' ],
-      failureCount: 1,
-      returnTo: '/authorize/continue',
-      state: 'xyz'
+  "state": {
+    "Zwu8y84x": {
+      "location": "https://www.example.com/login",
+      "messages": [ "Invalid username or password." ],
+      "failureCount": 1,
+      "returnTo": "/authorize/continue",
+      "state": "xyz"
     }
   }
 }
