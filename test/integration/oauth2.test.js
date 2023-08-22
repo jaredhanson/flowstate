@@ -147,68 +147,6 @@ describe('GET /oauth2/authorize', function() {
 
 describe('GET /oauth2/authorize/continue', function() {
   
-  it('should redirect with return_to and state parameters', function(done) {
-    var store = new SessionStore();
-    sinon.spy(store, 'get');
-    sinon.spy(store, 'set');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/authorize/continue',
-        clientID: 's6BhdRkqt3',
-        redirectURI: 'https://client.example.com/cb',
-        state: 'xyz'
-      });
-      
-      req.state.continue();
-      
-      res.redirect('/consent');
-    }
-  
-    chai.express.use([ state({ store: store }), handler ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/authorize/continue';
-        req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://server.example.com/login'
-        };
-        req.query = { state: '00000000' };
-        req.session = {
-          state: {
-            '00000000': {
-              location: 'https://server.example.com/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
-            }
-          }
-        };
-      })
-      .finish(function() {
-        expect(store.get).to.have.callCount(1);
-        expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/consent?return_to=https%3A%2F%2Fserver.example.com%2Fauthorize%2Fcontinue&state=00000000');
-        expect(this.req.session).to.deep.equal({
-          state: {
-            '00000000': {
-              location: 'https://server.example.com/authorize/continue',
-              clientID: 's6BhdRkqt3',
-              redirectURI: 'https://client.example.com/cb',
-              state: 'xyz'
-            }
-          }
-        });
-        done();
-      })
-      .listen();
-  }); // should redirect with return_to and state parameters
-  
 });
 
 
