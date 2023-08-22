@@ -402,7 +402,7 @@ describe('ServerResponse#redirect', function() {
         req.url = '/login/password?state=456';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/login'
+          'referer': 'https://www.example.com/login/password'
         };
         req.query = { state: '456' };
         req.session = {};
@@ -458,7 +458,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with current URL and loaded state when processing a non-mutating request
   
-  it('should redirect with current URL and state after saving modifications when processing a non-mutating request', function(done) {
+  it('should redirect with current URL and loaded state after saving modifications when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -466,25 +466,25 @@ describe('ServerResponse#redirect', function() {
   
     function handler(req, res, next) {
       req.state.riskScore = 0.82;
-      res.redirect('/captcha')
+      res.redirect('/captcha');
     }
   
     chai.express.use([ state({ store: store }), handler ])
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'GET';
-        req.url = '/login?state=456';
+        req.url = '/login/password?state=456';
         req.headers = {
           'host': 'www.example.com',
-          'referer': 'https://www.example.com/login'
+          'referer': 'https://www.example.com/login/password'
         };
         req.query = { state: '456' };
         req.session = {};
         req.session.state = {};
         req.session.state['456'] = {
-          location: 'https://www.example.com/login',
+          location: 'https://www.example.com/login/password',
           messages: [ 'Invalid username or password.' ],
-          failureCount: 1,
+          failureCount: 3,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
         };
@@ -497,11 +497,11 @@ describe('ServerResponse#redirect', function() {
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('/captcha?return_to=https%3A%2F%2Fwww.example.com%2Flogin&state=456');
+        expect(this.getHeader('Location')).to.equal('/captcha?return_to=https%3A%2F%2Fwww.example.com%2Flogin%2Fpassword&state=456');
         expect(this.req.state).to.deep.equal({
-          location: 'https://www.example.com/login',
+          location: 'https://www.example.com/login/password',
           messages: [ 'Invalid username or password.' ],
-          failureCount: 1,
+          failureCount: 3,
           riskScore: 0.82,
           returnTo: 'https://www.example.com/authorize/continue',
           state: '123'
@@ -509,9 +509,9 @@ describe('ServerResponse#redirect', function() {
         expect(this.req.session).to.deep.equal({
           state: {
             '456': {
-              location: 'https://www.example.com/login',
+              location: 'https://www.example.com/login/password',
               messages: [ 'Invalid username or password.' ],
-              failureCount: 1,
+              failureCount: 3,
               riskScore: 0.82,
               returnTo: 'https://www.example.com/authorize/continue',
               state: '123'
@@ -532,7 +532,7 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect with current URL and state after saving modifications when processing a non-mutating request
+  }); // should redirect with current URL and loaded state after saving modifications when processing a non-mutating request
   
   it('should redirect without state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
