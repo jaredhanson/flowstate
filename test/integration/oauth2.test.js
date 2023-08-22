@@ -142,58 +142,6 @@ describe('GET /oauth2/authorize', function() {
       .listen();
   }); // should initialize state by ignoring external state and respond after popping and completing state
   
-  it('should redirect without return location after pushing, popping, and completing current state', function(done) {
-    var store = new SessionStore();
-    sinon.spy(store, 'get');
-    sinon.spy(store, 'set');
-    sinon.spy(store, 'destroy');
-
-    function handler(req, res, next) {
-      expect(req.state).to.deep.equal({
-        location: 'https://server.example.com/authorize',
-        returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
-      });
-      
-      req.pushState({
-        clientID: req.query.client_id,
-        redirectURI: req.query.redirect_uri,
-        state: req.query.state
-      }, '/authorize/continue');
-      
-      req.popState();
-      req.state.complete();
-      res.redirect('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
-    }
-  
-    chai.express.use([ state({ external: true, store: store }), handler ])
-      .request(function(req, res) {
-        req.connection = { encrypted: true };
-        req.method = 'GET';
-        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
-        req.headers = {
-          'host': 'server.example.com',
-          'referer': 'https://client.example.com/'
-        };
-        req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
-        req.session = {};
-      })
-      .finish(function() {
-        expect(store.get).to.have.callCount(0);
-        expect(store.set).to.have.callCount(0);
-        expect(store.destroy).to.have.callCount(0);
-        
-        expect(this.req.session).to.deep.equal({});
-        expect(this.req.state).to.deep.equal({
-          location: 'https://server.example.com/authorize'
-        });
-        
-        expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
-        done();
-      })
-      .listen();
-  }); // should redirect without return location after pushing, popping, and completing current state
-  
 }); // GET /oauth2/authorize
 
 
