@@ -203,14 +203,14 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with URL that propagates body parameter
   
-  it('should render with propagated query parameters as redirect URL with state', function(done) {
+  it('should render with URL and state that propagates query parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -258,16 +258,16 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with propagated query parameters as redirect URL with state
+  }); // should render with URL and state that propagates query parameters
   
-  it('should render with propagated body parameters as redirect URL with state', function(done) {
+  it('should render with URL and state that propagates body parameters', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('stepup')
+      res.render('stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -315,16 +315,16 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with propagated body parameters as redirect URL with state
+  }); // should render with URL and state that propagates body parameters
   
-  it('should render with propagated body parameters as redirect URL with state when that state is not found in state store', function(done) {
+  it('should render with URL and state that propagates body parameters when that state is not found in state store', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('stepup')
+      res.render('stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -356,7 +356,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with propagated body parameters as redirect URL with state when that state is not found in state store
+  }); // should render with URL and state that propagates body parameters when that state is not found in state store
   
   it('should render with current state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
