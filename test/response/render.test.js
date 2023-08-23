@@ -671,7 +671,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with captured URL and state after completing current state when processing a mutating request
   
-  it('should render with modified initial state when unsuccessfully processing a mutating request', function(done) {
+  it('should render with saved initial state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -680,7 +680,7 @@ describe('ServerResponse#render', function() {
     function handler(req, res, next) {
       req.state.failureCount = 1;
       res.status(403);
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store, genh: function() { return '456' } }), handler ])
@@ -735,9 +735,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with modified initial state when unsuccessfully processing a mutating request
+  }); // should render with saved initial state when unsuccessfully processing a mutating request
   
-  it('should render with current state when unsuccessfully processing a mutating request', function(done) {
+  it('should render with loaded state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -745,7 +745,7 @@ describe('ServerResponse#render', function() {
   
     function handler(req, res, next) {
       res.status(403);
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -803,9 +803,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state when unsuccessfully processing a mutating request
+  }); // should render with loaded state when unsuccessfully processing a mutating request
   
-  it('should render with current state after saving modifications when unsuccessfully processing a mutating request', function(done) {
+  it('should render with loaded state after saving modifications when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -814,7 +814,7 @@ describe('ServerResponse#render', function() {
     function handler(req, res, next) {
       req.state.failureCount = req.state.failureCount + 1;
       res.status(403);
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -875,6 +875,6 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state after saving modifications when unsuccessfully processing a mutating request
+  }); // should render with loaded state after saving modifications when unsuccessfully processing a mutating request
   
 });
