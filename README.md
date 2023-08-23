@@ -195,7 +195,7 @@ the login view, and prompting the user for a password will repeat, with the
 
 #### Resume State
 
-```
+```js
 app.post('/login', flowstate(), authenticate(), function(req, res, next) {
   if (mfaRequired(req.user)) {
     return res.redirect('/stepup');
