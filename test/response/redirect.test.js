@@ -1027,7 +1027,7 @@ describe('ServerResponse#redirect', function() {
           'host': 'www.example.com',
           'referer': 'https://client.example.com/'
         };
-        req.query = {};
+        req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
         req.session = {};
       })
       .finish(function() {
@@ -1047,5 +1047,47 @@ describe('ServerResponse#redirect', function() {
       })
       .listen();
   }); // should redirect with URL of external endpoint
+  
+  it('should redirect without state after completing state when processing a non-mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+  
+    function handler(req, res, next) {
+      req.state.complete();
+      res.redirect('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
+    }
+  
+    chai.express.use([ state({ external: true, store: store }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://client.example.com/'
+        };
+        req.query = { response_type: 'code', client_id: 's6BhdRkqt3', state: 'xyz', redirect_uri: 'https://client.example.com/cb' };
+        req.session = {};
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        expect(this.getHeader('Location')).to.equal('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
+        // FIXME: this should have returnTo
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/authorize',
+          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+        });
+        expect(this.req.session).to.deep.equal({});
+        
+        expect(store.get).to.have.callCount(0);
+        expect(store.set).to.have.callCount(0);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should redirect without state after completing state when processing a non-mutating request
   
 });
