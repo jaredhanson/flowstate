@@ -358,7 +358,7 @@ describe('ServerResponse#render', function() {
       .listen();
   }); // should render with URL and state that propagates body parameters when that state is not found in state store
   
-  it('should render with current state when processing a non-mutating request', function(done) {
+  it('should render with loaded state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -367,7 +367,7 @@ describe('ServerResponse#render', function() {
     function handler(req, res, next) {
       res.locals.message = req.state.messages[0];
       res.locals.attemptsRemaining = 3 - req.state.failureCount;
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -435,9 +435,9 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state when processing a non-mutating request
+  }); // should render with loaded state when processing a non-mutating request
   
-  it('should render with current state after saving modifications when processing a non-mutating request', function(done) {
+  it('should render with loaded state after saving modifications when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -447,7 +447,7 @@ describe('ServerResponse#render', function() {
       res.locals.message = req.state.messages[0];
       delete req.state.messages;
       res.locals.attemptsRemaining = 3 - req.state.failureCount;
-      res.render('login')
+      res.render('login');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -513,16 +513,16 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with current state after saving modifications when processing a non-mutating request
+  }); // should render with loaded state after saving modifications when processing a non-mutating request
   
-  it('should render without state after completing current state when processing a mutating request', function(done) {
+  it('should render without state after completing state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('stepup')
+      res.render('stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -558,16 +558,16 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render without state after completing current state when processing a mutating request
+  }); // should render without state after completing state when processing a mutating request
   
-  it('should render with redirect URL after completing current state when processing a mutating request', function(done) {
+  it('should render with captured URL after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('stepup')
+      res.render('stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -605,16 +605,16 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL after completing current state when processing a mutating request
+  }); // should render with captured URL after completing current state when processing a mutating request
   
-  it('should render with redirect URL and state after completing current state when processing a mutating request', function(done) {
+  it('should render with captured URL and state after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
     sinon.spy(store, 'destroy');
   
     function handler(req, res, next) {
-      res.render('stepup')
+      res.render('stepup');
     }
   
     chai.express.use([ state({ store: store }), handler ])
@@ -669,7 +669,7 @@ describe('ServerResponse#render', function() {
         done();
       })
       .listen();
-  }); // should render with redirect URL and state after completing current state when processing a mutating request
+  }); // should render with captured URL and state after completing current state when processing a mutating request
   
   it('should render with modified initial state when unsuccessfully processing a mutating request', function(done) {
     var store = new SessionStore();
