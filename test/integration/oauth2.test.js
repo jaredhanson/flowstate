@@ -47,7 +47,7 @@ describe('GET /oauth2/authorize', function() {
         expect(this.req.session).to.deep.equal({});
         expect(this.req.state).to.deep.equal({
           location: 'https://server.example.com/authorize',
-          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         
         expect(this.statusCode).to.equal(302);

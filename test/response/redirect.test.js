@@ -1074,10 +1074,9 @@ describe('ServerResponse#redirect', function() {
       .finish(function() {
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
-        // FIXME: this should have returnTo
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
-          //returnTo: 'https://server.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
+          returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb'
         });
         expect(this.req.session).to.deep.equal({});
         

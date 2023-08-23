@@ -560,12 +560,9 @@ describe('IncomingMessage#pushState', function() {
       .finish(function() {
         expect(this.statusCode).to.equal(302);
         expect(this.getHeader('Location')).to.equal('https://www.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz');
-        
-        // FIXME: why doesn't this have returnTo?
-        // Because it was completed.  Can that be removed?
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/authorize',
-          //returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fwww%2Eexample%2Ecom%2Fcb'
+          returnTo: 'https://www.example.com/authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fwww%2Eexample%2Ecom%2Fcb'
         });
         expect(this.req.session).to.deep.equal({});
         
