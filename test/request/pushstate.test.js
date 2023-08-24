@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('IncomingMessage#pushState', function() {
   
-  it('should redirect after saving pushed state without state', function(done) {
+  it('should save pushed state without captured parameters and redirect to URL with pushed state handle', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -53,9 +53,9 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should redirect after saving pushed state without state
+  }); // should save pushed state without captured parameters and redirect to URL with pushed state handle
   
-  it('should redirect after saving pushed state that redirects to URL specified as referrer header', function(done) {
+  it('should save pushed state that captures referrer header and redirect to URL with pushed state handle', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -104,7 +104,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should redirect after saving pushed state that redirects to URL specified as referrer header
+  }); // should save pushed state that captures referrer header and redirect to URL with pushed state handle
   
   it('should redirect after saving pushed state that redirects to URL specified as query parameter', function(done) {
     var store = new SessionStore();
