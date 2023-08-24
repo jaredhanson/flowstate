@@ -238,7 +238,7 @@ describe('ServerResponse#resumeState', function() {
       .listen();
   }); // should redirect with captured URL and state after completing current state when processing a non-mutating request
   
-  it('should redirect with redirect URL after completing current state when processing a mutating request', function(done) {
+  it('should redirect with captured URL after completing current state when processing a mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -256,26 +256,26 @@ describe('ServerResponse#resumeState', function() {
       .request(function(req, res) {
         req.connection = { encrypted: true };
         req.method = 'POST';
-        req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=af0ifjsldkj';
+        req.url = '/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz';
         req.headers = {
-          'host': 'client.example.com'
+          'host': 'www.example.com'
         };
-        req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'af0ifjsldkj' };
+        req.query = { code: 'SplxlOBeZQQYbYS6WxSbIA', state: 'xyz' };
         req.session = {};
         req.session.state = {};
-        req.session.state['af0ifjsldkj'] = {
-          location: 'https://client.example.com/cb',
+        req.session.state['xyz'] = {
+          location: 'https://www.example.com/cb',
           provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
+          returnTo: 'https://www.example.com/'
         };
       })
       .finish(function() {
         expect(this.statusCode).to.equal(302);
-        expect(this.getHeader('Location')).to.equal('https://client.example.com/');
+        expect(this.getHeader('Location')).to.equal('https://www.example.com/');
         expect(this.req.state).to.deep.equal({
-          location: 'https://client.example.com/cb',
+          location: 'https://www.example.com/cb',
           provider: 'http://server.example.com',
-          returnTo: 'https://client.example.com/'
+          returnTo: 'https://www.example.com/'
         });
         expect(this.req.session).to.deep.equal({});
         
@@ -286,7 +286,7 @@ describe('ServerResponse#resumeState', function() {
         done();
       })
       .listen();
-  }); // should redirect with redirect URL after completing current state when processing a mutating request
+  }); // should redirect with captured URL after completing current state when processing a mutating request
   
   it('should yield arguments by encoding them as query parameters to redirect URL', function(done) {
     var store = new SessionStore();
