@@ -1048,7 +1048,7 @@ describe('ServerResponse#redirect', function() {
       .listen();
   }); // should redirect with URL of external endpoint
   
-  it('should redirect without state after completing state when processing a non-mutating request', function(done) {
+  it('should redirect without URL of external endpoint after completing state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -1087,6 +1087,6 @@ describe('ServerResponse#redirect', function() {
         done();
       })
       .listen();
-  }); // should redirect without state after completing state when processing a non-mutating request
+  }); // should redirect without URL of external endpoint after completing state when processing a non-mutating request
   
 });
