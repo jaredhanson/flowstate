@@ -7,7 +7,7 @@ var chai = require('chai')
 
 describe('IncomingMessage#pushState', function() {
   
-  it('should save pushed state without captured parameters and redirect to URL with pushed state handle', function(done) {
+  it('should save pushed state without captured parameters and redirect to URL with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -53,9 +53,9 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state without captured parameters and redirect to URL with pushed state handle
+  }); // should save pushed state without captured parameters and redirect to URL with pushed state
   
-  it('should save pushed state that captures referrer header and redirect to URL with pushed state handle', function(done) {
+  it('should save pushed state that captures referrer header and redirect to URL with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -104,9 +104,9 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures referrer header and redirect to URL with pushed state handle
+  }); // should save pushed state that captures referrer header and redirect to URL with pushed state
   
-  it('should save pushed state that captures URL from query parameter and redirect to URL with pushed state handle', function(done) {
+  it('should save pushed state that captures URL from query parameter and redirect to URL with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -155,7 +155,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures URL from query parameter and redirect to URL with pushed state handle
+  }); // should save pushed state that captures URL from query parameter and redirect to URL with pushed state
   
   // TODO: pull this out into state initiation tests?
   // TODO: ensure relative and aboslute urls are being handled correctly elsewhere.
@@ -210,7 +210,7 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should redirect after saving pushed state that redirects to relative URL specified as query parameter
   
-  it('should save pushed state that captures URL and state from query parameters and redirect to URL with pushed state handle', function(done) {
+  it('should save pushed state that captures URL and state from query parameters and redirect to URL with pushed state', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -274,7 +274,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures URL and state from query parameters and redirect to URL with pushed state handle
+  }); // should save pushed state that captures URL and state from query parameters and redirect to URL with pushed state
   
   it('should save pushed state that captures URL from current state and redirect to URL with pushed state handle when processing a non-mutating request that is optioned as mutating', function(done) {
     var store = new SessionStore();
@@ -336,7 +336,9 @@ describe('IncomingMessage#pushState', function() {
   
   // TODO: test case same as above, but propagating state
   
-  it('should redirect within callback after saving pushed state that redirects to URL with state specified as query parameters', function(done) {
+  // WIP
+  // should save pushed state that captures URL from query parameter and redirect to URL with pushed state handle
+  it('should save pushed state that captures URL from query parameter and invoke callback that redirects to URL with state already specified', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -403,7 +405,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should redirect within callback after saving pushed state that redirects to URL with state specified as query parameters
+  }); // should save pushed state that captures URL from query parameter and invoke callback that redirects to URL with state already specified
   
   it('should redirect within callback after saving pushed state with explicit handle that redirects to URL with state specified as query parameters', function(done) {
     var store = new SessionStore();
