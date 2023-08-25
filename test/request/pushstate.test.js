@@ -276,6 +276,7 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should save pushed state that captures URL and state from query parameters and redirect to URL with pushed state
   
+  // TODO: review name
   it('should save pushed state that captures URL from current state and redirect to URL with pushed state handle when processing a non-mutating request that is optioned as mutating', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -336,9 +337,7 @@ describe('IncomingMessage#pushState', function() {
   
   // TODO: test case same as above, but propagating state
   
-  // WIP
-  // should save pushed state that captures URL from query parameter and redirect to URL with pushed state handle
-  it('should save pushed state that captures URL from query parameter and invoke callback that redirects to URL with state already specified', function(done) {
+  it('should save pushed state that captures URL and state from query parameters and invoke callback that redirects to URL with state query parameter', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -405,7 +404,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures URL from query parameter and invoke callback that redirects to URL with state already specified
+  }); // should save pushed state that captures URL and state from query parameters and invoke callback that redirects to URL with state query parameter
   
   it('should redirect within callback after saving pushed state with explicit handle that redirects to URL with state specified as query parameters', function(done) {
     var store = new SessionStore();
