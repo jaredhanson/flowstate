@@ -528,4 +528,73 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should push state to location from external endpoint and redirect with pushed URL and state
   
+  // FIXME: review this and fix the state stuff.  maybe remove if it doesn't make sense.
+  it('should save pushed state that captures URL from current state and redirect to cross-origin URL with pushed state when processing a non-mutating request', function(done) {
+    var store = new SessionStore();
+    sinon.spy(store, 'get');
+    sinon.spy(store, 'set');
+    sinon.spy(store, 'destroy');
+    
+    function handler(req, res, next) {
+      req.pushState({
+        resource: 'a'
+      }, '/consent');
+      res.redirect('/consent');
+    }
+  
+    chai.express.use([ state({ store: store, genh: function() { return '456' } }), handler ])
+      .request(function(req, res) {
+        req.connection = { encrypted: true };
+        req.method = 'GET';
+        req.url = '/authorize/continue?state=123';
+        req.headers = {
+          'host': 'www.example.com',
+          'referer': 'https://www.example.com/'
+        };
+        req.query = { state: '123' };
+        req.session = {};
+        req.session.state = {};
+        req.session.state['123'] = {
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/cb',
+          state: 'xyz'
+        };
+      })
+      .finish(function() {
+        expect(this.statusCode).to.equal(302);
+        // FIXME: redirect to continue
+        expect(this.getHeader('Location')).to.equal('/consent?return_to=https%3A%2F%2Fwww.example.com%2Fconsent&state=456');
+        expect(this.req.state).to.deep.equal({
+          location: 'https://www.example.com/authorize/continue',
+          clientID: 's6BhdRkqt3',
+          redirectURI: 'https://www.example.com/cb',
+          state: 'xyz'
+        });
+        expect(this.req.session).to.deep.equal({
+          state: {
+            '456': {
+              location: 'https://www.example.com/consent',
+              resource: 'a',
+              //returnTo: 'https://www.example.com/dashboard',
+              state: 'xyz'
+            },
+            '123': {
+              location: 'https://www.example.com/authorize/continue',
+              clientID: 's6BhdRkqt3',
+              redirectURI: 'https://www.example.com/cb',
+              state: 'xyz'
+            }
+          }
+        });
+        
+        expect(store.get).to.have.callCount(1);
+        expect(store.set).to.have.callCount(1);
+        expect(store.destroy).to.have.callCount(0);
+        
+        done();
+      })
+      .listen();
+  }); // should save pushed state that captures URL from current state and redirect to cross-origin URL with pushed state when processing a non-mutating request that is optioned as mutating
+  
 });
