@@ -336,7 +336,7 @@ describe('IncomingMessage#pushState', function() {
   
   // TODO: test case same as above, but propagating state
   
-  it('should save pushed state that captures URL and state from query parameters and invoke callback that redirects to cross-origin URL with state query parameter', function(done) {
+  it('should save pushed state that captures URL and state from query parameters that redirects to cross-origin URL with state query parameter from within callback', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -403,9 +403,9 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures URL and state from query parameters and invoke callback that redirects to cross-origin URL with state query parameter
+  }); // should save pushed state that captures URL and state from query parameters that redirects to cross-origin URL with state query parameter from within callback
   
-  it('should save pushed state with explicit handle that captures URL and state from query parameters and invoke callback that redirects to cross-origin URL with state query parameter', function(done) {
+  it('should save pushed state with explicit handle that captures URL and state from query parameters that redirects to cross-origin URL with state query parameter from within callback', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -472,7 +472,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state with explicit handle that captures URL and state from query parameters and invoke callback that redirects to cross-origin URL with state query parameter
+  }); // should save pushed state with explicit handle that captures URL and state from query parameters that redirects to cross-origin URL with state query parameter from within callback
   
   it('should push state to location from external endpoint and redirect with pushed URL and state', function(done) {
     var store = new SessionStore();
