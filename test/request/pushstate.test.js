@@ -276,8 +276,7 @@ describe('IncomingMessage#pushState', function() {
       .listen();
   }); // should save pushed state that captures URL and state from query parameters and redirect to cross-origin URL with pushed state
   
-  // TODO: review name
-  it('should save pushed state that captures URL from current state and redirect to URL with pushed state handle when processing a non-mutating request that is optioned as mutating', function(done) {
+  it('should save pushed state that captures URL from current state and redirect to cross-origin URL with pushed state when processing a non-mutating request that is optioned as mutating', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
     sinon.spy(store, 'set');
@@ -333,7 +332,7 @@ describe('IncomingMessage#pushState', function() {
         done();
       })
       .listen();
-  }); // should save pushed state that captures URL from current state and redirect to URL with pushed state handle when processing a non-mutating request that is optioned as mutating
+  }); // should save pushed state that captures URL from current state and redirect to cross-origin URL with pushed state when processing a non-mutating request that is optioned as mutating
   
   // TODO: test case same as above, but propagating state
   
