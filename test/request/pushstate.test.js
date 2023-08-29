@@ -529,6 +529,7 @@ describe('IncomingMessage#pushState', function() {
   }); // should push state to location from external endpoint and redirect with pushed URL and state
   
   // FIXME: review this and fix the state stuff.  maybe remove if it doesn't make sense.
+  // WIP: immediate mode.  good idea or no?
   it('should save pushed state that captures URL from current state and redirect to cross-origin URL with pushed state when processing a non-mutating request', function(done) {
     var store = new SessionStore();
     sinon.spy(store, 'get');
@@ -557,7 +558,9 @@ describe('IncomingMessage#pushState', function() {
         req.session.state['123'] = {
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/cb',
+          returnTo: 'https://www.example.com/cb',
+          // TODO: option here to have this be a returnToKey option
+          //redirectURI: 'https://www.example.com/cb',
           state: 'xyz'
         };
       })
@@ -568,7 +571,7 @@ describe('IncomingMessage#pushState', function() {
         expect(this.req.state).to.deep.equal({
           location: 'https://www.example.com/authorize/continue',
           clientID: 's6BhdRkqt3',
-          redirectURI: 'https://www.example.com/cb',
+          returnTo: 'https://www.example.com/cb',
           state: 'xyz'
         });
         expect(this.req.session).to.deep.equal({
@@ -576,13 +579,15 @@ describe('IncomingMessage#pushState', function() {
             '456': {
               location: 'https://www.example.com/consent',
               resource: 'a',
-              //returnTo: 'https://www.example.com/dashboard',
+              // FIXME: should be /continue
+              returnTo: 'https://www.example.com/cb',
+              // FIXME: should be /123
               state: 'xyz'
             },
             '123': {
               location: 'https://www.example.com/authorize/continue',
               clientID: 's6BhdRkqt3',
-              redirectURI: 'https://www.example.com/cb',
+              returnTo: 'https://www.example.com/cb',
               state: 'xyz'
             }
           }
